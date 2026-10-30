@@ -157,9 +157,17 @@ CREATE TABLE IF NOT EXISTS alternativa(
 
 
 
-CREATE TABLE IF NOT EXISTS  (
+CREATE TABLE IF NOT EXISTS candidato_questao  (
+    questao_id INTEGER NOT NULL REFERENCES(questao.questao_id),
+    candidato_id INTEGER NOT NULL REFERENCES(candidato.candidato_id),
 
+    reposta_questao json
+
+
+    CONSTRAINT pk_candidato_questao PRIMARY KEY(questao_id, candidato_id)
 );
+
+
 
 CREATE TABLE IF NOT EXISTS (
 

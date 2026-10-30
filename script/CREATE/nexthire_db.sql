@@ -148,10 +148,8 @@ CREATE TABLE IF NOT EXISTS alternativa (
 CREATE TABLE IF NOT EXISTS candidato_questao  (
     questao_id INTEGER NOT NULL REFERENCES(questao.questao_id),
     candidato_id INTEGER NOT NULL REFERENCES(candidato.candidato_id),
-
     reposta_questao JSONB NOT NULL,  
-
-
+    
     CONSTRAINT pk_candidato_questao PRIMARY KEY(questao_id, candidato_id)
 );
 
@@ -215,7 +213,29 @@ CREATE TABLE IF NOT EXISTS comentario(
 );
 
  
+CREATE TABLE IF NOT EXISTS avaliacao_habilidade(
+
+habilidade_id INTEGER NOT NULL  REFERENCES(habilidade.habilidade_id),
+candidato_id INTEGER NOT NULL   REFERENCES(candidato.candidato_id),
+entrevista_id INTEGER NOT NULL  REFERENCES(entrevista.entrevista_id),
+nivel_avaliado INT NOT NULL
+
+);
 
 
+CREATE TABLE IF NOT EXISTS informacao_candidato(
+    info_candidato_id SERIAL PRIMARY KEY,
+    telefone varchar(15) NOT NULL,
+    data_nascimento TIMESTAMP(0) NOT NULL,
+    resumo TEXT NOT NULL,
+    candidato_id INTEGER NOT NULL REFERENCES(usuario.usuario_id)
+
+);
+
+CREATE TABLE curriculo_candidato (
+    curriculo_candidato_id SERIAL PRIMARY KEY,
+    curriculo_convertido JSONB NOT NULL,
+    candidato_id INTEGER NOT NULL REFERENCES(usuario.usuario_id)
+)
 
 

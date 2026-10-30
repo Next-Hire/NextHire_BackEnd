@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS anotacao (
 );
 
 
+
 CREATE TABLE IF NOT EXISTS empresa_funcionario (
     empresa_id INTEGER NOT NULL REFERENCES(usuario.usuario_id) NOT NULL,
     funcionario_id INTEGER NOT NULL REFERENCES(usuario.usuario_id) NOT NULL,
@@ -143,36 +144,78 @@ CREATE TABLE IF NOT EXISTS alternativa (
     questao_id INTEGER NOT NULL REFERENCES(questao.questao_id)
 
 );
-
---
-
-
-CREATE TABLE IF NOT EXISTS alternativa(
-    alternativa_id SERIAL PRIMARY KEY,
-    texto TEXT NOT NULL,
-    alternativa_correta BOOLEAN NOT NULL
-    
-);
-
-
-
-
+ 
 CREATE TABLE IF NOT EXISTS candidato_questao  (
     questao_id INTEGER NOT NULL REFERENCES(questao.questao_id),
     candidato_id INTEGER NOT NULL REFERENCES(candidato.candidato_id),
 
-    reposta_questao json
+    reposta_questao JSONB NOT NULL,  
 
 
     CONSTRAINT pk_candidato_questao PRIMARY KEY(questao_id, candidato_id)
 );
 
+CREATE TABLE IF NOT EXISTS processo_seletivo (
+    processo_seletivo_id SERIAL PRIMARY KEY,
+    titulo_processo TEXT NOT NULL,
+    data_abertura TIMESTAMP DEFAULT CLOCK_TIMESTAMP(),
+    data_fechamento TIMESTAMP NOT NULL,
+    status_processo_seletivo BOOLEAN DEFAULT TRUE,
+
+    -- escala_vaga  escala_trabalho_enum NOT NULL,
+    -- modelo_trabalho_vaga modelo_trabalo_enum NOT NULL,
+    -- nivel_prioridade_vaga nivel_prioridade_enum NOT NULL,
+    vaga_id INTEGER NOT NULL REFERENCES(vaga.vaga_id)
+
+    
+);
+
+CREATE TABLE IF NOT EXISTS candidato_processo_seletivo (
+    processo_seletivo_id INTEGER NOT NULL REFERENCES(processo_seletivo.processo_seletivo_id),
+    candidato_id INTEGER NOT NULL REFERENCES(usuario.usuario_id),
+
+    status_relacao status_relacao_enum NOT NULL,
+
+    CONSTRAINT pk_candidato_processo_seletivo PRIMARY KEY(processo_seletivo_id, candidato_id)
+);
 
 
-CREATE TABLE IF NOT EXISTS (
+CREATE TABLE IF NOT EXISTS entrevista (
+    entrevista_id SERIAL PRIMARY KEY NOT NULL,
+    nome_entrevista TEXT NOT NULL,
+    horario_inicio TIMESTAMP DEFAULT CLOCK_TIMESTAMP(),
+    horario_fim TIMESTAMP NOT NULL,
+    status_entrevista BOOLEAN DEFAULT 1,
+
+    processo_seletivo_id INTEGER NOT NULL REFERENCES(processo_seletivo.processo_seletivo_id)
 
 );
 
-CREATE TABLE IF NOT EXISTS (
+CREATE TABLE IF NOT EXISTS entrevistador_entrevista (
+    gestor_id INTEGER NOT NULL REFERENCES(usuario.usuario_id),
+    entrevista_id INTEGER NOT NULL REFERENCES(entrevista.entrevista_id),
 
+    CONSTRAINT pk_entrevistador_entrevista PRIMARY KEY(gestor_id, entrevista_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS entrevistador_entrevista (
+    candidato_id INTEGER NOT NULL REFERENCES(usuario.usuario_id),
+    entrevista_id INTEGER NOT NULL REFERENCES(entrevista.entrevista_id),
+
+    CONSTRAINT pk_entrevistador_entrevista PRIMARY KEY(candidato_id, entrevista_id)
+);
+
+CREATE TABLE IF NOT EXISTS comentario(
+    comentario_id SERIAL PRIMARY KEY,
+    texto TEXT NOT NULL,
+    data_comentario TIMESTAMP DEFAULT CLOCK_TIMESTAMP(),
+    gestor_id INTEGER NOT NULL REFERENCES(usuario.usuario_id),
+    entrevista_id INTEGER NOT NULL REFERENCES(entrevista.entrevista_id)
+);
+
+ 
+
+
+
+

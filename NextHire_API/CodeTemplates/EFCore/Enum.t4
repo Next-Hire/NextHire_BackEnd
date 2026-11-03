@@ -1,0 +1,25 @@
+<#@ template language="C#" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Relational" #>
+<#@ assembly name="Npgsql.EntityFrameworkCore.PostgreSQL" #>
+<#@ parameter type="System.String" name="NamespaceHint" #>
+<#@ parameter type="System.String" name="EnumName" #>
+<#@ parameter type="System.Collections.Generic.List<string>" name="EnumValues" #>
+<#@ import namespace="NpgsqlTypes" #>
+using System;
+using NpgsqlTypes;
+
+namespace <#= NamespaceHint #>.Domain.Enums;
+
+public enum <#= EnumName #>
+{
+<#
+    for (int i = 0; i < EnumValues.Count; i++)
+    {
+        var comma = i < EnumValues.Count - 1 ? "," : "";
+#>
+    <#= EnumValues[i] #><#= comma #>
+<#
+    }
+#>
+}

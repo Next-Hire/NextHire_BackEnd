@@ -1,191 +1,465 @@
-<#@ template hostSpecific="true" #>
-<#@ assembly name="Microsoft.EntityFrameworkCore" #>
-<#@ assembly name="Microsoft.EntityFrameworkCore.Design" #>
-<#@ assembly name="Microsoft.EntityFrameworkCore.Relational" #>
-<#@ assembly name="Npgsql.EntityFrameworkCore.PostgreSQL" #>
-<#@ assembly name="Microsoft.Extensions.DependencyInjection.Abstractions" #>
-<#@ parameter name="Model" type="Microsoft.EntityFrameworkCore.Metadata.IModel" #>
-<#@ parameter name="Options" type="Microsoft.EntityFrameworkCore.Scaffolding.ModelCodeGenerationOptions" #>
-<#@ parameter name="NamespaceHint" type="System.String" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="System.IO" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="Microsoft.EntityFrameworkCore" #>
-<#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
-<#@ import namespace="Microsoft.EntityFrameworkCore.Infrastructure" #>
-<#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
-<#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
-<#@ import namespace="Npgsql.EntityFrameworkCore.PostgreSQL.Metadata" #>
-<#
-    // --- GERADOR DE ARQUIVOS DE ENUM ---
-    try 
-    {
-        var postgresEnums = Model.GetPostgresEnums();
-        if (postgresEnums != null)
+
+    <#@ template hostSpecific="true" #>
+    <#@ assembly name="Microsoft.EntityFrameworkCore" #>
+    <#@ assembly name="Microsoft.EntityFrameworkCore.Design" #>
+    <#@ assembly name="Microsoft.EntityFrameworkCore.Relational" #>
+    <#@ assembly name="Npgsql.EntityFrameworkCore.PostgreSQL" #>
+    <#@ assembly name="Npgsql" #>
+    <#@ assembly name="Microsoft.Extensions.DependencyInjection.Abstractions" #>
+
+    <#@ parameter name="Model" type="Microsoft.EntityFrameworkCore.Metadata.IModel" #>
+    <#@ parameter name="Options" type="Microsoft.EntityFrameworkCore.Scaffolding.ModelCodeGenerationOptions" #>
+    <#@ parameter name="NamespaceHint" type="System.String" #>
+
+    <#@ import namespace="System" #>
+    <#@ import namespace="System.Collections.Generic" #>
+    <#@ import namespace="System.IO" #>
+    <#@ import namespace="System.Linq" #>
+    <#@ import namespace="System.Text" #>
+    <#@ import namespace="System.Text.RegularExpressions" #>
+    <#@ import namespace="Microsoft.EntityFrameworkCore" #>
+    <#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
+    <#@ import namespace="Microsoft.EntityFrameworkCore.Infrastructure" #>
+    <#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
+    <#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
+    <#@ import namespace="Npgsql" #>
+
+    <#
+        var services = (IServiceProvider)Host;
+
+        var code = services.GetRequiredService<ICSharpHelper>();
+
+        var annotationCodeGenerator =
+            services.GetRequiredService<IAnnotationCodeGenerator>();
+
+        // =========================================================
+        // 1. NAMESPACES
+        // =========================================================
+
+        var modelNamespace = !string.IsNullOrWhiteSpace(Options.ModelNamespace)
+            ? Options.ModelNamespace
+            : "Domains";
+
+        var contextNamespace = !string.IsNullOrWhiteSpace(Options.ContextNamespace)
+            ? Options.ContextNamespace
+            : (!string.IsNullOrWhiteSpace(NamespaceHint) ? NamespaceHint : "Contexts");
+
+        // =========================================================
+        // 2. METADADOS DOS ENUMS POSTGRESQL
+        // =========================================================
+
+        var postgresEnums = new List<PgEnumInfo>();
+
+        if (!string.IsNullOrWhiteSpace(Options.ConnectionString))
         {
-            var outputDir = Host.ResolvePath(Options.ModelNamespace ?? "Domains");
-            if (!Directory.Exists(outputDir))
+        using (var connection = new NpgsqlConnection(Options.ConnectionString))
+        {
+            connection.Open();
+
+            var sql = @"
+                SELECT
+                    ns.nspname AS schema_name,
+                    t.typname AS enum_name,
+                    e.enumlabel AS enum_label
+                FROM pg_type t
+                INNER JOIN pg_namespace ns
+                    ON ns.oid = t.typnamespace
+                INNER JOIN pg_enum e
+                    ON e.enumtypid = t.oid
+                WHERE t.typtype = 'e'
+                AND ns.nspname NOT IN (
+                    'pg_catalog',
+                    'information_schema'
+                )
+                ORDER BY
+                    ns.nspname,
+                    t.typname,
+                    e.enumsortorder;
+            ";
+
+            using (var command = new NpgsqlCommand(sql, connection))
+            using (var reader = command.ExecuteReader())
             {
-                Directory.CreateDirectory(outputDir);
-            }
-
-            foreach (var enumType in postgresEnums)
-            {
-                if (enumType == null || string.IsNullOrEmpty(enumType.Name)) continue;
-
-                var enumClassName = string.Join("", enumType.Name.Split('_').Select(s => char.ToUpper(s[0]) + s.Substring(1)));
-                var filePath = Path.Combine(outputDir, enumClassName + ".cs");
-
-                var enumSb = new StringBuilder();
-                enumSb.AppendLine("using System;");
-                enumSb.AppendLine();
-                enumSb.AppendLine($"namespace {Options.ModelNamespace ?? NamespaceHint};");
-                enumSb.AppendLine();
-                enumSb.AppendLine($"public enum {enumClassName}");
-                enumSb.AppendLine("{");
-
-                if (enumType.Labels != null)
+                while (reader.Read())
                 {
-                    for (int i = 0; i < enumType.Labels.Count; i++)
+                    var schema = reader.GetString(0);
+                    var name = reader.GetString(1);
+                    var label = reader.GetString(2);
+
+                    var existing = postgresEnums.FirstOrDefault(
+                        x => x.Schema == schema && x.Name == name
+                    );
+
+                    if (existing == null)
                     {
-                        var label = enumType.Labels[i];
-                        if (string.IsNullOrEmpty(label)) continue;
-                        var pascalLabel = string.Join("", label.Split('_').Select(s => char.ToUpper(s[0]) + s.Substring(1)));
-                        var comma = i < enumType.Labels.Count - 1 ? "," : "";
-                        enumSb.AppendLine($"    {pascalLabel}{comma}");
+                        existing = new PgEnumInfo
+                        {
+                            Schema = schema,
+                            Name = name
+                        };
+
+                        postgresEnums.Add(existing);
                     }
+
+                    existing.Labels.Add(label);
+                }
+            }
+        }
+        }
+
+        // =========================================================
+        // 3. DIRETÓRIO DOS ENUMS
+        // =========================================================
+
+
+        var projectDirectory = string.IsNullOrWhiteSpace(Options.ProjectDir)
+            ? Directory.GetCurrentDirectory()
+            : Options.ProjectDir;
+
+        var outputDir = Path.Combine(projectDirectory, "Domains");
+
+        Directory.CreateDirectory(outputDir);
+
+        // =========================================================
+        // 4. GERAÇÃO DAS CLASSES ENUM
+        // =========================================================
+
+        foreach (var pgEnum in postgresEnums)
+        {
+            var className = EnumClassName(
+                pgEnum.Schema,
+                pgEnum.Name
+            );
+
+            var filePath = Path.Combine(
+                outputDir,
+                className + ".cs"
+            );
+
+            var enumBuilder = new StringBuilder();
+
+            enumBuilder.AppendLine("using NpgsqlTypes;");
+            enumBuilder.AppendLine();
+            enumBuilder.AppendLine($"namespace {modelNamespace};");
+            enumBuilder.AppendLine();
+            enumBuilder.AppendLine($"public enum {className}");
+            enumBuilder.AppendLine("{");
+
+            var usedNames = new HashSet<string>();
+
+            for (var i = 0; i < pgEnum.Labels.Count; i++)
+            {
+                var label = pgEnum.Labels[i];
+
+                var memberName = ToIdentifier(label);
+
+                if (!usedNames.Add(memberName))
+                {
+                    memberName += "_" + i;
+                    usedNames.Add(memberName);
                 }
 
-                enumSb.AppendLine("}");
-                File.WriteAllText(filePath, enumSb.ToString());
+                enumBuilder.AppendLine(
+                    $"    [PgName({code.Literal(label)})]"
+                );
+
+                enumBuilder.AppendLine(
+                    $"    {memberName} = {i},"
+                );
+
+                enumBuilder.AppendLine();
             }
-        }
-    }
-    catch { }
 
-    var services = (IServiceProvider)Host;
-    var providerCode = services.GetRequiredService<IProviderConfigurationCodeGenerator>();
-    var annotationCodeGenerator = services.GetRequiredService<IAnnotationCodeGenerator>();
-    var code = services.GetRequiredService<ICSharpHelper>();
+            enumBuilder.AppendLine("}");
 
-    var usings = new List<string>
-    {
-        "System",
-        "System.Collections.Generic",
-        "Microsoft.EntityFrameworkCore"
-    };
-
-    if (NamespaceHint != Options.ModelNamespace && !string.IsNullOrEmpty(Options.ModelNamespace))
-    {
-        usings.Add(Options.ModelNamespace);
-    }
-
-    if (!string.IsNullOrEmpty(NamespaceHint))
-    {
-#>
-namespace <#= NamespaceHint #>;
-
-<#
-    }
-#>
-public partial class <#= Options.ContextName #> : DbContext
-{
-    public <#= Options.ContextName #>()
-    {
-    }
-
-    public <#= Options.ContextName #>(DbContextOptions<<#= Options.ContextName #>> options)
-        : base(options)
-    {
-    }
-
-<#
-    foreach (var entityType in Model.GetEntityTypes().Where(e => !e.IsSimpleManyToManyJoinEntityType()))
-    {
-#>
-    public virtual DbSet<<#= entityType.Name #>> <#= entityType.GetDbSetName() #> { get; set; }
-
-<#
-    }
-
-    if (!Options.SuppressOnConfiguring)
-    {
-#>
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-<#
-    var useProviderCall = providerCode.GenerateUseProvider(Options.ConnectionString);
-    usings.AddRange(useProviderCall.GetRequiredUsings());
-#>
-        => optionsBuilder<#= code.Fragment(useProviderCall, indent: 3) #>;
-
-<#
-    }
-#>
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-<# 
-    try 
-    {
-        var pgEnums = Model.GetPostgresEnums();
-        if (pgEnums != null)
-        {
-            foreach (var enumType in pgEnums) 
-            { 
-                if (enumType == null || string.IsNullOrEmpty(enumType.Name)) continue;
-                var hasSchema = !string.IsNullOrEmpty(enumType.Schema) && enumType.Schema != "public";
-                var schemaParam = hasSchema ? $"\"{enumType.Schema}\", " : "";
-#>
-        modelBuilder.HasPostgresEnum(<#= schemaParam #>"<#= enumType.Name #>");
-<# 
-            } 
-        }
-    }
-    catch { }
-#>
-
-<#
-    foreach (var entityType in Model.GetEntityTypes().Where(e => !e.IsSimpleManyToManyJoinEntityType()))
-    {
-#>
-        modelBuilder.Entity<<#= entityType.Name #>>(entity =>
-        {
-<#
-        var key = entityType.FindPrimaryKey();
-        if (key != null)
-        {
-#>
-            entity.HasKey(<#= code.Lambda(key.Properties, "e") #>);
-<#
+            File.WriteAllText(
+                filePath,
+                enumBuilder.ToString(),
+                new UTF8Encoding(false)
+            );
         }
 
-        foreach (var property in entityType.GetProperties())
+        // =========================================================
+        // 5. USINGS DO DBCONTEXT
+        // =========================================================
+
+        var usings = new List<string>
         {
-            var propertyFluentApiCalls = property.GetFluentApiCalls(annotationCodeGenerator);
-            if (propertyFluentApiCalls != null)
+            "System",
+            "System.Collections.Generic",
+            "Microsoft.EntityFrameworkCore"
+        };
+
+        if (!string.IsNullOrWhiteSpace(modelNamespace)
+            && modelNamespace != contextNamespace)
+        {
+            usings.Add(modelNamespace);
+        }
+
+        foreach (var item in usings.Distinct())
+        {
+    #>
+    using <#= item #>;
+    <#
+        }
+
+        if (!string.IsNullOrWhiteSpace(contextNamespace))
+        {
+    #>
+
+    namespace <#= contextNamespace #>;
+
+    <#
+        }
+    #>
+
+    public partial class <#= Options.ContextName #> : DbContext
+    {
+        public <#= Options.ContextName #>()
+        {
+        }
+
+        public <#= Options.ContextName #>(
+            DbContextOptions<<#= Options.ContextName #>> options
+        ) : base(options)
+        {
+        }
+
+        // =========================================================
+        // 6. DBSETS
+        // =========================================================
+
+    <#
+        foreach (var entityType in Model.GetEntityTypes()
+            .Where(e => !e.IsSimpleManyToManyJoinEntityType()))
+        {
+    #>
+        public virtual DbSet<<#= entityType.Name #>> <#= entityType.GetDbSetName() #> { get; set; }
+
+    <#
+        }
+
+        // =========================================================
+        // 7. CONFIGURAÇÃO DO NPGSQL
+        // =========================================================
+
+        if (!Options.SuppressOnConfiguring)
+        {
+    #>
+        protected override void OnConfiguring(
+            DbContextOptionsBuilder optionsBuilder
+        )
+        {
+            if (!optionsBuilder.IsConfigured)
             {
-#>
-            entity.Property(e => e.<#= property.Name #>)<#= code.Fragment(propertyFluentApiCalls, indent: 4) #>;
-<#
+                optionsBuilder.UseNpgsql(
+                    <#= code.Literal(Options.ConnectionString) #>,
+                    npgsqlOptions =>
+                    {
+    <#
+            foreach (var pgEnum in postgresEnums)
+            {
+                var className = EnumClassName(
+                    pgEnum.Schema,
+                    pgEnum.Name
+                );
+    #>
+                        npgsqlOptions.MapEnum<
+                            global::<#= modelNamespace #>.<#= className #>
+                        >(
+                            <#= code.Literal(pgEnum.Name) #>,
+                            <#= code.Literal(pgEnum.Schema) #>
+                        );
+    <#
+            }
+    #>
+                    }
+                );
             }
         }
 
-        foreach (var foreignKey in entityType.GetForeignKeys())
-        {
-#>
-            entity.HasOne(d => d.<#= foreignKey.DependentToPrincipal.Name #>).<#= foreignKey.IsUnique ? "WithOne" : "WithMany" #>(<#= foreignKey.PrincipalToDependent != null ? $"p => p.{foreignKey.PrincipalToDependent.Name}" : "" #>)
-                .HasForeignKey(d => d.<#= string.Join(", ", foreignKey.Properties.Select(p => p.Name)) #>)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-<#
+    <#
         }
-#>
-        });
 
-<#
-    }
-#>
-        OnModelCreatingPartial(modelBuilder);
+    // =========================================================
+    // 8. MODEL CREATING
+    // =========================================================
+    #>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+    <#
+        // Registro dos enums PostgreSQL no modelo EF Core.
+
+        foreach (var pgEnum in postgresEnums)
+        {
+            var className = EnumClassName(
+                pgEnum.Schema,
+                pgEnum.Name
+            );
+    #>
+            modelBuilder.HasPostgresEnum<
+                global::<#= modelNamespace #>.<#= className #>
+            >(
+                <#= code.Literal(pgEnum.Schema) #>,
+                <#= code.Literal(pgEnum.Name) #>
+            );
+
+    <#
     }
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-}
+        // =========================================================
+        // 9. ENTIDADES
+        // =========================================================
+
+        foreach (var entityType in Model.GetEntityTypes()
+            .Where(e => !e.IsSimpleManyToManyJoinEntityType()))
+        {
+    #>
+            modelBuilder.Entity<<#= entityType.Name #>>(entity =>
+            {
+    <#
+            var key = entityType.FindPrimaryKey();
+
+            if (key != null)
+            {
+    #>
+                entity.HasKey(
+                    <#= code.Lambda(key.Properties, "e") #>
+                );
+
+    <#
+            }
+
+            // Propriedades
+            foreach (var property in entityType.GetProperties())
+            {
+                var propertyCalls =
+                    property.GetFluentApiCalls(annotationCodeGenerator);
+
+                if (propertyCalls != null)
+                {
+    #>
+                entity.Property(e => e.<#= property.Name #>)<#= code.Fragment(propertyCalls, indent: 4) #>;
+
+    <#
+                }
+            }
+
+            // Relacionamentos
+            foreach (var foreignKey in entityType.GetForeignKeys())
+            {
+                if (foreignKey.DependentToPrincipal == null)
+                    continue;
+
+                var navigation = foreignKey.DependentToPrincipal;
+
+                var principalNavigation = foreignKey.PrincipalToDependent;
+
+                var withNavigation = principalNavigation != null
+                    ? $"p => p.{principalNavigation.Name}"
+                    : "";
+    #>
+                entity.HasOne(d => d.<#= navigation.Name #>)
+                    .<#= foreignKey.IsUnique ? "WithOne" : "WithMany" #>(
+                        <#= withNavigation #>
+                    )
+                    .HasForeignKey(<#= code.Lambda(
+                        foreignKey.Properties,
+                        "d"
+                    ) #>)
+                    .OnDelete(DeleteBehavior.ClientSetNull);
+
+    <#
+            }
+    #>
+            });
+
+    <#
+        }
+    #>
+            OnModelCreatingPartial(modelBuilder);
+        }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    }
+
+    <#+
+        // =========================================================
+        // 10. CLASSES AUXILIARES
+        // =========================================================
+
+        private sealed class PgEnumInfo
+        {
+            public string Schema { get; set; } = "";
+
+            public string Name { get; set; } = "";
+
+            public List<string> Labels { get; } = new();
+        }
+
+        // =========================================================
+        // 11. CONVERSÃO PARA IDENTIFICADORES C#
+        // =========================================================
+
+        private string ToIdentifier(string value)
+        {
+            var parts = Regex.Split(
+                value,
+                @"[^\p{L}\p{Nd}]+"
+            ).Where(x => !string.IsNullOrWhiteSpace(x));
+
+            var result = string.Concat(
+                parts.Select(x =>
+                    char.ToUpperInvariant(x[0]) + x.Substring(1)
+                )
+            );
+
+            if (string.IsNullOrWhiteSpace(result))
+                result = "Value";
+
+            if (char.IsDigit(result[0]))
+                result = "_" + result;
+
+            var reserved = new HashSet<string>
+            {
+                "Abstract", "As", "Base", "Bool", "Break",
+                "Byte", "Case", "Catch", "Char", "Checked",
+                "Class", "Const", "Continue", "Decimal",
+                "Default", "Delegate", "Do", "Double",
+                "Else", "Enum", "Event", "Explicit",
+                "Extern", "False", "Finally", "Fixed",
+                "Float", "For", "Foreach", "Goto", "If",
+                "Implicit", "In", "Int", "Interface",
+                "Internal", "Is", "Lock", "Long", "Namespace",
+                "New", "Null", "Object", "Operator", "Out",
+                "Override", "Params", "Private", "Protected",
+                "Public", "Readonly", "Ref", "Return",
+                "Sbyte", "Sealed", "Short", "Sizeof", "Stackalloc",
+                "Static", "String", "Struct", "Switch", "This",
+                "Throw", "True", "Try", "Typeof", "Uint",
+                "Ulong", "Unchecked", "Unsafe", "Ushort",
+                "Using", "Virtual", "Void", "Volatile", "While"
+            };
+
+            if (reserved.Contains(result))
+                result = "_" + result;
+
+            return result;
+        }
+
+        // =========================================================
+        // 12. NOME DA CLASSE ENUM
+        // =========================================================
+
+        private string EnumClassName(string schema, string name)
+        {
+            var typeName = ToIdentifier(name);
+
+            if (schema != "public")
+            {
+                return ToIdentifier(schema) + typeName;
+            }
+
+            return typeName;
+        }
+    #>

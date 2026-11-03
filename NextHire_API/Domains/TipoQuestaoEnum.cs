@@ -1,0 +1,19 @@
+using NpgsqlTypes;
+
+namespace NextHire_API.Domains;
+
+public enum TipoQuestaoEnum
+{
+    [PgName("verdadeiro_falso")]
+    VerdadeiroFalso = 0,
+
+    [PgName("unica_escolha")]
+    UnicaEscolha = 1,
+
+    [PgName("multipla_escolha")]
+    MultiplaEscolha = 2,
+
+    [PgName("dissertativa")]
+    Dissertativa = 3,
+
+}

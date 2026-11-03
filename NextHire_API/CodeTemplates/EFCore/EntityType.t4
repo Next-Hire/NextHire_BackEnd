@@ -9,15 +9,14 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.ComponentModel.DataAnnotations" #>
 <#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
 <#@ import namespace="Microsoft.EntityFrameworkCore" #>
 <#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Infrastructure" #>
 <#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
 <#
-    if (EntityType.IsSimpleManyToManyJoinEntityType())
+    if (!ProductInfo.GetVersion().StartsWith("10.0") && !ProductInfo.GetVersion().StartsWith("9.0") && !ProductInfo.GetVersion().StartsWith("8.0"))
     {
-        // Don't scaffold these
-        return "";
+        Warning("Your templates were created using an older version of Entity Framework. Additional features and bug fixes may be available. See https://aka.ms/efcore-docs-updating-templates for more information.");
     }
 
     var services = (IServiceProvider)Host;
@@ -34,7 +33,35 @@
     {
         usings.Add("System.ComponentModel.DataAnnotations");
         usings.Add("System.ComponentModel.DataAnnotations.Schema");
-        usings.Add("Microsoft.EntityFrameworkCore");
+    }
+
+    // TRAVA SAFE CONTRA NULLREFERENCE EM USINGS:
+    if (EntityType != null)
+    {
+        foreach (var property in EntityType.GetProperties())
+        {
+            if (property?.ClrType == null)
+            {
+                continue;
+            }
+
+            var propertyType = property.ClrType;
+            if (Nullable.GetUnderlyingType(propertyType) != null)
+            {
+                propertyType = Nullable.GetUnderlyingType(propertyType);
+            }
+
+            if (propertyType.IsPrimitive || propertyType == typeof(string))
+            {
+                continue;
+            }
+
+            var propertyNamespace = propertyType.Namespace;
+            if (propertyNamespace != null && !usings.Contains(propertyNamespace))
+            {
+                usings.Add(propertyNamespace);
+            }
+        }
     }
 
     if (!string.IsNullOrEmpty(NamespaceHint))
@@ -45,21 +72,13 @@ namespace <#= NamespaceHint #>;
 <#
     }
 
-    if (!string.IsNullOrEmpty(EntityType.GetComment()))
+    var entityTypeFluentApiCalls = EntityType?.GetFluentApiCalls(annotationCodeGenerator);
+    if (Options.UseDataAnnotations && entityTypeFluentApiCalls != null)
     {
-#>
-/// <summary>
-/// <#= code.XmlComment(EntityType.GetComment()) #>
-/// </summary>
-<#
-    }
-
-    if (Options.UseDataAnnotations)
-    {
-        foreach (var dataAnnotation in EntityType.GetDataAnnotations(annotationCodeGenerator))
+        foreach (var attribute in entityTypeFluentApiCalls.GetAttributes())
         {
 #>
-<#= code.Fragment(dataAnnotation) #>
+<#= code.Fragment(attribute) #>
 <#
         }
     }
@@ -68,40 +87,65 @@ public partial class <#= EntityType.Name #>
 {
 <#
     var firstProperty = true;
-    foreach (var property in EntityType.GetProperties().OrderBy(p => p.GetColumnOrder() ?? -1))
+    foreach (var property in EntityType.GetProperties())
     {
         if (!firstProperty)
         {
             WriteLine("");
         }
 
-        if (!string.IsNullOrEmpty(property.GetComment()))
-        {
-#>
-    /// <summary>
-    /// <#= code.XmlComment(property.GetComment(), indent: 1) #>
-    /// </summary>
-<#
-        }
-
         if (Options.UseDataAnnotations)
         {
-            var dataAnnotations = property.GetDataAnnotations(annotationCodeGenerator)
-                .Where(a => !(a.Type == typeof(RequiredAttribute) && Options.UseNullableReferenceTypes && !property.ClrType.IsValueType));
-            foreach (var dataAnnotation in dataAnnotations)
+            var propertyFluentApiCalls = property.GetFluentApiCalls(annotationCodeGenerator);
+            if (propertyFluentApiCalls != null)
             {
+                foreach (var attribute in propertyFluentApiCalls.GetAttributes())
+                {
 #>
-    <#= code.Fragment(dataAnnotation) #>
+    <#= code.Fragment(attribute) #>
 <#
+                }
             }
         }
 
-        usings.AddRange(code.GetRequiredUsings(property.ClrType));
+        string propertyTypeName = property.ClrType != null ? code.Reference(property.ClrType) : "string";
 
-        var needsNullable = Options.UseNullableReferenceTypes && property.IsNullable && !property.ClrType.IsValueType;
-        var needsInitializer = Options.UseNullableReferenceTypes && !property.IsNullable && !property.ClrType.IsValueType;
+        // Tenta capturar pelo nome do enum Postgres
+        var enumAnnotation = property.FindAnnotation("Npgsql:PostgresEnumName");
+        string rawEnumName = enumAnnotation?.Value?.ToString();
+
+        // Tenta capturar pelo nome do tipo de coluna no banco (Relational:ColumnType)
+        if (string.IsNullOrEmpty(rawEnumName))
+        {
+            var columnType = property.GetColumnType();
+            if (!string.IsNullOrEmpty(columnType) && columnType.EndsWith("_enum", System.StringComparison.OrdinalIgnoreCase))
+            {
+                rawEnumName = columnType;
+            }
+            else if (!string.IsNullOrEmpty(property.Name) && property.Name.EndsWith("_enum", System.StringComparison.OrdinalIgnoreCase))
+            {
+                rawEnumName = property.Name;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(rawEnumName))
+        {
+            // Remove schema de nomes como "public.tipo_usuario_enum"
+            if (rawEnumName.Contains("."))
+            {
+                rawEnumName = rawEnumName.Split('.').Last();
+            }
+
+            // Converte snake_case para PascalCase
+            propertyTypeName = string.Join("", rawEnumName.Split('_').Select(s => char.ToUpper(s[0]) + s.Substring(1)));
+
+            if (property.IsNullable)
+            {
+                propertyTypeName += "?";
+            }
+        }
 #>
-    public <#= code.Reference(property.ClrType) #><#= needsNullable ? "?" : "" #> <#= property.Name #> { get; set; }<#= needsInitializer ? " = null!;" : "" #>
+    public <#= propertyTypeName #> <#= property.Name #> { get; set; } = null!;
 <#
         firstProperty = false;
     }
@@ -109,16 +153,6 @@ public partial class <#= EntityType.Name #>
     foreach (var navigation in EntityType.GetNavigations())
     {
         WriteLine("");
-
-        if (Options.UseDataAnnotations)
-        {
-            foreach (var dataAnnotation in navigation.GetDataAnnotations(annotationCodeGenerator))
-            {
-#>
-    <#= code.Fragment(dataAnnotation) #>
-<#
-            }
-        }
 
         var targetType = navigation.TargetEntityType.Name;
         if (navigation.IsCollection)
@@ -129,10 +163,8 @@ public partial class <#= EntityType.Name #>
         }
         else
         {
-            var needsNullable = Options.UseNullableReferenceTypes && !(navigation.ForeignKey.IsRequired && navigation.IsOnDependent);
-            var needsInitializer = Options.UseNullableReferenceTypes && navigation.ForeignKey.IsRequired && navigation.IsOnDependent;
 #>
-    public virtual <#= targetType #><#= needsNullable ? "?" : "" #> <#= navigation.Name #> { get; set; }<#= needsInitializer ? " = null!;" : "" #>
+    public virtual <#= targetType #> <#= navigation.Name #> { get; set; } = null!;
 <#
         }
     }
@@ -141,33 +173,19 @@ public partial class <#= EntityType.Name #>
     {
         WriteLine("");
 
-        if (Options.UseDataAnnotations)
+        var targetType = skipNavigation.TargetEntityType.Name;
+        if (skipNavigation.IsCollection)
         {
-            foreach (var dataAnnotation in skipNavigation.GetDataAnnotations(annotationCodeGenerator))
-            {
 #>
-    <#= code.Fragment(dataAnnotation) #>
+    public virtual ICollection<<#= targetType #>> <#= skipNavigation.Name #> { get; set; } = new List<<#= targetType #>>();
 <#
-            }
         }
+        else
+        {
 #>
-    public virtual ICollection<<#= skipNavigation.TargetEntityType.Name #>> <#= skipNavigation.Name #> { get; set; } = new List<<#= skipNavigation.TargetEntityType.Name #>>();
+    public virtual <#= targetType #> <#= skipNavigation.Name #> { get; set; } = null!;
 <#
+        }
     }
 #>
 }
-<#
-    var previousOutput = GenerationEnvironment;
-    GenerationEnvironment = new StringBuilder();
-
-    foreach (var ns in usings.Distinct().OrderBy(x => x, new NamespaceComparer()))
-    {
-#>
-using <#= ns #>;
-<#
-    }
-
-    WriteLine("");
-
-    GenerationEnvironment.Append(previousOutput);
-#>

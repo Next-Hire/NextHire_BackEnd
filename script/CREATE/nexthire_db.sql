@@ -17,13 +17,7 @@ CREATE TYPE situacao_profissional_enum AS ENUM ('empregado', 'desempregado');
     status_empresa BOOLEAN DEFAULT true
 );
 
-CREATE TABLE IF NOT EXISTS experiencia_profissional (
-experiencia_profissional_id SERIAL PRIMARY KEY, 
-data_entrada TIMESTAMP(0) NOT NULL,
-data_saida TIMESTAMP(0),
-atualmente_trabalho BOOLEAN DEFAULT true,
-usuario_id INTEGER REFERENCES(usuario.usuario_id) NOT NULL
-); 
+
 
 CREATE TABLE IF NOT EXISTS usuario(
     usuario_id SERIAL PRIMARY KEY,
@@ -35,6 +29,14 @@ CREATE TABLE IF NOT EXISTS usuario(
     tipo_usuario tipo_usuario_enum NOT NULL
 
 );
+
+CREATE TABLE IF NOT EXISTS experiencia_profissional (
+experiencia_profissional_id SERIAL PRIMARY KEY, 
+data_entrada TIMESTAMP(0) NOT NULL,
+data_saida TIMESTAMP(0),
+atualmente_trabalho BOOLEAN DEFAULT true,
+usuario_id INTEGER REFERENCES(usuario.usuario_id) NOT NULL
+); 
 
 CREATE TABLE IF NOT EXISTS anotacao (
     anotacao_id SERIAL PRIMARY KEY,

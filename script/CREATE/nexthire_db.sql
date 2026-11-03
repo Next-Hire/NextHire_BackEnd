@@ -8,13 +8,22 @@ CREATE TYPE status_relacao_enum AS ENUM('avanca', 'nao_avanca', 'considera');
 CREATE TYPE nivel_prioridade_enum AS ENUM('alta', 'media', 'baixa');
 CREATE TYPE escala_trabalho_enum AS ENUM('12x36', '5x2', '4x3', '15x15', '30x30');
 CREATE TYPE modelo_trabalo_enum AS ENUM('hibrido', 'presencial', 'remoto');
-
+CREATE TYPE situacao_profissional_enum AS ENUM ('empregado', 'desempregado');
+-- CREATE TYPE formacao_academica_enum AS ENUM ('sem_instrucao', 'fundamental_incompleto', 'fundamental_completo', 'medio_incompleto', 'medio_completo', 'tecnico_incompleto', 'tecnico_completo', 'superior_incompleto', 'superior_completo', 'pos_graduacao_incompleta', 'pos_graduacao_completa', 'mestrado_incompleto', 'mestrado_completo', 'doutorado_incompleto', 'doutorado_completo', 'pos_doutorado');
 
  CREATE TABLE IF NOT EXISTS empresa (
     empresa_id SERIAL PRIMARY KEY,
     nome TEXT NOT NULL,
     status_empresa BOOLEAN DEFAULT true
 );
+
+CREATE TABLE IF NOT EXISTS experiencia_profissional (
+experiencia_profissional_id SERIAL PRIMARY KEY, 
+data_entrada TIMESTAMP(0) NOT NULL,
+data_saida TIMESTAMP(0),
+atualmente_trabalho BOOLEAN DEFAULT true,
+usuario_id INTEGER REFERENCES(usuario.usuario_id) NOT NULL
+); 
 
 CREATE TABLE IF NOT EXISTS usuario(
     usuario_id SERIAL PRIMARY KEY,
@@ -50,11 +59,11 @@ CREATE TABLE IF NOT EXISTS area_ocupacao (
 
 );
 
-CREATE TABLE IF NOT EXISTS gestor_area (
-    gestor_id INTEGER NOT NULL REFERENCES(usuario.usuario_id),
+CREATE TABLE IF NOT EXISTS usuario_area (
+    usuario_id INTEGER NOT NULL REFERENCES(usuario.usuario_id),
     area_ocupacao_id INTEGER NOT NULL REFERENCES(area_ocupacao.area_ocupacao_id),
 
-    CONSTRAINT pk_gestor_area PRIMARY KEY(gestor_id, area_ocupacao_id)
+    CONSTRAINT pk_usuario_area PRIMARY KEY(usuario_id, area_ocupacao_id)
 
 );
 
@@ -79,11 +88,13 @@ CREATE TABLE IF NOT EXISTS vaga  (
     data_fechamento TIMESTAMP NOT NULL,
     descricao TEXT NOT NULL,
     status_vaga BOOLEAN DEFAULT true,
+    idiomas_desejados JSONB NOT NULL,
+    tempo_experiencia_desejado NUMERIC(10,2),
     
     escala_vaga  escala_trabalho_enum NOT NULL,
     modelo_trabalho_vaga modelo_trabalo_enum NOT NULL,
     nivel_prioridade_vaga nivel_prioridade_enum NOT NULL,
-
+    
     empresa_id INTEGER NOT NULL REFERENCES(empresa.empresa_id),
     analista_rh INTEGER NOT NULL REFERENCES(usuario.usuario_id),
 );
@@ -159,10 +170,6 @@ CREATE TABLE IF NOT EXISTS processo_seletivo (
     data_abertura TIMESTAMP DEFAULT CLOCK_TIMESTAMP(),
     data_fechamento TIMESTAMP NOT NULL,
     status_processo_seletivo BOOLEAN DEFAULT TRUE,
-
-    -- escala_vaga  escala_trabalho_enum NOT NULL,
-    -- modelo_trabalho_vaga modelo_trabalo_enum NOT NULL,
-    -- nivel_prioridade_vaga nivel_prioridade_enum NOT NULL,
     vaga_id INTEGER NOT NULL REFERENCES(vaga.vaga_id)
 
     
@@ -228,7 +235,11 @@ CREATE TABLE IF NOT EXISTS informacao_candidato(
     telefone varchar(15) NOT NULL,
     data_nascimento TIMESTAMP(0) NOT NULL,
     resumo TEXT NOT NULL,
-    candidato_id INTEGER NOT NULL REFERENCES(usuario.usuario_id)
+    candidato_id INTEGER NOT NULL REFERENCES(usuario.usuario_id),
+    situacao_profissional situacao_profissional_enum ,
+    --formacao_academica nivel_estudo_enum, --,
+    formacao_academica JSONB NOT NULL,
+    idioma JSONB NOT NULL
 
 );
 

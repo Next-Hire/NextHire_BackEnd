@@ -1,20 +1,21 @@
-
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using NextHire_API.Contexts;
 using System.Text;
+using NextHire_API.Applications;
+using NextHire_API.Contexts;
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 var builder = WebApplication.CreateBuilder(args);
 
 string conexaoBanco = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-builder.Services.AddDbContext<NextHireContext>(options => options.UseNpgsql(conexaoBanco));
 builder.Services.AddControllers();
- 
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// builder.Services.AddOpenApi();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -34,10 +35,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
-
-
-
+builder.Services.AddDbContext<NextHireContext>(options => options.UseNpgsql(conexaoBanco));
+ 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -67,7 +66,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
- 
+// cors btw
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
@@ -87,13 +87,30 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
- 
+//if (!app.Environment.IsDevelopment())
+//    app.UseHttpsRedirection();
 
- app.UseStaticFiles();
+// Mapeia a pasta 'wwwroot' ou 'uploads' para o caminho web '/uploads'
+string caminhoUploads = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads");
+
+if (!Directory.Exists(caminhoUploads))
+{
+    Directory.CreateDirectory(caminhoUploads);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(caminhoUploads),
+    RequestPath = "/uploads"
+});
+
+// Mantém o suporte a arquivos estáticos padrão de wwwroot
+app.UseStaticFiles();
 
 app.UseCors("CorsPolicy");
 
- app.UseAuthentication();
+// ATENÇÃO: Autenticação SEMPRE ANTES da Autorização
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

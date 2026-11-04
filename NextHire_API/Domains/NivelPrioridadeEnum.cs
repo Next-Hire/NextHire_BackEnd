@@ -1,0 +1,16 @@
+using NpgsqlTypes;
+
+namespace NextHire_API.Domains;
+
+public enum NivelPrioridadeEnum
+{
+    [PgName("alta")]
+    Alta = 0,
+
+    [PgName("media")]
+    Media = 1,
+
+    [PgName("baixa")]
+    Baixa = 2,
+
+}

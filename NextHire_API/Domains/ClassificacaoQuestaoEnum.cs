@@ -1,0 +1,16 @@
+using NpgsqlTypes;
+
+namespace NextHire_API.Domains;
+
+public enum ClassificacaoQuestaoEnum
+{
+    [PgName("comportamental")]
+    Comportamental = 0,
+
+    [PgName("tecnica")]
+    Tecnica = 1,
+
+    [PgName("situacional")]
+    Situacional = 2,
+
+}

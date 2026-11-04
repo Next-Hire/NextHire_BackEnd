@@ -32,24 +32,24 @@ namespace NextHire_API.Applications.Services
 
         public ListarAreaOcupacaoDto ListarPorID(int id)
         {
-            var item = _repository.BuscarPorId(id);
+            var area = _repository.BuscarPorId(id);
 
-            if (item == null)
+            if (area == null)
             {
-                throw new DomainException("Item não encontrado.");
+                throw new DomainException("Area de Ocupação não encontrado.");
             }
 
-            return lerDto(item);
+            return lerDto(area);
         }
 
         public ListarAreaOcupacaoDto ListarPorNome(string nome)
         {
-            var item = _repository.BuscarPorNome(nome);
-            if (item == null)
+            var area = _repository.BuscarPorNome(nome);
+            if (area == null)
             {
-                throw new DomainException("Item não encontrado.");
+                throw new DomainException("Area de Ocupação não encontrado.");
             }
-            return lerDto(item);
+            return lerDto(area);
         }
 
         public ListarAreaOcupacaoDto Adicionar(AdicionarAreaOcupacao areaOcupacao)
@@ -71,7 +71,7 @@ namespace NextHire_API.Applications.Services
 
             if (areaExistente == null)
             {
-                throw new DomainException("Item não encontrado.");
+                throw new DomainException("Area de Ocupação não encontrado.");
             }
 
             areaExistente.nome = areaOcupacao.nome;
@@ -80,6 +80,18 @@ namespace NextHire_API.Applications.Services
 
             _repository.Atualizar(areaExistente);
             return lerDto(areaExistente);
+        }
+
+        public void Deletar(int id)
+        {
+            area_ocupacao area = _repository.BuscarPorId(id);
+
+            if (area == null)
+            {
+                throw new DomainException("Area de Ocupação não encontrado.");
+            }
+
+            _repository.Deletar(id);
         }
     }
 }

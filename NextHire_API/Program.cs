@@ -7,6 +7,9 @@ using Microsoft.OpenApi;
 using System.Text;
 using NextHire_API.Applications;
 using NextHire_API.Contexts;
+using NextHire_API.Interfaces;
+using NextHire_API.Repository;
+using NextHire_API.Applications.Services;
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -36,35 +39,38 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<NextHireContext>(options => options.UseNpgsql(conexaoBanco));
- 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var chave = builder.Configuration["Jwt:Key"]!;
 
-        var issuer = builder.Configuration["Jwt:Issuer"]!;
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        var chave = builder.Configuration["Jwt:Key"]!;
 
-        var audience = builder.Configuration["Jwt:Audience"]!;
+//        var issuer = builder.Configuration["Jwt:Issuer"]!;
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
+//        var audience = builder.Configuration["Jwt:Audience"]!;
 
-            ValidateAudience = true,
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = true,
 
-            ValidateLifetime = true,
+//            ValidateAudience = true,
 
-            ValidateIssuerSigningKey = true,
+//            ValidateLifetime = true,
 
-            ValidIssuer = issuer,
+//            ValidateIssuerSigningKey = true,
 
-            ValidAudience = audience,
+//            ValidIssuer = issuer,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(chave)
-            )
-        };
-    });
+//            ValidAudience = audience,
+
+//            IssuerSigningKey = new SymmetricSecurityKey(
+//                Encoding.UTF8.GetBytes(chave)
+//            )
+//        };
+//    //});
+
+builder.Services.AddScoped<IAreaOcupacaoRepository, AreaOcupacaoRepository>();
+builder.Services.AddScoped<AreaOcupacaoService>();
 
 // cors btw
 

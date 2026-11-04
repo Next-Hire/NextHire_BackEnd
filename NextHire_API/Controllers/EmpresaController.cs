@@ -15,11 +15,13 @@ namespace NextHire_API.Controllers
         public EmpresaController(EmpresaService rep) => _rep = rep;
 
         [HttpGet]
-        public async Task<IEnumerable<LerEmpresaDTO>> Listar()
+        public async Task<ActionResult<IEnumerable<LerEmpresaDTO>>> Listar()
         {
             try
             {
                 IEnumerable<LerEmpresaDTO?> Query = await _rep.Listar();
+                if (Query == null || !Query.Any())
+                    return NotFound(Query);
                 return Ok(Query);
             }
 

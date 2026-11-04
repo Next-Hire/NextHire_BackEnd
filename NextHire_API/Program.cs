@@ -7,6 +7,9 @@ using Microsoft.OpenApi;
 using System.Text;
 using NextHire_API.Applications;
 using NextHire_API.Contexts;
+using NextHire_API.Applications.Services;
+using NextHire_API.Interfaces;
+using NextHire_API.Repository;
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -36,35 +39,36 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<NextHireContext>(options => options.UseNpgsql(conexaoBanco));
- 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        var chave = builder.Configuration["Jwt:Key"]!;
+builder.Services.AddScoped<EmpresaService>();
+builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        var chave = builder.Configuration["Jwt:Key"]!;
 
-        var issuer = builder.Configuration["Jwt:Issuer"]!;
+//        var issuer = builder.Configuration["Jwt:Issuer"]!;
 
-        var audience = builder.Configuration["Jwt:Audience"]!;
+//        var audience = builder.Configuration["Jwt:Audience"]!;
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = true,
 
-            ValidateAudience = true,
+//            ValidateAudience = true,
 
-            ValidateLifetime = true,
+//            ValidateLifetime = true,
 
-            ValidateIssuerSigningKey = true,
+//            ValidateIssuerSigningKey = true,
 
-            ValidIssuer = issuer,
+//            ValidIssuer = issuer,
 
-            ValidAudience = audience,
+//            ValidAudience = audience,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(chave)
-            )
-        };
-    });
+//            IssuerSigningKey = new SymmetricSecurityKey(
+//                Encoding.UTF8.GetBytes(chave)
+//            )
+//        };
+//    });
 
 // cors btw
 

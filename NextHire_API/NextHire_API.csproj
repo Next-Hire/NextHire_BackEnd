@@ -36,11 +36,6 @@
     <Folder Include="Applications\Convertions\DomainToConversion\" />
     <Folder Include="Applications\Authentication\" />
     <Folder Include="Applications\Validations\" />
-    <Folder Include="Applications\Services\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="DTOs\" />
-    <Folder Include="Repository\" />
   </ItemGroup>
 
 </Project>

@@ -115,7 +115,7 @@ namespace NextHire_API.Repository
         }
 
 
-        public async Task<SetorOcupacao?> AtualizarSetor(int idSetor, string nomeEmpresa, string nomeArea, string nomeGestor, string nomeSetor)
+        public async Task<SetorOcupacao?> AtualizarSetor(int idSetor, string? nomeEmpresa, string? nomeArea, string? nomeGestor, string nomeSetor)
         {
             SetorOcupacao? setorOcupacaoQuery = 
                 await _ctx.SetorOcupacao.FindAsync(idSetor);
@@ -129,7 +129,7 @@ namespace NextHire_API.Repository
             Usuario? gestorQuery = 
                 await _ctx.Usuario.FirstOrDefaultAsync(varAux => varAux.TipoUsuario.Equals("gestor") && varAux.Nome == nomeGestor);
 
-            if (setorOcupacaoQuery == null || empresaQuery == null || areaOcupacaoQuery == null || gestorQuery == null)
+            if (setorOcupacaoQuery == null && (empresaQuery == null || areaOcupacaoQuery == null || gestorQuery == null))
                 return null;
 
             setorOcupacaoQuery.EmpresaId = empresaQuery.EmpresaId;

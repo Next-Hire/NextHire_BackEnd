@@ -22,7 +22,7 @@ namespace NextHire_API.Repository
      await _ctx.empresa.FindAsync(id)
             ?? throw new InvalidOperationException("Empresa não encontrada");
 
-        public async Task<bool?> empresaExiste(string nome)
+        public async Task<bool> empresaExiste(string nome)
             => await _ctx.empresa.AnyAsync(varAux => varAux.nome == nome);
 
         public async Task<empresa?> Adicionar(empresa EmpresaConstrutor)

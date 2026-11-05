@@ -19,16 +19,89 @@ namespace NextHire_API.Controllers
         {
             try
             {
-                IEnumerable<LerEmpresaDTO?> Query = await _rep.Listar();
-                if (Query == null || !Query.Any())
-                    return NotFound(Query);
-                return Ok(Query);
+                IEnumerable<LerEmpresaDTO?> lista_de_empresas = await _rep.ListagemTotal();
+                if (lista_de_empresas == null || !lista_de_empresas.Any())
+                    return NotFound(lista_de_empresas);
+                return Ok(lista_de_empresas);
             }
 
             catch (DomainException ex)
             {
-                throw new DomainException("Empresas não encontradas");
+                return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("BuscarPorNome/{nome}")]
+        public async Task<ActionResult<LerEmpresaDTO>> BuscarPorNome(string nome)
+        {
+            try
+            {
+                LerEmpresaDTO empresa = await _rep.ObterPorEmpresa(nome);
+                return Ok(empresa);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("BuscarPorId/{id}")]
+        public async Task<ActionResult<LerEmpresaDTO>> BuscarPorId(int id)
+        {
+            try
+            {
+                LerEmpresaDTO empresa = await _rep.ObterPorId(id);
+                return Ok(empresa);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<CriarEmpresaDTO>> Adicionar([FromBody] CriarEmpresaDTO empresaCons)
+        {
+            try
+            {
+                CriarEmpresaDTO empresa = await _rep.Adicionar(empresaCons);
+                return Ok(empresa);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("Atualizar/{id}")]
+        public async Task<ActionResult<LerEmpresaDTO>> Atualizar(int id, [FromBody] LerEmpresaDTO? empresaCons)
+        {
+            try
+            {
+                LerEmpresaDTO empresa = await _rep.Atualizar(id, empresaCons);
+                return Ok(empresa);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult<LerEmpresaDTO>> Remover(int id)
+        {
+            try
+            {
+                LerEmpresaDTO empresa = await _rep.Remover(id);
+                return Ok(empresa);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
     }
 }

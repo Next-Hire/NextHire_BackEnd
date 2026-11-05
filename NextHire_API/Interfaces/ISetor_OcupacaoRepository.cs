@@ -6,8 +6,10 @@ namespace NextHire_API.Interfaces
     {
 
         public Task<IEnumerable<SetorOcupacao?>> ListagemTotal();
-        public Task<IEnumerable<SetorOcupacao?>> ObterListagemSetoresPorEmpresaEPorArea(int? idEmpresa, string? empresaNome, string? area, int? areaId);
-        public Task<IEnumerable<SetorOcupacao?>> ObterSetoresPorIdEmpresa(int idEmpresa);
+        public Task<List<SetorOcupacao?>> ObterListagemSetoresPorEmpresaEPorArea(int? idEmpresa, string? empresaNome, string? area, int? areaId);
+        //public Task<IEnumerable<SetorOcupacao?>> ObterSetoresPorIdEmpresa(int idEmpresa);
+        public Task<List<SetorOcupacao?>> ObterSetoresPorEmpresa(int? idEmpresa, string? empresaNome);
+        public Task<bool> existeSetor(string nomeSetor, int empresaId, int areaId);
         public Task<SetorOcupacao?> ObterSetorPorId(int id);
         public Task<SetorOcupacao?> ObterSetorPorNome(string nomeSetor);
         public Task<SetorOcupacao?> ObterSetorPorArea(int? idArea, string? area);

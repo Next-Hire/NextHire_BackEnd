@@ -14,10 +14,4 @@ public partial class AvaliacaoHabilidade
 
     public int NivelAvaliado { get; set; }
 
-    public virtual Usuario Candidato { get; set; } = null!;
-
-    public virtual Entrevista Entrevista { get; set; } = null!;
-
-    public virtual Habilidade Habilidade { get; set; } = null!;
-
 }

@@ -13,65 +13,65 @@ namespace NextHire_API.Applications.Services
 
         public EmpresaService(IEmpresaRepository rep) => _rep = rep;
 
-        public async Task<LerEmpresaDTO> ObterPorId(int empresaId)
+        public async Task<LerEmpresaDTO> ObterPorId(int EmpresaId)
         {
-            empresa empresaQuery = await _rep.BuscarPorId(empresaId)
+            Empresa EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
                     ?? throw new DomainException("Empresa não encontrada!");
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
         public async Task<IEnumerable<LerEmpresaDTO>> ListagemTotal()
         {
-            IEnumerable<empresa?> empresasQuery = await _rep.Listar();
-            if(empresasQuery == null || !empresasQuery.Any())
-                throw new DomainException("Nenhuma empresa cadastrada!");
-            return empresasQuery.Select(EmpresaConvertion.listarEmpresas);
+            IEnumerable<Empresa?> EmpresasQuery = await _rep.Listar();
+            if(EmpresasQuery == null || !EmpresasQuery.Any())
+                throw new DomainException("Nenhuma Empresa cadastrada!");
+            return EmpresasQuery.Select(EmpresaConvertion.listarEmpresas);
         }
 
         public async Task<LerEmpresaDTO> ObterPorEmpresa(string nome)
         {
-            empresa? empresaQuery = await _rep.BuscarPorNome(nome)
+            Empresa? EmpresaQuery = await _rep.BuscarPorNome(nome)
                     ?? throw new DomainException("Empresa Não encontrada!");
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
-        public async Task<CriarEmpresaDTO> Adicionar(CriarEmpresaDTO empresaCons)
+        public async Task<CriarEmpresaDTO> Adicionar(CriarEmpresaDTO EmpresaCons)
         {
-            if (await _rep.empresaExiste(empresaCons.nome))
+            if (await _rep.EmpresaExiste(EmpresaCons.nome))
                 throw new DomainException("Empresa já cadastrada!");
 
-            empresa empresa = new empresa
+            Empresa Empresa = new Empresa
             {
-                nome = empresaCons.nome,
-
+                Nome = EmpresaCons.nome,
+                //StatusEmpresa = true
             };
 
-            await _rep.Adicionar(empresa);
-            return EmpresaConvertion.criarEmpresaDTO(empresa);
+            await _rep.Adicionar(Empresa);
+            return EmpresaConvertion.criarEmpresaDTO(Empresa);
         }
 
-        public async Task<LerEmpresaDTO> Atualizar(int empresaId, LerEmpresaDTO empresaCons)
+        public async Task<LerEmpresaDTO> Atualizar(int EmpresaId, LerEmpresaDTO EmpresaCons)
         {
-            empresa? empresaQuery = await _rep.BuscarPorId(empresaId)
+            Empresa? EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
                 ?? throw new DomainException("Empresa não encontrada!");
 
-            empresaQuery.nome = empresaCons.nome;
+            EmpresaQuery.Nome = EmpresaCons.nome;
 
 
-            await _rep.Atualizar(empresaQuery.empresa_id, empresaQuery);
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            await _rep.Atualizar(EmpresaQuery.EmpresaId, EmpresaQuery);
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
-        public async Task<LerEmpresaDTO> Remover(int empresaId)
+        public async Task<LerEmpresaDTO> Remover(int EmpresaId)
         {
-            empresa? empresaQuery = await _rep.BuscarPorId(empresaId)
+            Empresa? EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
                 ?? throw new DomainException("Empresa não encontrada!");
 
-            empresaQuery.status_empresa = false;
+            EmpresaQuery.StatusEmpresa = false;
 
 
-            await _rep.Remover(empresaQuery.empresa_id);
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            await _rep.Remover(EmpresaQuery.EmpresaId);
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
     }

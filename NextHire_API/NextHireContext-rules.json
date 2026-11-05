@@ -1,0 +1,955 @@
+{
+  "Name": "NextHireContext",
+  "PreserveCasingUsingRegex": false,
+  "IncludeUnknownSchemas": true,
+  "SplitEntityTypeConfigurations": false,
+  "CaseSensitive": false,
+  "Schemas": [
+    {
+      "SchemaName": "public",
+      "IncludeUnknownTables": true,
+      "IncludeUnknownViews": true,
+      "IncludeUnknownFunctions": false,
+      "Namespace": null,
+      "Entities": [
+        {
+          "Name": "experiencia_profissional",
+          "EntityName": "ExperienciaProfissional",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "experiencia_profissional_id",
+              "PropertyName": "ExperienciaProfissionalId"
+            },
+            {
+              "Name": "atualmente_trabalho",
+              "PropertyName": "AtualmenteTrabalho"
+            },
+            {
+              "Name": "data_entrada",
+              "PropertyName": "DataEntrada"
+            },
+            {
+              "Name": "data_saida",
+              "PropertyName": "DataSaida"
+            },
+            {
+              "Name": "usuario_id",
+              "PropertyName": "UsuarioId"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Usuario",
+              "NewName": null,
+              "FkName": "experiencia_profissional_usuario_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "questao",
+          "EntityName": "Questao",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "questao_id",
+              "PropertyName": "QuestaoId"
+            },
+            {
+              "Name": "texto_questao",
+              "PropertyName": "TextoQuestao"
+            },
+            {
+              "Name": "vaga_id",
+              "PropertyName": "VagaId"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Alternativa",
+              "NewName": null,
+              "FkName": "alternativa_questao_id_fkey",
+              "ToEntity": "Alternativa",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "CandidatoQuestao",
+              "NewName": null,
+              "FkName": "candidato_questao_questao_id_fkey",
+              "ToEntity": "CandidatoQuestao",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "Vaga",
+              "NewName": null,
+              "FkName": "questao_vaga_id_fkey",
+              "ToEntity": "Vaga",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "candidato_vaga",
+          "EntityName": "CandidatoVaga",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "vaga_id",
+              "PropertyName": "VagaId"
+            },
+            {
+              "Name": "data_hora_inscricao",
+              "PropertyName": "DataHoraInscricao"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Candidato",
+              "NewName": null,
+              "FkName": "candidato_vaga_candidato_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Vaga",
+              "NewName": null,
+              "FkName": "candidato_vaga_vaga_id_fkey",
+              "ToEntity": "Vaga",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "vaga",
+          "EntityName": "Vaga",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "vaga_id",
+              "PropertyName": "VagaId"
+            },
+            {
+              "Name": "analista_rh",
+              "PropertyName": "AnalistaRh"
+            },
+            {
+              "Name": "data_abertura",
+              "PropertyName": "DataAbertura"
+            },
+            {
+              "Name": "data_fechamento",
+              "PropertyName": "DataFechamento"
+            },
+            {
+              "Name": "descricao",
+              "PropertyName": "Descricao"
+            },
+            {
+              "Name": "empresa_id",
+              "PropertyName": "EmpresaId"
+            },
+            {
+              "Name": "idiomas_desejados",
+              "PropertyName": "IdiomasDesejados"
+            },
+            {
+              "Name": "status_vaga",
+              "PropertyName": "StatusVaga"
+            },
+            {
+              "Name": "tempo_experiencia_desejado",
+              "PropertyName": "TempoExperienciaDesejado"
+            },
+            {
+              "Name": "titulo",
+              "PropertyName": "Titulo"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "CandidatoVaga",
+              "NewName": null,
+              "FkName": "candidato_vaga_vaga_id_fkey",
+              "ToEntity": "CandidatoVaga",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "ProcessoSeletivo",
+              "NewName": null,
+              "FkName": "processo_seletivo_vaga_id_fkey",
+              "ToEntity": "ProcessoSeletivo",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "Questao",
+              "NewName": null,
+              "FkName": "questao_vaga_id_fkey",
+              "ToEntity": "Questao",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "AnalistaRhNavigation",
+              "NewName": null,
+              "FkName": "vaga_analista_rh_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Empresa",
+              "NewName": null,
+              "FkName": "vaga_empresa_id_fkey",
+              "ToEntity": "Empresa",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "gestor_setor",
+          "EntityName": "GestorSetor",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "gestor_id",
+              "PropertyName": "GestorId"
+            },
+            {
+              "Name": "setor_ocupacao_id",
+              "PropertyName": "SetorOcupacaoId"
+            }
+          ]
+        },
+        {
+          "Name": "empresa_funcionario",
+          "EntityName": "EmpresaFuncionario",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "empresa_id",
+              "PropertyName": "EmpresaId"
+            },
+            {
+              "Name": "funcionario_id",
+              "PropertyName": "FuncionarioId"
+            }
+          ]
+        },
+        {
+          "Name": "anotacao",
+          "EntityName": "Anotacao",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "anotacao_id",
+              "PropertyName": "AnotacaoId"
+            },
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "comentario",
+              "PropertyName": "Comentario"
+            },
+            {
+              "Name": "gestor_id",
+              "PropertyName": "GestorId"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Candidato",
+              "NewName": null,
+              "FkName": "anotacao_candidato_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Gestor",
+              "NewName": null,
+              "FkName": "anotacao_gestor_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "gestor_vaga",
+          "EntityName": "GestorVaga",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "gestor_id",
+              "PropertyName": "GestorId"
+            },
+            {
+              "Name": "vaga_id",
+              "PropertyName": "VagaId"
+            }
+          ]
+        },
+        {
+          "Name": "usuario_area",
+          "EntityName": "UsuarioArea",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "usuario_id",
+              "PropertyName": "UsuarioId"
+            },
+            {
+              "Name": "area_ocupacao_id",
+              "PropertyName": "AreaOcupacaoId"
+            }
+          ]
+        },
+        {
+          "Name": "habilidade_candidato",
+          "EntityName": "HabilidadeCandidato",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "habilidade_id",
+              "PropertyName": "HabilidadeId"
+            },
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "nivel",
+              "PropertyName": "Nivel"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Candidato",
+              "NewName": null,
+              "FkName": "habilidade_candidato_candidato_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Habilidade",
+              "NewName": null,
+              "FkName": "habilidade_candidato_habilidade_id_fkey",
+              "ToEntity": "Habilidade",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "curriculo_candidato",
+          "EntityName": "CurriculoCandidato",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "curriculo_candidato_id",
+              "PropertyName": "CurriculoCandidatoId"
+            },
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "curriculo_convertido",
+              "PropertyName": "CurriculoConvertido"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Candidato",
+              "NewName": null,
+              "FkName": "curriculo_candidato_candidato_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "entrevistador_entrevista",
+          "EntityName": "EntrevistadorEntrevista",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "gestor_id",
+              "PropertyName": "GestorId"
+            },
+            {
+              "Name": "entrevista_id",
+              "PropertyName": "EntrevistaId"
+            }
+          ]
+        },
+        {
+          "Name": "comentario",
+          "EntityName": "Comentario",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "comentario_id",
+              "PropertyName": "ComentarioId"
+            },
+            {
+              "Name": "data_comentario",
+              "PropertyName": "DataComentario"
+            },
+            {
+              "Name": "entrevista_id",
+              "PropertyName": "EntrevistaId"
+            },
+            {
+              "Name": "gestor_id",
+              "PropertyName": "GestorId"
+            },
+            {
+              "Name": "texto",
+              "PropertyName": "Texto"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Entrevista",
+              "NewName": null,
+              "FkName": "comentario_entrevista_id_fkey",
+              "ToEntity": "Entrevista",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Gestor",
+              "NewName": null,
+              "FkName": "comentario_gestor_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "usuario",
+          "EntityName": "Usuario",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "usuario_id",
+              "PropertyName": "UsuarioId"
+            },
+            {
+              "Name": "email",
+              "PropertyName": "Email"
+            },
+            {
+              "Name": "nome",
+              "PropertyName": "Nome"
+            },
+            {
+              "Name": "primeiro_acesso",
+              "PropertyName": "PrimeiroAcesso"
+            },
+            {
+              "Name": "senha",
+              "PropertyName": "Senha"
+            },
+            {
+              "Name": "status_usuario",
+              "PropertyName": "StatusUsuario"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "AnotacaoCandidato",
+              "NewName": null,
+              "FkName": "anotacao_candidato_id_fkey",
+              "ToEntity": "Anotacao",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "AnotacaoGestor",
+              "NewName": null,
+              "FkName": "anotacao_gestor_id_fkey",
+              "ToEntity": "Anotacao",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "CandidatoQuestao",
+              "NewName": null,
+              "FkName": "candidato_questao_candidato_id_fkey",
+              "ToEntity": "CandidatoQuestao",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "CandidatoVaga",
+              "NewName": null,
+              "FkName": "candidato_vaga_candidato_id_fkey",
+              "ToEntity": "CandidatoVaga",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "Comentario",
+              "NewName": null,
+              "FkName": "comentario_gestor_id_fkey",
+              "ToEntity": "Comentario",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "CurriculoCandidato",
+              "NewName": null,
+              "FkName": "curriculo_candidato_candidato_id_fkey",
+              "ToEntity": "CurriculoCandidato",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "ExperienciaProfissional",
+              "NewName": null,
+              "FkName": "experiencia_profissional_usuario_id_fkey",
+              "ToEntity": "ExperienciaProfissional",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "HabilidadeCandidato",
+              "NewName": null,
+              "FkName": "habilidade_candidato_candidato_id_fkey",
+              "ToEntity": "HabilidadeCandidato",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "InformacaoCandidato",
+              "NewName": null,
+              "FkName": "informacao_candidato_candidato_id_fkey",
+              "ToEntity": "InformacaoCandidato",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "VagaNavigation",
+              "NewName": null,
+              "FkName": "vaga_analista_rh_fkey",
+              "ToEntity": "Vaga",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            }
+          ]
+        },
+        {
+          "Name": "empresa",
+          "EntityName": "Empresa",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "empresa_id",
+              "PropertyName": "EmpresaId"
+            },
+            {
+              "Name": "nome",
+              "PropertyName": "Nome"
+            },
+            {
+              "Name": "status_empresa",
+              "PropertyName": "StatusEmpresa"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "SetorOcupacao",
+              "NewName": null,
+              "FkName": "setor_ocupacao_empresa_id_fkey",
+              "ToEntity": "SetorOcupacao",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "Vaga",
+              "NewName": null,
+              "FkName": "vaga_empresa_id_fkey",
+              "ToEntity": "Vaga",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            }
+          ]
+        },
+        {
+          "Name": "setor_ocupacao",
+          "EntityName": "SetorOcupacao",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "setor_ocupacao_id",
+              "PropertyName": "SetorOcupacaoId"
+            },
+            {
+              "Name": "area_ocupacao_id",
+              "PropertyName": "AreaOcupacaoId"
+            },
+            {
+              "Name": "empresa_id",
+              "PropertyName": "EmpresaId"
+            },
+            {
+              "Name": "nome",
+              "PropertyName": "Nome"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "AreaOcupacao",
+              "NewName": null,
+              "FkName": "setor_ocupacao_area_ocupacao_id_fkey",
+              "ToEntity": "AreaOcupacao",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Empresa",
+              "NewName": null,
+              "FkName": "setor_ocupacao_empresa_id_fkey",
+              "ToEntity": "Empresa",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "habilidade",
+          "EntityName": "Habilidade",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "habilidade_id",
+              "PropertyName": "HabilidadeId"
+            },
+            {
+              "Name": "nome",
+              "PropertyName": "Nome"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "HabilidadeCandidato",
+              "NewName": null,
+              "FkName": "habilidade_candidato_habilidade_id_fkey",
+              "ToEntity": "HabilidadeCandidato",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            }
+          ]
+        },
+        {
+          "Name": "avaliacao_habilidade",
+          "EntityName": "AvaliacaoHabilidade",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "entrevista_id",
+              "PropertyName": "EntrevistaId"
+            },
+            {
+              "Name": "habilidade_id",
+              "PropertyName": "HabilidadeId"
+            },
+            {
+              "Name": "nivel_avaliado",
+              "PropertyName": "NivelAvaliado"
+            }
+          ]
+        },
+        {
+          "Name": "candidato_questao",
+          "EntityName": "CandidatoQuestao",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "questao_id",
+              "PropertyName": "QuestaoId"
+            },
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "reposta_questao",
+              "PropertyName": "RepostaQuestao"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Candidato",
+              "NewName": null,
+              "FkName": "candidato_questao_candidato_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Questao",
+              "NewName": null,
+              "FkName": "candidato_questao_questao_id_fkey",
+              "ToEntity": "Questao",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "area_ocupacao",
+          "EntityName": "AreaOcupacao",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "area_ocupacao_id",
+              "PropertyName": "AreaOcupacaoId"
+            },
+            {
+              "Name": "nome",
+              "PropertyName": "Nome"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "SetorOcupacao",
+              "NewName": null,
+              "FkName": "setor_ocupacao_area_ocupacao_id_fkey",
+              "ToEntity": "SetorOcupacao",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            }
+          ]
+        },
+        {
+          "Name": "candidato_entrevista",
+          "EntityName": "CandidatoEntrevista",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "entrevista_id",
+              "PropertyName": "EntrevistaId"
+            }
+          ]
+        },
+        {
+          "Name": "informacao_candidato",
+          "EntityName": "InformacaoCandidato",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "info_candidato_id",
+              "PropertyName": "InfoCandidatoId"
+            },
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            },
+            {
+              "Name": "data_nascimento",
+              "PropertyName": "DataNascimento"
+            },
+            {
+              "Name": "formacao_academica",
+              "PropertyName": "FormacaoAcademica"
+            },
+            {
+              "Name": "idioma",
+              "PropertyName": "Idioma"
+            },
+            {
+              "Name": "resumo",
+              "PropertyName": "Resumo"
+            },
+            {
+              "Name": "telefone",
+              "PropertyName": "Telefone"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Candidato",
+              "NewName": null,
+              "FkName": "informacao_candidato_candidato_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "habilidade_vaga",
+          "EntityName": "HabilidadeVaga",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "habilidade_id",
+              "PropertyName": "HabilidadeId"
+            },
+            {
+              "Name": "vaga_id",
+              "PropertyName": "VagaId"
+            }
+          ]
+        },
+        {
+          "Name": "processo_seletivo",
+          "EntityName": "ProcessoSeletivo",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "processo_seletivo_id",
+              "PropertyName": "ProcessoSeletivoId"
+            },
+            {
+              "Name": "data_abertura",
+              "PropertyName": "DataAbertura"
+            },
+            {
+              "Name": "data_fechamento",
+              "PropertyName": "DataFechamento"
+            },
+            {
+              "Name": "status_processo_seletivo",
+              "PropertyName": "StatusProcessoSeletivo"
+            },
+            {
+              "Name": "titulo_processo",
+              "PropertyName": "TituloProcesso"
+            },
+            {
+              "Name": "vaga_id",
+              "PropertyName": "VagaId"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Entrevista",
+              "NewName": null,
+              "FkName": "entrevista_processo_seletivo_id_fkey",
+              "ToEntity": "Entrevista",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "Vaga",
+              "NewName": null,
+              "FkName": "processo_seletivo_vaga_id_fkey",
+              "ToEntity": "Vaga",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "candidato_processo_seletivo",
+          "EntityName": "CandidatoProcessoSeletivo",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "processo_seletivo_id",
+              "PropertyName": "ProcessoSeletivoId"
+            },
+            {
+              "Name": "candidato_id",
+              "PropertyName": "CandidatoId"
+            }
+          ]
+        },
+        {
+          "Name": "alternativa",
+          "EntityName": "Alternativa",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "alternativa_id",
+              "PropertyName": "AlternativaId"
+            },
+            {
+              "Name": "alternativa_correta",
+              "PropertyName": "AlternativaCorreta"
+            },
+            {
+              "Name": "questao_id",
+              "PropertyName": "QuestaoId"
+            },
+            {
+              "Name": "texto_alternativa",
+              "PropertyName": "TextoAlternativa"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Questao",
+              "NewName": null,
+              "FkName": "alternativa_questao_id_fkey",
+              "ToEntity": "Questao",
+              "Multiplicity": "1"
+            }
+          ]
+        },
+        {
+          "Name": "entrevista",
+          "EntityName": "Entrevista",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "entrevista_id",
+              "PropertyName": "EntrevistaId"
+            },
+            {
+              "Name": "horario_fim",
+              "PropertyName": "HorarioFim"
+            },
+            {
+              "Name": "horario_inicio",
+              "PropertyName": "HorarioInicio"
+            },
+            {
+              "Name": "nome_entrevista",
+              "PropertyName": "NomeEntrevista"
+            },
+            {
+              "Name": "processo_seletivo_id",
+              "PropertyName": "ProcessoSeletivoId"
+            },
+            {
+              "Name": "status_entrevista",
+              "PropertyName": "StatusEntrevista"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Comentario",
+              "NewName": null,
+              "FkName": "comentario_entrevista_id_fkey",
+              "ToEntity": "Comentario",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "ProcessoSeletivo",
+              "NewName": null,
+              "FkName": "entrevista_processo_seletivo_id_fkey",
+              "ToEntity": "ProcessoSeletivo",
+              "Multiplicity": "1"
+            }
+          ]
+        }
+      ],
+      "Functions": []
+    }
+  ]
+}

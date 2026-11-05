@@ -12,47 +12,47 @@ namespace NextHire_API.Repository
 
         public EmpresaRepository(NextHireContext ctx) => _ctx = ctx;
 
-        public async Task<IEnumerable<empresa?>> Listar() 
-            => await _ctx.empresa.ToListAsync();
-        public async Task<empresa?> BuscarPorNome(string nome) =>
-             await _ctx.empresa.FirstOrDefaultAsync(varAux => varAux.nome == nome) 
+        public async Task<IEnumerable<Empresa?>> Listar() 
+            => await _ctx.Empresa.ToListAsync();
+        public async Task<Empresa?> BuscarPorNome(string nome) =>
+             await _ctx.Empresa.FirstOrDefaultAsync(varAux => varAux.Nome == nome) 
                     ?? throw new InvalidOperationException("Empresa não encontrada");
 
-        public async Task<empresa?> BuscarPorId(int id) =>
-     await _ctx.empresa.FindAsync(id)
+        public async Task<Empresa?> BuscarPorId(int id) =>
+     await _ctx.Empresa.FindAsync(id)
             ?? throw new InvalidOperationException("Empresa não encontrada");
 
-        public async Task<bool> empresaExiste(string nome)
-            => await _ctx.empresa.AnyAsync(varAux => varAux.nome == nome);
+        public async Task<bool> EmpresaExiste(string nome)
+            => await _ctx.Empresa.AnyAsync(varAux => varAux.Nome == nome);
 
-        public async Task<empresa?> Adicionar(empresa EmpresaConstrutor)
+        public async Task<Empresa?> Adicionar(Empresa EmpresaConstrutor)
         {
-            await _ctx.empresa.AddAsync(EmpresaConstrutor);
+            await _ctx.Empresa.AddAsync(EmpresaConstrutor);
             await _ctx.SaveChangesAsync();
             return EmpresaConstrutor;
         }
 
-        public async Task<empresa?> Atualizar(int id, empresa empresaConstrutor)
+        public async Task<Empresa?> Atualizar(int id, Empresa EmpresaConstrutor)
         {
-            empresa? empresaQuery = await _ctx.empresa.FindAsync(id) 
+            Empresa? EmpresaQuery = await _ctx.Empresa.FindAsync(id) 
                 ?? throw new InvalidOperationException("Empresa não encontrada");
 
-            empresaQuery.nome = empresaConstrutor.nome;
+            EmpresaQuery.Nome = EmpresaConstrutor.Nome;
 
             await _ctx.SaveChangesAsync();
-            return empresaQuery;
+            return EmpresaQuery;
         }
 
 
-        public async Task<empresa?> Remover(int id)
+        public async Task<Empresa?> Remover(int id)
         {
-            empresa? empresaQuery = await _ctx.empresa.FindAsync(id) 
+            Empresa? EmpresaQuery = await _ctx.Empresa.FindAsync(id) 
                    ?? throw new InvalidOperationException("Empresa não encontrada");
 
-            empresaQuery.status_empresa = false;
+            EmpresaQuery.StatusEmpresa = false;
             await _ctx.SaveChangesAsync();
 
-            return empresaQuery;
+            return EmpresaQuery;
 
 
         }

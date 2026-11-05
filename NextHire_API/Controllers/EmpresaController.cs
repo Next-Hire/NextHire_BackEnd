@@ -19,10 +19,10 @@ namespace NextHire_API.Controllers
         {
             try
             {
-                IEnumerable<LerEmpresaDTO?> lista_de_empresas = await _rep.ListagemTotal();
-                if (lista_de_empresas == null || !lista_de_empresas.Any())
-                    return NotFound(lista_de_empresas);
-                return Ok(lista_de_empresas);
+                IEnumerable<LerEmpresaDTO?> lista_de_Empresas = await _rep.ListagemTotal();
+                if (lista_de_Empresas == null || !lista_de_Empresas.Any())
+                    return NotFound(lista_de_Empresas);
+                return Ok(lista_de_Empresas);
             }
 
             catch (DomainException ex)
@@ -36,8 +36,8 @@ namespace NextHire_API.Controllers
         {
             try
             {
-                LerEmpresaDTO empresa = await _rep.ObterPorEmpresa(nome);
-                return Ok(empresa);
+                LerEmpresaDTO Empresa = await _rep.ObterPorEmpresa(nome);
+                return Ok(Empresa);
             }
             catch (DomainException ex)
             {
@@ -50,8 +50,8 @@ namespace NextHire_API.Controllers
         {
             try
             {
-                LerEmpresaDTO empresa = await _rep.ObterPorId(id);
-                return Ok(empresa);
+                LerEmpresaDTO Empresa = await _rep.ObterPorId(id);
+                return Ok(Empresa);
             }
             catch (DomainException ex)
             {
@@ -60,12 +60,12 @@ namespace NextHire_API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CriarEmpresaDTO>> Adicionar([FromBody] CriarEmpresaDTO empresaCons)
+        public async Task<ActionResult<CriarEmpresaDTO>> Adicionar([FromBody] CriarEmpresaDTO EmpresaCons)
         {
             try
             {
-                CriarEmpresaDTO empresa = await _rep.Adicionar(empresaCons);
-                return Ok(empresa);
+                CriarEmpresaDTO Empresa = await _rep.Adicionar(EmpresaCons);
+                return Ok(Empresa);
             }
             catch (DomainException ex)
             {
@@ -74,12 +74,12 @@ namespace NextHire_API.Controllers
         }
 
         [HttpPut("Atualizar/{id}")]
-        public async Task<ActionResult<LerEmpresaDTO>> Atualizar(int id, [FromBody] LerEmpresaDTO? empresaCons)
+        public async Task<ActionResult<LerEmpresaDTO>> Atualizar(int id, [FromBody] LerEmpresaDTO? EmpresaCons)
         {
             try
             {
-                LerEmpresaDTO empresa = await _rep.Atualizar(id, empresaCons);
-                return Ok(empresa);
+                LerEmpresaDTO Empresa = await _rep.Atualizar(id, EmpresaCons);
+                return Ok(Empresa);
             }
             catch (DomainException ex)
             {
@@ -92,8 +92,8 @@ namespace NextHire_API.Controllers
         {
             try
             {
-                LerEmpresaDTO empresa = await _rep.Remover(id);
-                return Ok(empresa);
+                LerEmpresaDTO Empresa = await _rep.Remover(id);
+                return Ok(Empresa);
             }
             catch (DomainException ex)
             {

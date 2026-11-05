@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
-using NextHire_API.Applications;
 using NextHire_API.Contexts;
 using NextHire_API.Applications.Services;
 using NextHire_API.Interfaces;

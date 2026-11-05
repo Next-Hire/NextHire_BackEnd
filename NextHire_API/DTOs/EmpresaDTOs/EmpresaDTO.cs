@@ -11,8 +11,9 @@ namespace NextHire_API.DTOs.EmpresaDTOs
 
     public class LerEmpresaDTO
     {
-        public int empresaId { get; set; }
+        public int EmpresaId { get; set; }
         [Required(ErrorMessage = "Nome é obrigatório")]
         public string nome { get; set; } = string.Empty;
+        public bool statusEmpresa { get; set; }
     }
 }

@@ -5,20 +5,22 @@ namespace NextHire_API.Applications.Convertions.DomainToConversion
 {
     public class EmpresaConvertion
     {
-        public static CriarEmpresaDTO criarEmpresaDTO(empresa empresa)
+        public static CriarEmpresaDTO criarEmpresaDTO(Empresa empresa)
         {
             return new CriarEmpresaDTO
             {
-                nome = empresa.nome
+                nome = empresa.Nome
             };
         }
 
-        public static LerEmpresaDTO listarEmpresas(empresa empresa)
+        public static LerEmpresaDTO listarEmpresas(Empresa empresa)
         {
             return new LerEmpresaDTO
             {
-                empresaId = empresa.empresa_id,
-                nome = empresa.nome
+                EmpresaId = empresa.EmpresaId,
+                nome = empresa.Nome,
+                statusEmpresa = empresa.StatusEmpresa ?? true
+
             };
         }
 

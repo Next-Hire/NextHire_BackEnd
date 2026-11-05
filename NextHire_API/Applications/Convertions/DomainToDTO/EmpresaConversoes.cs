@@ -5,21 +5,22 @@ namespace NextHire_API.Applications.Convertions.DomainToDTO
 {
     public static class EmpresaConversoes
     {
-        public static LerEmpresaDTO LerEmpresa(empresa empresa)
+        public static LerEmpresaDTO LerEmpresa(Empresa Empresa)
         {
             return new LerEmpresaDTO
             {
-                empresaId = empresa.empresa_id,
-                nome = empresa.nome
-                
+                EmpresaId = Empresa.EmpresaId,
+                nome = Empresa.Nome,
+                statusEmpresa = Empresa.StatusEmpresa ?? true
+
             };
         }
 
-        public static CriarEmpresaDTO CriarEmpresa(empresa empresa)
+        public static CriarEmpresaDTO CriarEmpresa(Empresa Empresa)
         {
             return new CriarEmpresaDTO
             {
-                nome = empresa.nome,
+                nome = Empresa.Nome
             };
         }
     }

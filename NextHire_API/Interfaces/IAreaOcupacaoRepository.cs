@@ -4,11 +4,11 @@ namespace NextHire_API.Interfaces
 {
     public interface IAreaOcupacaoRepository
     {
-        List<area_ocupacao> Listar();
-        area_ocupacao BuscarPorId(int id);
-        area_ocupacao BuscarPorNome(string nome);
-        void Adicionar(area_ocupacao areaOcupacao);
-        void Atualizar(area_ocupacao areaOcupacao);
+        List<AreaOcupacao> Listar();
+        AreaOcupacao BuscarPorId(int id);
+        AreaOcupacao BuscarPorNome(string nome);
+        void Adicionar(AreaOcupacao areaOcupacao);
+        void Atualizar(AreaOcupacao areaOcupacao);
         void Deletar(int id);
 
     }

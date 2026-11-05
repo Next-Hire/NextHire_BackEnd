@@ -13,18 +13,18 @@ namespace NextHire_API.Repository
             _context = context;
         }
 
-        public void Adicionar(area_ocupacao areaOcupacao)
+        public void Adicionar(AreaOcupacao areaOcupacao)
         {
-            _context.area_ocupacao.Add(areaOcupacao);
+            _context.AreaOcupacao.Add(areaOcupacao);
             _context.SaveChanges();
         }
 
-        public void Atualizar(area_ocupacao areaOcupacao)
+        public void Atualizar(AreaOcupacao areaOcupacao)
         {
             if (areaOcupacao == null)
                 return;
 
-            area_ocupacao area = _context.area_ocupacao.Find(areaOcupacao.area_ocupacao_id);
+            AreaOcupacao area = _context.AreaOcupacao.Find(areaOcupacao.AreaOcupacaoId);
             if (area == null)
                 return;
 
@@ -32,29 +32,29 @@ namespace NextHire_API.Repository
             _context.SaveChanges();
         }
 
-        public area_ocupacao BuscarPorId(int id)
+        public AreaOcupacao BuscarPorId(int id)
         {
-            return _context.area_ocupacao.Find(id);
+            return _context.AreaOcupacao.Find(id);
         }
 
-        public area_ocupacao BuscarPorNome(string nome)
+        public AreaOcupacao BuscarPorNome(string nome)
         {
-            return _context.area_ocupacao.FirstOrDefault(a => a.nome == nome);
+            return _context.AreaOcupacao.FirstOrDefault(a => a.Nome == nome);
         }
 
         public void Deletar(int id)
         {
-            area_ocupacao area = _context.area_ocupacao.Find(id);
+            AreaOcupacao area = _context.AreaOcupacao.Find(id);
             if (area == null)
                 return;
 
-            _context.area_ocupacao.Remove(area);
+            _context.AreaOcupacao.Remove(area);
             _context.SaveChanges();
         }
 
-        public List<area_ocupacao> Listar()
+        public List<AreaOcupacao> Listar()
         {
-            return _context.area_ocupacao.ToList();
+            return _context.AreaOcupacao.ToList();
         }
     }
 }

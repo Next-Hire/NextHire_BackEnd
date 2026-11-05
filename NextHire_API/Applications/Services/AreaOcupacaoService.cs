@@ -14,14 +14,14 @@ namespace NextHire_API.Applications.Services
             _repository = areaOcupacaoRepository;
         }
 
-        private static ListarAreaOcupacaoDto lerDto(area_ocupacao areaOcupacao)
+        private static ListarAreaOcupacaoDto lerDto(AreaOcupacao areaOcupacao)
         {
             return new ListarAreaOcupacaoDto
             {
-                area_ocupacao_id = areaOcupacao.area_ocupacao_id,
-                nome = areaOcupacao.nome,
-                setor_ocupacao = areaOcupacao.setor_ocupacao,
-                usuario = areaOcupacao.usuario
+                area_ocupacao_id = areaOcupacao.AreaOcupacaoId,
+                nome = areaOcupacao.Nome,
+                SetorOcupacao = areaOcupacao.SetorOcupacao,
+                Usuario = areaOcupacao.Usuario
             };
         }
 
@@ -54,11 +54,11 @@ namespace NextHire_API.Applications.Services
 
         public ListarAreaOcupacaoDto Adicionar(AdicionarAreaOcupacao areaOcupacao)
         {
-            var area = new area_ocupacao
+            var area = new AreaOcupacao
             {
-                nome = areaOcupacao.nome,
-                setor_ocupacao = areaOcupacao.setor_ocupacao,
-                usuario = areaOcupacao.usuario
+                Nome = areaOcupacao.Nome,
+                SetorOcupacao = areaOcupacao.SetorOcupacao,
+                Usuario = areaOcupacao.Usuario
             };
 
             _repository.Adicionar(area);
@@ -74,9 +74,9 @@ namespace NextHire_API.Applications.Services
                 throw new DomainException("Area de Ocupação não encontrado.");
             }
 
-            areaExistente.nome = areaOcupacao.nome;
-            areaExistente.setor_ocupacao = areaOcupacao.setor_ocupacao;
-            areaExistente.usuario = areaOcupacao.usuario;
+            areaExistente.Nome = areaOcupacao.Nome;
+            areaExistente.SetorOcupacao = areaOcupacao.SetorOcupacao;
+            areaExistente.Usuario = areaOcupacao.Usuario;
 
             _repository.Atualizar(areaExistente);
             return lerDto(areaExistente);
@@ -84,7 +84,7 @@ namespace NextHire_API.Applications.Services
 
         public void Deletar(int id)
         {
-            area_ocupacao area = _repository.BuscarPorId(id);
+            AreaOcupacao area = _repository.BuscarPorId(id);
 
             if (area == null)
             {

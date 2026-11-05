@@ -16,11 +16,12 @@ namespace NextHire_API.Repository
             => await _ctx.Empresa.ToListAsync();
         public async Task<Empresa?> BuscarPorNome(string nome) =>
              await _ctx.Empresa.FirstOrDefaultAsync(varAux => varAux.Nome == nome) 
-                    ?? throw new InvalidOperationException("Empresa não encontrada");
+                    ?? null;
 
         public async Task<Empresa?> BuscarPorId(int id) =>
      await _ctx.Empresa.FindAsync(id)
-            ?? throw new InvalidOperationException("Empresa não encontrada");
+            ?? null; // Descobrir como fazer com que o throw new InvalidOperationException()
+                     // não pare a api
 
         public async Task<bool> EmpresaExiste(string nome)
             => await _ctx.Empresa.AnyAsync(varAux => varAux.Nome == nome);
@@ -35,7 +36,7 @@ namespace NextHire_API.Repository
         public async Task<Empresa?> Atualizar(int id, Empresa EmpresaConstrutor)
         {
             Empresa? EmpresaQuery = await _ctx.Empresa.FindAsync(id) 
-                ?? throw new InvalidOperationException("Empresa não encontrada");
+                ?? null; // throw new InvalidOperationException()
 
             EmpresaQuery.Nome = EmpresaConstrutor.Nome;
 

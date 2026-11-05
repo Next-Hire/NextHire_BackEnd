@@ -27,7 +27,7 @@ namespace NextHire_API.Controllers
 
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 
@@ -41,7 +41,7 @@ namespace NextHire_API.Controllers
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 
@@ -55,7 +55,7 @@ namespace NextHire_API.Controllers
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 
@@ -74,11 +74,11 @@ namespace NextHire_API.Controllers
         }
 
         [HttpPut("Atualizar/{id}")]
-        public async Task<ActionResult<LerEmpresaDTO>> Atualizar(int id, [FromBody] LerEmpresaDTO? EmpresaCons)
+        public async Task<ActionResult<LerEmpresaDTO>> Atualizar(int id, string? nome, bool? status)
         {
             try
             {
-                LerEmpresaDTO Empresa = await _rep.Atualizar(id, EmpresaCons);
+                LerEmpresaDTO Empresa = await _rep.Atualizar(id, nome, status);
                 return Ok(Empresa);
             }
             catch (DomainException ex)

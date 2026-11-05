@@ -15,8 +15,9 @@ namespace NextHire_API.Applications.Services
 
         public async Task<LerEmpresaDTO> ObterPorId(int EmpresaId)
         {
-            Empresa EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
-                    ?? throw new DomainException("Empresa não encontrada!");
+            Empresa EmpresaQuery = await _rep.BuscarPorId(EmpresaId);
+                    if(EmpresaQuery == null || EmpresaQuery.EmpresaId == 0)
+                     throw new DomainException("Nenhuma Empresa cadastrada!");
             return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
@@ -30,8 +31,9 @@ namespace NextHire_API.Applications.Services
 
         public async Task<LerEmpresaDTO> ObterPorEmpresa(string nome)
         {
-            Empresa? EmpresaQuery = await _rep.BuscarPorNome(nome)
-                    ?? throw new DomainException("Empresa Não encontrada!");
+            Empresa? EmpresaQuery = await _rep.BuscarPorNome(nome);
+            if (EmpresaQuery == null || EmpresaQuery.EmpresaId == 0)
+                throw new DomainException("Nenhuma Empresa cadastrada!");
             return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
@@ -50,12 +52,13 @@ namespace NextHire_API.Applications.Services
             return EmpresaConvertion.criarEmpresaDTO(Empresa);
         }
 
-        public async Task<LerEmpresaDTO> Atualizar(int EmpresaId, LerEmpresaDTO EmpresaCons)
+        public async Task<LerEmpresaDTO> Atualizar(int EmpresaId, string? nome, bool? status)
         {
             Empresa? EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
                 ?? throw new DomainException("Empresa não encontrada!");
 
-            EmpresaQuery.Nome = EmpresaCons.nome;
+            EmpresaQuery.Nome = nome;
+            EmpresaQuery.StatusEmpresa = status;
 
 
             await _rep.Atualizar(EmpresaQuery.EmpresaId, EmpresaQuery);

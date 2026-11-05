@@ -1,5 +1,7 @@
-﻿using NextHire_API.Contexts;
+﻿using Microsoft.EntityFrameworkCore;
+using NextHire_API.Contexts;
 using NextHire_API.Domains;
+using NextHire_API.DTOs.AreaOcupacaoDto;
 using NextHire_API.Interfaces;
 
 namespace NextHire_API.Repository
@@ -34,12 +36,28 @@ namespace NextHire_API.Repository
 
         public AreaOcupacao BuscarPorId(int id)
         {
-            return _context.AreaOcupacao.Find(id);
+            return _context.AreaOcupacao
+                .Include(a => a.SetorOcupacao)
+                .Include(a => a.Usuario)
+                .FirstOrDefault(a => a.AreaOcupacaoId == id);
         }
 
         public AreaOcupacao BuscarPorNome(string nome)
         {
-            return _context.AreaOcupacao.FirstOrDefault(a => a.Nome == nome);
+            return _context.AreaOcupacao
+                .Include(a => a.SetorOcupacao)
+                .Include(a => a.Usuario)
+                .FirstOrDefault(a => a.Nome == nome);
+        }
+
+        public SetorOcupacao BuscarSetorPorId(int id)
+        {
+            return _context.SetorOcupacao.Find(id);
+        }
+
+        public Usuario BuscarUsuarioPorId(int id)
+        {
+            return _context.Usuario.Find(id);
         }
 
         public void Deletar(int id)
@@ -52,9 +70,22 @@ namespace NextHire_API.Repository
             _context.SaveChanges();
         }
 
-        public List<AreaOcupacao> Listar()
+        public async Task<List<ListarAreaOcupacaoDto>> Listar()
         {
-            return _context.AreaOcupacao.ToList();
+            return await _context.AreaOcupacao
+                .Select(a => new ListarAreaOcupacaoDto
+                {
+                    AreaOcupacaoId = a.AreaOcupacaoId,
+                    Nome = a.Nome,
+
+                    SetorOcupacao = a.SetorOcupacao
+                        .Select(s => new SetorOcupacao
+                        {
+                            SetorOcupacaoId = s.SetorOcupacaoId,
+                            Nome = s.Nome
+                        }).ToList()
+                })
+                .ToListAsync();
         }
     }
 }

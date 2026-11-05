@@ -18,8 +18,8 @@ namespace NextHire_API.Applications.Services
         {
             return new ListarAreaOcupacaoDto
             {
-                area_ocupacao_id = areaOcupacao.AreaOcupacaoId,
-                nome = areaOcupacao.Nome,
+                AreaOcupacaoId = areaOcupacao.AreaOcupacaoId,
+                Nome = areaOcupacao.Nome,
                 SetorOcupacao = areaOcupacao.SetorOcupacao,
                 Usuario = areaOcupacao.Usuario
             };
@@ -54,11 +54,19 @@ namespace NextHire_API.Applications.Services
 
         public ListarAreaOcupacaoDto Adicionar(AdicionarAreaOcupacao areaOcupacao)
         {
+            var setor = _repository.BuscarSetorPorId(areaOcupacao.SetorId);
+            var usuario = _repository.BuscarUsuarioPorId(areaOcupacao.UsuarioId);
+
+            if (setor == null || usuario == null)
+            {
+                throw new DomainException("Setor ou usuário não encontrado.");
+            }
+
             var area = new AreaOcupacao
             {
                 Nome = areaOcupacao.Nome,
-                SetorOcupacao = areaOcupacao.SetorOcupacao,
-                Usuario = areaOcupacao.Usuario
+                SetorOcupacao = new List<SetorOcupacao> { setor },
+                Usuario = new List<Usuario> { usuario }
             };
 
             _repository.Adicionar(area);
@@ -75,8 +83,17 @@ namespace NextHire_API.Applications.Services
             }
 
             areaExistente.Nome = areaOcupacao.Nome;
-            areaExistente.SetorOcupacao = areaOcupacao.SetorOcupacao;
-            areaExistente.Usuario = areaOcupacao.Usuario;
+
+            var setor = _repository.BuscarSetorPorId(areaOcupacao.SetorId);
+            var usuario = _repository.BuscarUsuarioPorId(areaOcupacao.UsuarioId);
+
+            if (setor == null || usuario == null)
+            {
+                throw new DomainException("Setor ou usuário não encontrado.");
+            }
+
+            areaExistente.SetorOcupacao = new List<SetorOcupacao> { setor };
+            areaExistente.Usuario = new List<Usuario> { usuario };
 
             _repository.Atualizar(areaExistente);
             return lerDto(areaExistente);

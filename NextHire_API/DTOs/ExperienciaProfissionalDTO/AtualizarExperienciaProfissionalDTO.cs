@@ -4,10 +4,10 @@ namespace NextHire_API.DTOs.ExperienciaProfissionalDTO
 {
     public class AtualizarExperienciaProfissionalDTO
     {
-        public DateTime data_entrada { get; set; }
+        public DateTime DataEntrada { get; set; }
 
-        public DateTime? data_saida { get; set; }
+        public DateTime? DataSaida { get; set; }
 
-        public bool? atualmente_trabalho { get; set; }
+        public bool? AtualmenteTrabalha { get; set; }
     }
 }

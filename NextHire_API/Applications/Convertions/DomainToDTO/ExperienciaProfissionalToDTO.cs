@@ -1,29 +1,29 @@
 ﻿using NextHire_API.Domains;
 using NextHire_API.DTOs.ExperienciaProfissionalDTO;
 
-namespace NextHire_API.Applications.Convertions.DomainToDTO
+namespace NextHireAPI.Applications.Convertions.DomainToDTO
 {
     public static class ExperienciaProfissionalToDTO
     {
-        public static ListarExperienciaProfissionalDto ConvertarParaListar(experiencia_profissional experienciaProfissional)
+        public static ListarExperienciaProfissionalDto ConvertarParaListar(ExperienciaProfissional experienciaProfissional)
         {
             return new ListarExperienciaProfissionalDto
             {
-                experiencia_profissional_id = experienciaProfissional.experiencia_profissional_id,
-                data_entrada = experienciaProfissional.data_entrada,
-                data_saida = experienciaProfissional.data_saida,
-                status_experiencia = experienciaProfissional.atualmente_trabalho ?? true ? "Trabalha atualmente aqui" : "Experiência anterior",
-                usuario_id = experienciaProfissional.usuario_id
+                ExperienciaProfissionalId = experienciaProfissional.ExperienciaProfissionalId,
+                DataEntrada = experienciaProfissional.DataEntrada,
+                DataSaida = experienciaProfissional.DataSaida,
+                StatusExperiencia = experienciaProfissional.AtualmenteTrabalho ?? true ? "Trabalha atualmente aqui" : "Experiência anterior",
+                UsuarioId = experienciaProfissional.UsuarioId
             };
         }
 
-        public static AtualizarExperienciaProfissionalDTO ConverderParaAtualizar(experiencia_profissional experienciaProfissional)
+        public static AtualizarExperienciaProfissionalDTO ConverderParaAtualizar(ExperienciaProfissional experienciaProfissional)
         {
             return new AtualizarExperienciaProfissionalDTO
             {
-                data_entrada = experienciaProfissional.data_entrada,
-                data_saida = experienciaProfissional.data_saida,
-                atualmente_trabalho = experienciaProfissional.atualmente_trabalho,
+                DataEntrada = experienciaProfissional.DataEntrada,
+                DataSaida = experienciaProfissional.DataSaida,
+                AtualmenteTrabalha = experienciaProfissional.AtualmenteTrabalho,
             };
         }
     }

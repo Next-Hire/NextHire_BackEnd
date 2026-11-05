@@ -4,10 +4,10 @@ namespace NextHire_API.Interfaces
 {
     public interface IExperienciaProfissionalRepository
     {
-        public Task<List<experiencia_profissional>> ListarExperienciasProfissionaisPorUsuario(int idUsuario, bool? ativo);
-        public Task<experiencia_profissional> BuscarExperienciaProfissionalPorId(int idExperienciaProfissional);
-        public Task CadastrarExperienciaProfissional(experiencia_profissional experienciaProfissional);
-        public Task AtualizarExperienciaProfissional(int idExperienciaProfissional, experiencia_profissional experienciaProfissional);
+        public Task<List<ExperienciaProfissional>> ListarExperienciasProfissionaisPorUsuario(int idUsuario, bool? ativo);
+        public Task<ExperienciaProfissional> BuscarExperienciaProfissionalPorId(int idExperienciaProfissional);
+        public Task CadastrarExperienciaProfissional(ExperienciaProfissional experienciaProfissional);
+        public Task AtualizarExperienciaProfissional(int idExperienciaProfissional, ExperienciaProfissional experienciaProfissional);
         public Task RemoverExperienciaProfissional(int idExperienciaProfissional);
     }
 }

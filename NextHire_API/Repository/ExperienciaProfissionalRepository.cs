@@ -13,43 +13,44 @@ namespace NextHire_API.Repository
             _context = context;
         }  
 
-        public async Task<List<experiencia_profissional>> ListarExperienciasProfissionaisPorUsuario(int idUsuario, bool? ativo)
+        public async Task<List<ExperienciaProfissional>> ListarExperienciasProfissionaisPorUsuario(int idUsuario, bool? ativo)
         {
-            List<experiencia_profissional> experienciasProfissionais = 
-                    await _context.experiencia_profissional
-                        .Include(e => e.usuario)
-                        .OrderBy(e => e.data_entrada)
-                        .Where(e => e.usuario_id == idUsuario)
+            List<ExperienciaProfissional> experienciasProfissionais = 
+                    await _context.ExperienciaProfissional
+                        .Include(e => e.Usuario)
+                        .OrderBy(e => e.DataEntrada)
+                        .Where(e => e.UsuarioId == idUsuario)
                         .ToListAsync();
 
             if(ativo == true)
                 return experienciasProfissionais
-                    .Where(e => e.atualmente_trabalho == true)
+                    .Where(e => e.AtualmenteTrabalho == true)
                     .ToList();
 
             if(ativo == false)
                 return experienciasProfissionais
-                    .Where(e => e.atualmente_trabalho == false)
+                    .Where(e => e.AtualmenteTrabalho == false)
                     .ToList();
 
             return experienciasProfissionais;
         }
 
-        public async Task<experiencia_profissional> BuscarExperienciaProfissionalPorId(int idExperienciaProfissional) => 
-                await _context.experiencia_profissional
-                    .FirstOrDefaultAsync(e => e.experiencia_profissional_id == idExperienciaProfissional);
+        public async Task<ExperienciaProfissional> BuscarExperienciaProfissionalPorId(int idExperienciaProfissional) => 
+                await _context.ExperienciaProfissional
+                    .FirstOrDefaultAsync(e => e.ExperienciaProfissionalId == idExperienciaProfissional) 
+                        ?? throw new InvalidOperationException("Experiencia profissional não encontrada.");
 
-        public async Task CadastrarExperienciaProfissional(experiencia_profissional experienciaProfissional)
+        public async Task CadastrarExperienciaProfissional(ExperienciaProfissional experienciaProfissional)
         {
-            await _context.experiencia_profissional.AddAsync(experienciaProfissional);
+            await _context.ExperienciaProfissional.AddAsync(experienciaProfissional);
             await _context.SaveChangesAsync();
         }
 
-        public async Task AtualizarExperienciaProfissional(int idExperienciaProfissional, experiencia_profissional experienciaProfissional)
+        public async Task AtualizarExperienciaProfissional(int idExperienciaProfissional, ExperienciaProfissional experienciaProfissional)
         {
-            experiencia_profissional experienciaProfissionalBuscada = 
-                await _context.experiencia_profissional
-                    .FirstOrDefaultAsync(e => e.experiencia_profissional_id == idExperienciaProfissional) 
+            ExperienciaProfissional experienciaProfissionalBuscada = 
+                await _context.ExperienciaProfissional
+                    .FirstOrDefaultAsync(e => e.ExperienciaProfissionalId == idExperienciaProfissional) 
                         ?? throw new InvalidOperationException("Experiencia profissional nao encontrada.");
             
             // METODO NOVO PARA USAR DE UPDATE
@@ -59,12 +60,12 @@ namespace NextHire_API.Repository
 
         public async Task RemoverExperienciaProfissional(int idExperienciaProfissional)
         {
-            experiencia_profissional experienciaProfissionalBuscada = 
-                await _context.experiencia_profissional
-                    .FirstOrDefaultAsync(e => e.experiencia_profissional_id == idExperienciaProfissional) 
+            ExperienciaProfissional experienciaProfissionalBuscada = 
+                await _context.ExperienciaProfissional
+                    .FirstOrDefaultAsync(e => e.ExperienciaProfissionalId == idExperienciaProfissional) 
                         ?? throw new InvalidOperationException("Experiencia profissional nao encontrada.");
 
-            _context.experiencia_profissional.Remove(experienciaProfissionalBuscada);
+            _context.ExperienciaProfissional.Remove(experienciaProfissionalBuscada);
             await _context.SaveChangesAsync();
         }
     }

@@ -2,7 +2,7 @@
 
 namespace NextHire_API.DTOs.ExperienciaProfissionalDTO
 {
-    public class AdicionarExperienciaProfissionalDTO
+    public class AdicionarExperienciaProfissionalDto
     {
         public bool? StatusExperiencia { get; set; }
 

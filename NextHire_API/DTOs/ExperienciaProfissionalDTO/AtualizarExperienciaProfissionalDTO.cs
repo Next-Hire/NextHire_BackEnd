@@ -2,7 +2,7 @@
 
 namespace NextHire_API.DTOs.ExperienciaProfissionalDTO
 {
-    public class AtualizarExperienciaProfissionalDTO
+    public class AtualizarExperienciaProfissionalDto
     {
         public DateTime DataEntrada { get; set; }
 

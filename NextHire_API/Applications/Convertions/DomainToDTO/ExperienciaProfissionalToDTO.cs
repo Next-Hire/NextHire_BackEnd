@@ -17,13 +17,26 @@ namespace NextHireAPI.Applications.Convertions.DomainToDTO
             };
         }
 
-        public static AtualizarExperienciaProfissionalDTO ConverderParaAtualizar(ExperienciaProfissional experienciaProfissional)
+        public static ExperienciaProfissional ConvertarParaAdicionar(AdicionarExperienciaProfissionalDto experienciaProfissionalDto)
         {
-            return new AtualizarExperienciaProfissionalDTO
+            return new ExperienciaProfissional
             {
+                DataEntrada = experienciaProfissionalDto.DataEntrada,
+                DataSaida = experienciaProfissionalDto.DataSaida,
+                AtualmenteTrabalho = experienciaProfissionalDto.StatusExperiencia ?? false,
+                UsuarioId = experienciaProfissionalDto.UsuarioId
+            };
+        }
+
+        public static ExperienciaProfissional ConverderParaAtualizar(AtualizarExperienciaProfissionalDto experienciaProfissional, int experienciaId, int usuarioId)
+        {
+            return new ExperienciaProfissional
+            {
+                ExperienciaProfissionalId = experienciaId,
                 DataEntrada = experienciaProfissional.DataEntrada,
                 DataSaida = experienciaProfissional.DataSaida,
-                AtualmenteTrabalha = experienciaProfissional.AtualmenteTrabalho,
+                AtualmenteTrabalho = experienciaProfissional.AtualmenteTrabalha,
+                UsuarioId = usuarioId
             };
         }
     }

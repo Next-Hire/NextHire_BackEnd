@@ -22,9 +22,11 @@ namespace NextHireAPI.Applications.Convertions.DomainToDTO
             return new ExperienciaProfissional
             {
                 DataEntrada = experienciaProfissionalDto.DataEntrada,
+                UsuarioId = experienciaProfissionalDto.UsuarioId,
+                Cargo = experienciaProfissionalDto.Cargo,
+                NomeEmpresa = experienciaProfissionalDto.NomeEmpresa,
                 DataSaida = experienciaProfissionalDto.DataSaida,
                 AtualmenteTrabalho = experienciaProfissionalDto.StatusExperiencia ?? false,
-                UsuarioId = experienciaProfissionalDto.UsuarioId
             };
         }
 
@@ -33,10 +35,12 @@ namespace NextHireAPI.Applications.Convertions.DomainToDTO
             return new ExperienciaProfissional
             {
                 ExperienciaProfissionalId = experienciaId,
+                UsuarioId = usuarioId,
+                Cargo = experienciaProfissional.Cargo,
+                NomeEmpresa = experienciaProfissional.NomeEmpresa,
                 DataEntrada = experienciaProfissional.DataEntrada,
                 DataSaida = experienciaProfissional.DataSaida,
-                AtualmenteTrabalho = experienciaProfissional.AtualmenteTrabalha,
-                UsuarioId = usuarioId
+                AtualmenteTrabalho = experienciaProfissional.AtualmenteTrabalha
             };
         }
     }

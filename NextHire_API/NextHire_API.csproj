@@ -37,12 +37,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Applications\Convertions\DomainToConversion\" />
+    <Folder Include="Applications\Convertions\DomainToDto\" />
     <Folder Include="Applications\Authentication\" />
     <Folder Include="Applications\Validations\" />
-    <Folder Include="Applications\Services\" />
-    <Folder Include="Controllers\" />
-    <Folder Include="DTOs\" />
   </ItemGroup>
 
 </Project>

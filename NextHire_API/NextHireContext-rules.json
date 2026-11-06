@@ -1,5 +1,5 @@
 {
-  "Name": "NextHireContext",
+  "Name": "AppDbContext",
   "PreserveCasingUsingRegex": false,
   "IncludeUnknownSchemas": true,
   "SplitEntityTypeConfigurations": false,
@@ -36,6 +36,14 @@
             {
               "Name": "usuario_id",
               "PropertyName": "UsuarioId"
+            },
+            {
+              "Name": "cargo",
+              "PropertyName": "Cargo"
+            },
+            {
+              "Name": "nome_empresa",
+              "PropertyName": "NomeEmpresa"
             }
           ],
           "Navigations": [

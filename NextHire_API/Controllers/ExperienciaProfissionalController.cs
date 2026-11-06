@@ -66,5 +66,19 @@ namespace NextHire_API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> RemoverExperienciaProfissional(int experienciaId)
+        {
+            try
+            {
+                await _service.RemoverExperienciaProfissional(experienciaId);
+                return StatusCode(204, "Experiencia removida com sucesso.");
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

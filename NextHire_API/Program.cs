@@ -6,6 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 using NextHire_API.Contexts;
+using NextHire_API.Interfaces;
+using NextHire_API.Repository;
+using NextHire_API.Applications.Services;
+using Npgsql;
+using NextHire_API.Domains; 
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -34,36 +39,67 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddDbContext<NextHireContext>(options => options.UseNpgsql(conexaoBanco));
- 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// ==============================================================================
+// Criar a fonte de dados e mapear os ENUMs do PostgreSQL
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(conexaoBanco);
+
+dataSourceBuilder.MapEnum<ClassificacaoQuestaoEnum>("classificacao_questao_enum");
+dataSourceBuilder.MapEnum<EscalaTrabalhoEnum>("escala_trabalho_enum");
+dataSourceBuilder.MapEnum<ModeloTrabaloEnum>("modelo_trabalo_enum");
+dataSourceBuilder.MapEnum<NivelPrioridadeEnum>("nivel_prioridade_enum");
+dataSourceBuilder.MapEnum<SituacaoProfissionalEnum>("situacao_profissional_enum");
+dataSourceBuilder.MapEnum<StatusRelacaoEnum>("status_relacao_enum");
+dataSourceBuilder.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
+dataSourceBuilder.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
+
+var dataSource = dataSourceBuilder.Build();
+
+// Registar o DbContext usando a fonte de dados com os enums configurados
+builder.Services.AddDbContext<NextHireContext>(options =>
+    options.UseNpgsql(dataSource, npgsql =>
     {
-        var chave = builder.Configuration["Jwt:Key"]!;
+        npgsql.MapEnum<ClassificacaoQuestaoEnum>("classificacao_questao_enum");
+        npgsql.MapEnum<EscalaTrabalhoEnum>("escala_trabalho_enum");
+        npgsql.MapEnum<ModeloTrabaloEnum>("modelo_trabalo_enum");
+        npgsql.MapEnum<NivelPrioridadeEnum>("nivel_prioridade_enum");
+        npgsql.MapEnum<SituacaoProfissionalEnum>("situacao_profissional_enum");
+        npgsql.MapEnum<StatusRelacaoEnum>("status_relacao_enum");
+        npgsql.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
+        npgsql.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
+    }));
+// ==============================================================================
 
-        var issuer = builder.Configuration["Jwt:Issuer"]!;
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        var chave = builder.Configuration["Jwt:Key"]!;
 
-        var audience = builder.Configuration["Jwt:Audience"]!;
+//        var issuer = builder.Configuration["Jwt:Issuer"]!;
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
+//        var audience = builder.Configuration["Jwt:Audience"]!;
 
-            ValidateAudience = true,
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = true,
 
-            ValidateLifetime = true,
+//            ValidateAudience = true,
 
-            ValidateIssuerSigningKey = true,
+//            ValidateLifetime = true,
 
-            ValidIssuer = issuer,
+//            ValidateIssuerSigningKey = true,
 
-            ValidAudience = audience,
+//            ValidIssuer = issuer,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(chave)
-            )
-        };
-    });
+//            ValidAudience = audience,
+
+//            IssuerSigningKey = new SymmetricSecurityKey(
+//                Encoding.UTF8.GetBytes(chave)
+//            )
+//        };
+//    //});
+
+builder.Services.AddScoped<IAreaOcupacaoRepository, AreaOcupacaoRepository>();
+builder.Services.AddScoped<AreaOcupacaoService>();
 
 // cors btw
 

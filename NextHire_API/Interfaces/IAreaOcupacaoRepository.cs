@@ -1,10 +1,11 @@
 ﻿using NextHire_API.Domains;
+using NextHire_API.DTOs.AreaOcupacaoDto;            
 
 namespace NextHire_API.Interfaces
 {
     public interface IAreaOcupacaoRepository
     {
-        List<AreaOcupacao> Listar();
+        List<ListarAreaOcupacaoDto> Listar();
         AreaOcupacao BuscarPorId(int id);
         AreaOcupacao BuscarPorNome(string nome);
         SetorOcupacao BuscarSetorPorId(int id);

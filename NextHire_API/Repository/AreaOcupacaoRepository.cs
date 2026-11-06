@@ -36,18 +36,12 @@ namespace NextHire_API.Repository
 
         public AreaOcupacao BuscarPorId(int id)
         {
-            return _context.AreaOcupacao
-                .Include(a => a.SetorOcupacao)
-                .Include(a => a.Usuario)
-                .FirstOrDefault(a => a.AreaOcupacaoId == id);
+            return _context.AreaOcupacao.FirstOrDefault(a => a.AreaOcupacaoId == id);
         }
 
         public AreaOcupacao BuscarPorNome(string nome)
         {
-            return _context.AreaOcupacao
-                .Include(a => a.SetorOcupacao)
-                .Include(a => a.Usuario)
-                .FirstOrDefault(a => a.Nome == nome);
+            return _context.AreaOcupacao.FirstOrDefault(a => a.Nome == nome);
         }
 
         public SetorOcupacao BuscarSetorPorId(int id)
@@ -70,22 +64,15 @@ namespace NextHire_API.Repository
             _context.SaveChanges();
         }
 
-        public async Task<List<ListarAreaOcupacaoDto>> Listar()
+        public List<ListarAreaOcupacaoDto> Listar()
         {
-            return await _context.AreaOcupacao
+            return _context.AreaOcupacao
                 .Select(a => new ListarAreaOcupacaoDto
                 {
                     AreaOcupacaoId = a.AreaOcupacaoId,
-                    Nome = a.Nome,
-
-                    SetorOcupacao = a.SetorOcupacao
-                        .Select(s => new SetorOcupacao
-                        {
-                            SetorOcupacaoId = s.SetorOcupacaoId,
-                            Nome = s.Nome
-                        }).ToList()
+                    Nome = a.Nome
                 })
-                .ToListAsync();
+                .ToList();
         }
     }
 }

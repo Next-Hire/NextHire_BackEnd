@@ -20,14 +20,12 @@ namespace NextHire_API.Applications.Services
             {
                 AreaOcupacaoId = areaOcupacao.AreaOcupacaoId,
                 Nome = areaOcupacao.Nome,
-                SetorOcupacao = areaOcupacao.SetorOcupacao,
-                Usuario = areaOcupacao.Usuario
             };
         }
 
         public List<ListarAreaOcupacaoDto> Listar()
         {
-            return _repository.Listar().Select(lerDto).ToList();
+            return _repository.Listar().ToList();
         }
 
         public ListarAreaOcupacaoDto ListarPorID(int id)
@@ -54,19 +52,10 @@ namespace NextHire_API.Applications.Services
 
         public ListarAreaOcupacaoDto Adicionar(AdicionarAreaOcupacao areaOcupacao)
         {
-            var setor = _repository.BuscarSetorPorId(areaOcupacao.SetorId);
-            var usuario = _repository.BuscarUsuarioPorId(areaOcupacao.UsuarioId);
-
-            if (setor == null || usuario == null)
-            {
-                throw new DomainException("Setor ou usuário não encontrado.");
-            }
 
             var area = new AreaOcupacao
             {
                 Nome = areaOcupacao.Nome,
-                SetorOcupacao = new List<SetorOcupacao> { setor },
-                Usuario = new List<Usuario> { usuario }
             };
 
             _repository.Adicionar(area);
@@ -83,17 +72,6 @@ namespace NextHire_API.Applications.Services
             }
 
             areaExistente.Nome = areaOcupacao.Nome;
-
-            var setor = _repository.BuscarSetorPorId(areaOcupacao.SetorId);
-            var usuario = _repository.BuscarUsuarioPorId(areaOcupacao.UsuarioId);
-
-            if (setor == null || usuario == null)
-            {
-                throw new DomainException("Setor ou usuário não encontrado.");
-            }
-
-            areaExistente.SetorOcupacao = new List<SetorOcupacao> { setor };
-            areaExistente.Usuario = new List<Usuario> { usuario };
 
             _repository.Atualizar(areaExistente);
             return lerDto(areaExistente);

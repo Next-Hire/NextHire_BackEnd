@@ -67,8 +67,8 @@ builder.Services.AddDbContext<NextHireContext>(options =>
         npgsql.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
         npgsql.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
     }));
-// ==============================================================================
 
+//? JWT CONFIG
 //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //    .AddJwtBearer(options =>
 //    {

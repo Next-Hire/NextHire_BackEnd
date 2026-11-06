@@ -100,6 +100,8 @@ builder.Services.AddDbContext<NextHireContext>(options =>
 
 builder.Services.AddScoped<IAreaOcupacaoRepository, AreaOcupacaoRepository>();
 builder.Services.AddScoped<AreaOcupacaoService>();
+builder.Services.AddScoped<IAnotacaoRepository, AnotacaoRepository>();
+builder.Services.AddScoped<AnotacaoService>();
 
 // cors btw
 

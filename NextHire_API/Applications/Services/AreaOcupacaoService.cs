@@ -73,7 +73,7 @@ namespace NextHire_API.Applications.Services
 
             areaExistente.Nome = areaOcupacao.Nome;
 
-            _repository.Atualizar(areaExistente);
+            _repository.Atualizar(id, areaExistente);
             return lerDto(areaExistente);
         }
 

@@ -21,12 +21,12 @@ namespace NextHire_API.Repository
             _context.SaveChanges();
         }
 
-        public void Atualizar(AreaOcupacao areaOcupacao)
+        public void Atualizar(int id, AreaOcupacao areaOcupacao)
         {
             if (areaOcupacao == null)
                 return;
 
-            AreaOcupacao area = _context.AreaOcupacao.Find(areaOcupacao.AreaOcupacaoId);
+            AreaOcupacao area = _context.AreaOcupacao.Find(id);
             if (area == null)
                 return;
 
@@ -44,10 +44,6 @@ namespace NextHire_API.Repository
             return _context.AreaOcupacao.FirstOrDefault(a => a.Nome == nome);
         }
 
-        public SetorOcupacao BuscarSetorPorId(int id)
-        {
-            return _context.SetorOcupacao.Find(id);
-        }
 
         public Usuario BuscarUsuarioPorId(int id)
         {

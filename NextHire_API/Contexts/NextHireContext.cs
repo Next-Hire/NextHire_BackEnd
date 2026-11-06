@@ -501,11 +501,8 @@ public partial class NextHireContext : DbContext
                 .HasColumnName("processo_seletivo_id");
             entity.Property(e => e.DataAbertura)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("data_abertura");
-            entity.Property(e => e.DataFechamento)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("data_fechamento");
+            entity.Property(e => e.DataFechamento).HasColumnName("data_fechamento");
             entity.Property(e => e.StatusProcessoSeletivo)
                 .HasDefaultValue(true)
                 .HasColumnName("status_processo_seletivo");
@@ -656,11 +653,8 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.AnalistaRh).HasColumnName("analista_rh");
             entity.Property(e => e.DataAbertura)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
                 .HasColumnName("data_abertura");
-            entity.Property(e => e.DataFechamento)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("data_fechamento");
+            entity.Property(e => e.DataFechamento).HasColumnName("data_fechamento");
             entity.Property(e => e.Descricao)
                 .IsRequired()
                 .HasColumnName("descricao");

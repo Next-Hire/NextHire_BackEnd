@@ -1,5 +1,5 @@
 {
-  "Name": "AppDbContext",
+  "Name": "NextHireContext",
   "PreserveCasingUsingRegex": false,
   "IncludeUnknownSchemas": true,
   "SplitEntityTypeConfigurations": false,

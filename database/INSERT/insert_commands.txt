@@ -1,0 +1,5 @@
+ON CMD OR BASH?
+docker exec -i nexthire1 psql -U postgres -d nexthire < seed.sql
+
+USING POWERSHELL?
+Get-Content .\seed.sql | docker exec -i nexthire1 psql -U postgres -d nexthire

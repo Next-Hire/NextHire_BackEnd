@@ -10,6 +10,8 @@ namespace NextHireAPI.Applications.Convertions.DomainToDTO
             return new ListarExperienciaProfissionalDto
             {
                 ExperienciaProfissionalId = experienciaProfissional.ExperienciaProfissionalId,
+                Cargo = experienciaProfissional.Cargo,
+                NomeEmpresa = experienciaProfissional.NomeEmpresa,
                 DataEntrada = experienciaProfissional.DataEntrada,
                 DataSaida = experienciaProfissional.DataSaida,
                 StatusExperiencia = experienciaProfissional.AtualmenteTrabalho ?? true ? "Trabalha atualmente aqui" : "Experiência anterior",

@@ -6,6 +6,11 @@ namespace NextHire_API.DTOs.ExperienciaProfissionalDTO
     {
         public int ExperienciaProfissionalId { get; set; }
 
+        public string? NomeEmpresa { get; set; }
+
+        public string? Cargo { get; set; }
+
+
         public string? StatusExperiencia { get; set; }
 
         public DateTime DataEntrada { get; set; }

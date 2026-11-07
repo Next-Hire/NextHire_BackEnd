@@ -17,7 +17,7 @@ namespace NextHire_API.Interfaces
         //
         public Task<SetorOcupacao?> CadastrarSetor(int? idEmpresa, int? idArea, string? nomeEmpresa, string? nomeArea, string nomeSetor);
         public Task<SetorOcupacao?> AtualizarSetor(int idSetor, string? nomeEmpresa, string? nomeArea, List<string?> nomeGestor, string nomeSetor);
-        public Task<SetorOcupacao?> ExcluirSetor(int idSetor);
+        public Task<SetorOcupacao?> ExcluirSetor(int setorId, int? areaId, int? empresaId, string? nomeEmpresa, string? nomeArea);
 
 
     }

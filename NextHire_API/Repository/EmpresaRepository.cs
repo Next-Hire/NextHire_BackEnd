@@ -18,7 +18,7 @@ namespace NextHire_API.Repository
              await _ctx.Empresa.FirstOrDefaultAsync(varAux => varAux.Nome == nome) 
                     ?? null;
 
-        public async Task<Empresa?> BuscarPorId(int id) =>
+        public async Task<Empresa?> BuscarPorId(int? id) =>
      await _ctx.Empresa.FindAsync(id)
             ?? null; // Descobrir como fazer com que o throw new InvalidOperationException()
                      // não pare a api

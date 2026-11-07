@@ -169,16 +169,22 @@ namespace NextHire_API.Repository
         }
 
 
-        public async Task<SetorOcupacao?> ExcluirSetor(int setorId)
+        public async Task<SetorOcupacao?> ExcluirSetor(int setorId, int? areaId, int? empresaId, string? nomeEmpresa, string? nomeArea)
         {
-            SetorOcupacao? querySetor = await _ctx.SetorOcupacao.FindAsync(setorId) 
-                                    ?? null;
-            if (querySetor == null)
+            AreaOcupacao? areaQuery = await _ctx.AreaOcupacao.FindAsync(areaId);
+            Empresa? empresaQuery = await _ctx.Empresa.FindAsync(empresaId);
+            if ((areaQuery == null || empresaQuery == null) || (areaQuery.AreaOcupacaoId == 0 || empresaQuery.EmpresaId == 0))
                 return null;
+
+            SetorOcupacao? querySetor = await _ctx.SetorOcupacao.FindAsync(setorId);
+            if ((!querySetor.AreaOcupacaoId.Equals(areaQuery.AreaOcupacaoId)) || (!querySetor.EmpresaId.Equals(empresaQuery.EmpresaId)))
+                return null;
+
             _ctx.SetorOcupacao.Remove(querySetor);
             await _ctx.SaveChangesAsync();
 
             return querySetor;
+ 
         }
 
     }

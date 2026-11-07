@@ -177,7 +177,10 @@ namespace NextHire_API.Repository
                 return null;
 
             SetorOcupacao? querySetor = await _ctx.SetorOcupacao.FindAsync(setorId);
-            if ((!querySetor.AreaOcupacaoId.Equals(areaQuery.AreaOcupacaoId)) || (!querySetor.EmpresaId.Equals(empresaQuery.EmpresaId)))
+            if(querySetor == null || querySetor.SetorOcupacaoId == 0)
+                return null;
+
+            if ((querySetor.AreaOcupacaoId != areaQuery.AreaOcupacaoId) || (querySetor.EmpresaId != empresaQuery.EmpresaId))
                 return null;
 
             _ctx.SetorOcupacao.Remove(querySetor);

@@ -13,7 +13,7 @@ namespace NextHire_API.Applications.Services
 
         public async Task<List<ListarExperienciaProfissionalDto>> ListarExperienciaProfissionalPorUsuario(int usuarioId, bool? ativo)
         {
-            if (usuarioId <= 0 || usuarioId == null)
+            if (usuarioId <= 0)
                 throw new DomainException("O Id do usuário deve ser maior que zero.");
             List<ExperienciaProfissional> experienciasDto = await _repository.ListarExperienciasProfissionaisPorUsuario(usuarioId, ativo);
 
@@ -34,7 +34,7 @@ namespace NextHire_API.Applications.Services
 
         public async Task CadastrarExperienciaProfissional(AdicionarExperienciaProfissionalDto experienciaProfissionalDto)
         {
-            if (experienciaProfissionalDto == null || experienciaProfissionalDto.UsuarioId <= 0 || experienciaProfissionalDto.DataEntrada > DateTime.Now || String.IsNullOrWhiteSpace(experienciaProfissionalDto.Cargo) || String.IsNullOrWhiteSpace(experienciaProfissionalDto.NomeEmpresa))
+            if (experienciaProfissionalDto == null || experienciaProfissionalDto.UsuarioId <= 0 || experienciaProfissionalDto.DataEntrada > DateOnly.FromDateTime(DateTime.Now) || String.IsNullOrWhiteSpace(experienciaProfissionalDto.Cargo) || String.IsNullOrWhiteSpace(experienciaProfissionalDto.NomeEmpresa))
                 throw new DomainException("O objeto de experiência profissional não pode ser nulo.");
 
             var experiencia = ExperienciaProfissionalToDTO.ConvertarParaAdicionar(experienciaProfissionalDto);

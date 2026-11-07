@@ -46,6 +46,8 @@ public partial class Usuario
 
     public virtual ICollection<Entrevista> Entrevista { get; set; } = new List<Entrevista>();
 
+    public virtual ICollection<Entrevista> EntrevistaNavigation { get; set; } = new List<Entrevista>();
+
     public virtual ICollection<ProcessoSeletivo> ProcessoSeletivo { get; set; } = new List<ProcessoSeletivo>();
 
     public virtual ICollection<SetorOcupacao> SetorOcupacao { get; set; } = new List<SetorOcupacao>();

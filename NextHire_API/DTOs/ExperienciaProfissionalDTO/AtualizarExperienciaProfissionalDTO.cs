@@ -8,9 +8,9 @@ namespace NextHire_API.DTOs.ExperienciaProfissionalDTO
 
         public string? Cargo { get; set; }
 
-        public DateTime DataEntrada { get; set; }
+        public DateOnly DataEntrada { get; set; }
 
-        public DateTime? DataSaida { get; set; }
+        public DateOnly? DataSaida { get; set; }
 
         public bool? AtualmenteTrabalha { get; set; }
     }

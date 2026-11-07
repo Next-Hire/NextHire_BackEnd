@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Mail;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace NextHireAPI.Applications.Services
 {
@@ -8,7 +9,7 @@ namespace NextHireAPI.Applications.Services
         private static string CodigoGerado { get; set; }
         private static MailAddress emailEmp = ConverteParaMailAdress(Environment.GetEnvironmentVariable("MAIL_TO_SMTP"));
         private static string senhaAplicativo = Environment.GetEnvironmentVariable("MAIL_CODE_PASS").ToString();
-        
+
         public static string GerarCodigo(int tamanho = 6)
         {
             const string letras = "ABCDEFGHIJKLMNOPQRSTUV";
@@ -54,7 +55,7 @@ namespace NextHireAPI.Applications.Services
         }
 
 
-        public static async Task EnviarCodigo(MailAddress emailDestinatario, string codigo)
+        public static async Task EnviarCodigoVerificacao(MailAddress emailDestinatario, string codigo)
         {
             var smtp = new SmtpClient("smtp.gmail.com")
             {
@@ -63,7 +64,7 @@ namespace NextHireAPI.Applications.Services
                 Credentials = new NetworkCredential(
                     emailEmp.ToString(),
                     senhaAplicativo
-    ),
+                ),
                 Timeout = 15000
             };
 
@@ -73,6 +74,7 @@ namespace NextHireAPI.Applications.Services
                 Body = $"Seu código para redefinir a senha é: {codigo}",
                 IsBodyHtml = false
             };
+
 
             mail.To.Add(emailDestinatario);
             await smtp.SendMailAsync(mail);

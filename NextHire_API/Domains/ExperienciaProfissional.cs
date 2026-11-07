@@ -12,9 +12,9 @@ public partial class ExperienciaProfissional
 
     public string? Cargo { get; set; }
 
-    public DateTime DataEntrada { get; set; }
+    public DateOnly DataEntrada { get; set; }
 
-    public DateTime? DataSaida { get; set; }
+    public DateOnly? DataSaida { get; set; }
 
     public string? NomeEmpresa { get; set; }
 

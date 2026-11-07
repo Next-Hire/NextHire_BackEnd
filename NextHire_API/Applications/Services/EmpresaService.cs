@@ -1,5 +1,4 @@
 ﻿using NextHire_API.Applications.Convertions.DomainToConversion;
-using NextHire_API.Applications.Convertions.DomainToDTO;
 using NextHire_API.Domains;
 using NextHire_API.DTOs.EmpresaDTOs;
 using NextHire_API.Exceptions;

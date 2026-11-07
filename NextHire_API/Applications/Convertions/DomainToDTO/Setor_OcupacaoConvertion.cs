@@ -51,11 +51,11 @@ namespace NextHire_API.Applications.Convertions.DomainToConversion
                     nome = setorOcup.AreaOcupacao.Nome
                 },
                 
-                Gestores = setorOcup.Gestor.Select(varAux => new GestorSetor_OcupacaoDTO
+                Gestores = setorOcup.Gestor?.Select(varAux => new GestorSetor_OcupacaoDTO
                 {
                     usuarioId = varAux.UsuarioId,
                     nome = varAux.Nome
-                }).ToList()
+                }).ToList() ?? new List<GestorSetor_OcupacaoDTO>()
             };
         }
 

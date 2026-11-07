@@ -169,11 +169,12 @@ namespace NextHire_API.Repository
         }
 
 
-        public async Task<SetorOcupacao?> RemoverSetor(int setorId)
+        public async Task<SetorOcupacao?> ExcluirSetor(int setorId)
         {
             SetorOcupacao? querySetor = await _ctx.SetorOcupacao.FindAsync(setorId) 
-                                    ?? throw new InvalidOperationException("Empresa não encontrada");
-
+                                    ?? null;
+            if (querySetor == null)
+                return null;
             _ctx.SetorOcupacao.Remove(querySetor);
             await _ctx.SaveChangesAsync();
 

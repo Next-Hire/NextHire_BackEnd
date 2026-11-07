@@ -115,35 +115,69 @@ namespace NextHire_API.Repository
         }
 
 
-        public async Task<SetorOcupacao?> AtualizarSetor(int idSetor, string? nomeEmpresa, string? nomeArea, string? nomeGestor, string nomeSetor)
+        public async Task<SetorOcupacao?> AtualizarSetor(int idSetor, string? nomeEmpresa, string? nomeArea, List<string?> nomeGestor, string nomeSetor)
         {
-            SetorOcupacao? setorOcupacaoQuery = 
-                await _ctx.SetorOcupacao.FindAsync(idSetor);
+            var Query = _ctx.SetorOcupacao.AsQueryable();
 
+            if (nomeGestor != null)
+                Query = Query.Include(varAux => varAux.Gestor);
+            
+            SetorOcupacao? setorOcupacaoQuery = 
+                await Query.FirstOrDefaultAsync(varAux => varAux.SetorOcupacaoId == idSetor);
+            
             Empresa? empresaQuery = 
                 await _ctx.Empresa.FirstOrDefaultAsync(varAux => varAux.Nome == nomeEmpresa);
 
             AreaOcupacao? areaOcupacaoQuery = 
                 await _ctx.AreaOcupacao.FirstOrDefaultAsync(varAux => varAux.Nome == nomeArea);
 
-            Usuario? gestorQuery = 
-                await _ctx.Usuario.FirstOrDefaultAsync(varAux => varAux.TipoUsuario.Equals("gestor") && varAux.Nome == nomeGestor);
 
-            if (setorOcupacaoQuery == null && (empresaQuery == null || areaOcupacaoQuery == null || gestorQuery == null))
+
+            if (setorOcupacaoQuery == null && (empresaQuery == null || areaOcupacaoQuery == null))
                 return null;
+            
 
             setorOcupacaoQuery.EmpresaId = empresaQuery.EmpresaId;
             setorOcupacaoQuery.Nome = nomeSetor;
             setorOcupacaoQuery.AreaOcupacaoId = areaOcupacaoQuery.AreaOcupacaoId;
+            
+            
+            if (nomeGestor != null)
+            {
+                List<Usuario?> gestorQuery = 
+                    await _ctx.Usuario
+                        .Where(varAux => varAux.TipoUsuario.Equals("gestor") && nomeGestor.Contains(varAux.Nome))
+                        .ToListAsync();
 
+                List<Usuario?> listaDeletar = setorOcupacaoQuery.Gestor
+                    .Where(varAux => !gestorQuery.Any(varAux2 => varAux2.UsuarioId == varAux2.UsuarioId))
+                    .ToList();
 
-            setorOcupacaoQuery.Gestor.Clear();
-            setorOcupacaoQuery.Gestor.Add(gestorQuery);
+                foreach (var gestor in listaDeletar)
+                    setorOcupacaoQuery.Gestor.Remove(gestor);
 
+                var listaAdicionar = gestorQuery.Where(varAux =>
+                    !setorOcupacaoQuery.Gestor.Any(varAux2 => varAux2.UsuarioId == varAux2.UsuarioId)).ToList();
+                
+                foreach (var gestor in listaAdicionar)
+                    setorOcupacaoQuery.Gestor.Add(gestor);
+
+            }
             await _ctx.SaveChangesAsync();
-
             return setorOcupacaoQuery;
 
+        }
+
+
+        public async Task<SetorOcupacao?> RemoverSetor(int setorId)
+        {
+            SetorOcupacao? querySetor = await _ctx.SetorOcupacao.FindAsync(setorId) 
+                                    ?? throw new InvalidOperationException("Empresa não encontrada");
+
+            _ctx.SetorOcupacao.Remove(querySetor);
+            await _ctx.SaveChangesAsync();
+
+            return querySetor;
         }
 
     }

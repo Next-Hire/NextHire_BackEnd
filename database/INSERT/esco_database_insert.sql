@@ -371,6 +371,9 @@ VALUES
     8
 );
 
+SELECT * FROM area_ocupacao
+SELECT * FROM usuario
+
 -- ATUALIZAR SEQUÊNCIAS SERIAL
 SELECT setval(pg_get_serial_sequence('empresa', 'empresa_id'), COALESCE(MAX(empresa_id), 1)) FROM empresa;
 SELECT setval(pg_get_serial_sequence('usuario', 'usuario_id'), COALESCE(MAX(usuario_id), 1)) FROM usuario;

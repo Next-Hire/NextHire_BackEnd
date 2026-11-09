@@ -40,6 +40,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<NextHireContext>(options => options.UseNpgsql(conexaoBanco));
 builder.Services.AddScoped<EmpresaService>();
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+builder.Services.AddScoped<ISetor_OcupacaoRepository, Setor_OcupacaoRepository>();
+builder.Services.AddScoped<Setor_OcupacaoService>();
 //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //    .AddJwtBearer(options =>
 //    {

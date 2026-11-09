@@ -166,7 +166,7 @@ namespace NextHire_API.Repository
             await _ctx.SaveChangesAsync();
             return setorOcupacaoQuery;
 
-        }
+        } //
 
 
         public async Task<SetorOcupacao?> ExcluirSetor(int setorId, int? areaId, int? empresaId, string? nomeEmpresa, string? nomeArea)

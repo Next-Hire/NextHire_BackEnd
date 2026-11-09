@@ -1,43 +1,28 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NextHire_API.Applications.Services;
-using NextHire_API.DTOs.EmpresaDTOs;
+using NextHire_API.DTOs.Setor_OcupacaoDTOs; 
 using NextHire_API.Exceptions;
 
 namespace NextHire_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmpresaController : ControllerBase
+    public class Setor_OcupacaoController : ControllerBase
     {
-        private readonly EmpresaService _rep;
-
-        public EmpresaController(EmpresaService rep) => _rep = rep;
+        private readonly Setor_OcupacaoService _service;
+        public Setor_OcupacaoController(Setor_OcupacaoService service) => _service = service;
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LerEmpresaDTO>>> Listar()
+        public async Task<ActionResult<IEnumerable<LerSetor_OcupacaoDTO2?>>> Listar()
         {
             try
             {
-                IEnumerable<LerEmpresaDTO?> lista_de_Empresas = await _rep.ListagemTotal();
-                if (lista_de_Empresas == null || !lista_de_Empresas.Any())
-                    return NotFound(lista_de_Empresas);
-                return Ok(lista_de_Empresas);
-            }
+                IEnumerable<LerSetor_OcupacaoDTO2> listaSetores = await _service.Listar();
+                if (listaSetores == null || !listaSetores.Any())
+                    return NotFound(listaSetores);
 
-            catch (DomainException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
-
-        [HttpGet("BuscarPorNome/{nome}")]
-        public async Task<ActionResult<LerEmpresaDTO>> BuscarPorNome(string nome)
-        {
-            try
-            {
-                LerEmpresaDTO Empresa = await _rep.ObterPorEmpresa(nome);
-                return Ok(Empresa);
+                return Ok(listaSetores);
             }
             catch (DomainException ex)
             {
@@ -45,13 +30,13 @@ namespace NextHire_API.Controllers
             }
         }
 
-        [HttpGet("BuscarPorId/{id}")]
-        public async Task<ActionResult<LerEmpresaDTO>> BuscarPorId(int id)
+        [HttpGet("BuscarPorId/{setorId}")]
+        public async Task<ActionResult<LerSetor_OcupacaoDTO2?>> ObterSetorPorId(int setorId)
         {
             try
             {
-                LerEmpresaDTO Empresa = await _rep.ObterPorId(id);
-                return Ok(Empresa);
+                LerSetor_OcupacaoDTO2 setor = await _service.ObterSetorPorId(setorId);
+                return Ok(setor);
             }
             catch (DomainException ex)
             {
@@ -59,13 +44,75 @@ namespace NextHire_API.Controllers
             }
         }
 
+        [HttpGet("BuscarPorNome/{setorNome}")]
+        public async Task<ActionResult<LerSetor_OcupacaoDTO2?>> ObterSetorNome(string setorNome)
+        {
+            try
+            {
+                LerSetor_OcupacaoDTO2 setor = await _service.ObterSetorNome(setorNome);
+                return Ok(setor);
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("BuscarPorArea/{areaId}")]
+        public async Task<ActionResult<LerSetor_OcupacaoDTO2?>> ObterSetorPorArea(int areaId, [FromQuery] string? nomeArea)
+        {
+            try
+            {
+                LerSetor_OcupacaoDTO2 setor = await _service.ObterSetorPorArea(areaId, nomeArea);
+                return Ok(setor);
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("ListarPorEmpresaEArea")]
+        public async Task<ActionResult<IEnumerable<LerSetor_OcupacaoDTO2?>>> ObterListagemSetoresPorEmpresaEPorArea(
+            [FromQuery] int empresaId, 
+            [FromQuery] string? empresaNome, 
+            [FromQuery] string? nomeArea, 
+            [FromQuery] int areaId)
+        {
+            try
+            {
+                IEnumerable<LerSetor_OcupacaoDTO2?> listaSetores = await _service.ObterListagemSetoresPorEmpresaEPorArea(empresaId, empresaNome, nomeArea, areaId);
+                return Ok(listaSetores);
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("BuscarPorEmpresa")]
+        public async Task<ActionResult<IEnumerable<LerSetor_OcupacaoDTO2?>>> ObterSetoresPorEmpresa(
+            [FromQuery] int? empresaId, 
+            [FromQuery] string? nomeEmpresa)
+        {
+            try
+            {
+                IEnumerable<LerSetor_OcupacaoDTO2> listaSetores = await _service.ObterSetoresPorEmpresa(empresaId, nomeEmpresa);
+                return Ok(listaSetores);
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        
         [HttpPost]
-        public async Task<ActionResult<CriarEmpresaDTO>> Adicionar([FromBody] CriarEmpresaDTO EmpresaCons)
+        public async Task<ActionResult<CriarSetor_OcupacaoDTO>> Adicionar([FromBody] CriarSetor_OcupacaoDTO criarDTO)
         {
             try
             {
-                CriarEmpresaDTO Empresa = await _rep.Adicionar(EmpresaCons);
-                return Ok(Empresa);
+                CriarSetor_OcupacaoDTO setorCriado = await _service.Adicionar(criarDTO);
+                return Ok(setorCriado);
             }
             catch (DomainException ex)
             {
@@ -73,13 +120,13 @@ namespace NextHire_API.Controllers
             }
         }
 
-        [HttpPut("Atualizar/{id}")]
-        public async Task<ActionResult<LerEmpresaDTO>> Atualizar(int id, string? nome, bool? status)
+        [HttpPut("Atualizar/{setorId}")]
+        public async Task<ActionResult<LerSetor_OcupacaoDTO2>> Atualizar(int setorId, [FromBody] AtualizarSetor_OcupacaoDTO atualizarDTO)
         {
             try
             {
-                LerEmpresaDTO Empresa = await _rep.Atualizar(id, nome, status);
-                return Ok(Empresa);
+                LerSetor_OcupacaoDTO2 setorAtualizado = await _service.Atualizar(setorId, atualizarDTO);
+                return Ok(setorAtualizado);
             }
             catch (DomainException ex)
             {
@@ -88,20 +135,22 @@ namespace NextHire_API.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<LerEmpresaDTO>> Remover(int id)
+        public async Task<ActionResult<LerSetor_OcupacaoDTO2>> RemoverSetor(
+            int setorId, 
+            [FromQuery] int areaId, 
+            [FromQuery] int? empresaId, 
+            [FromQuery] string? nomeEmpresa, 
+            [FromQuery] string? nomeArea)
         {
             try
             {
-                LerEmpresaDTO Empresa = await _rep.Remover(id);
-                return Ok(Empresa);
+                LerSetor_OcupacaoDTO2? setorRemovido = await _service.RemoverSetor(setorId, areaId, empresaId, nomeEmpresa, nomeArea);
+                return Ok(setorRemovido);
             }
             catch (DomainException ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-
-
-
     }
 }

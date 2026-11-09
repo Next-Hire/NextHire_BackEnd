@@ -18,16 +18,14 @@ namespace NextHire_API.Applications.Services
         {
             return new ListarAreaOcupacaoDto
             {
-                area_ocupacao_id = areaOcupacao.AreaOcupacaoId,
-                nome = areaOcupacao.Nome,
-                SetorOcupacao = areaOcupacao.SetorOcupacao,
-                Usuario = areaOcupacao.Usuario
+                AreaOcupacaoId = areaOcupacao.AreaOcupacaoId,
+                Nome = areaOcupacao.Nome,
             };
         }
 
         public List<ListarAreaOcupacaoDto> Listar()
         {
-            return _repository.Listar().Select(lerDto).ToList();
+            return _repository.Listar().ToList();
         }
 
         public ListarAreaOcupacaoDto ListarPorID(int id)
@@ -54,11 +52,10 @@ namespace NextHire_API.Applications.Services
 
         public ListarAreaOcupacaoDto Adicionar(AdicionarAreaOcupacao areaOcupacao)
         {
+
             var area = new AreaOcupacao
             {
                 Nome = areaOcupacao.Nome,
-                SetorOcupacao = areaOcupacao.SetorOcupacao,
-                Usuario = areaOcupacao.Usuario
             };
 
             _repository.Adicionar(area);
@@ -75,8 +72,6 @@ namespace NextHire_API.Applications.Services
             }
 
             areaExistente.Nome = areaOcupacao.Nome;
-            areaExistente.SetorOcupacao = areaOcupacao.SetorOcupacao;
-            areaExistente.Usuario = areaOcupacao.Usuario;
 
             _repository.Atualizar(areaExistente);
             return lerDto(areaExistente);

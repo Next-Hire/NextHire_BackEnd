@@ -8,9 +8,9 @@ public partial class ProcessoSeletivo
 {
     public int ProcessoSeletivoId { get; set; }
 
-    public DateTime? DataAbertura { get; set; }
+    public DateOnly? DataAbertura { get; set; }
 
-    public DateTime DataFechamento { get; set; }
+    public DateOnly DataFechamento { get; set; }
 
     public bool? StatusProcessoSeletivo { get; set; }
 

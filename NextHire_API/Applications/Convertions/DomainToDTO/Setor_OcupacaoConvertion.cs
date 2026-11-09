@@ -6,14 +6,19 @@ namespace NextHire_API.Applications.Convertions.DomainToConversion
 {
     public class Setor_OcupacaoConvertion
     {
-        public static CriarSetor_OcupacaoDTO criarSetorOcupacao(SetorOcupacao setorOcup)
+        public static CriarSetor_OcupacaoDTO CriarSetorOcupacao(SetorOcupacao setorOcup) 
         {
             return new CriarSetor_OcupacaoDTO
             {
                 nomeSetor = setorOcup.Nome,
-                nomeArea = setorOcup.AreaOcupacao.Nome ?? string.Empty, 
-                nomeEmpresa = setorOcup.Empresa.Nome ?? string.Empty,
-                nomeGestor = setorOcup.Gestor.Select(varAux => varAux.Nome).ToList() // Listando a colecao dos usuarios
+                areaId = setorOcup.AreaOcupacaoId,
+                empresaId = setorOcup.EmpresaId,
+                gestoresB = setorOcup.Gestor?.Select(varAux => new GestorSetor_OcupacaoDTO
+                {
+                    usuarioId = varAux.UsuarioId,
+                    nome = varAux.Nome
+                    
+                }).ToList() ?? new List<GestorSetor_OcupacaoDTO>()
             };
         }
 

@@ -167,22 +167,38 @@ namespace NextHire_API.Repository
             return setorOcupacaoQuery;
 
         } //
-
-
-        public async Task<SetorOcupacao?> ExcluirSetor(int setorId, int? areaId, int? empresaId, string? nomeEmpresa, string? nomeArea)
+        
+        
+        public async Task<List<Usuario?>> ObterGestoresPorIds(List<int> gestoresIds)
+        => 
+             await _ctx.Usuario
+                .Where(u => gestoresIds.Contains(u.UsuarioId))
+                .ToListAsync();
+        
+        
+        public async Task<SetorOcupacao?> Adicionar(SetorOcupacao setor)
         {
-            AreaOcupacao? areaQuery = await _ctx.AreaOcupacao.FindAsync(areaId);
-            Empresa? empresaQuery = await _ctx.Empresa.FindAsync(empresaId);
-            if ((areaQuery == null || empresaQuery == null) || (areaQuery.AreaOcupacaoId == 0 || empresaQuery.EmpresaId == 0))
-                return null;
+            await _ctx.SetorOcupacao.AddAsync(setor);
+            await _ctx.SaveChangesAsync();
 
+            return setor;
+        }
+
+        public async Task<SetorOcupacao?> Atualizar(SetorOcupacao setor)
+        {
+            _ctx.SetorOcupacao.Update(setor);
+            await _ctx.SaveChangesAsync();
+
+            return setor;
+        }
+
+
+        public async Task<SetorOcupacao?> ExcluirSetor(int setorId)
+        {
             SetorOcupacao? querySetor = await _ctx.SetorOcupacao.FindAsync(setorId);
             if(querySetor == null || querySetor.SetorOcupacaoId == 0)
                 return null;
-
-            if ((querySetor.AreaOcupacaoId != areaQuery.AreaOcupacaoId) || (querySetor.EmpresaId != empresaQuery.EmpresaId))
-                return null;
-
+ 
             _ctx.SetorOcupacao.Remove(querySetor);
             await _ctx.SaveChangesAsync();
 

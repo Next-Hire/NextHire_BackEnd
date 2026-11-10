@@ -20,7 +20,7 @@ namespace NextHire_API.Applications.Services
             {
                 AnotacaoId = anotacao.AnotacaoId,
                 CandidatoId = anotacao.CandidatoId,
-                Comentario = anotacao.Comentario,
+                Conteudo = anotacao.Conteudo,
                 GestorId = anotacao.GestorId
             };
         }  
@@ -45,7 +45,7 @@ namespace NextHire_API.Applications.Services
             Anotacao anotacao = new Anotacao
             {
                 CandidatoId = anotacaoDto.CandidatoId,
-                Comentario = anotacaoDto.Comentario,
+                Conteudo = anotacaoDto.Conteudo,
                 GestorId = anotacaoDto.GestorId
             };
             _repository.Adicionar(anotacao);
@@ -62,7 +62,7 @@ namespace NextHire_API.Applications.Services
             }
 
             anotacaoExiste.CandidatoId = anotacaoDto.CandidatoId;
-            anotacaoExiste.Comentario = anotacaoDto.Comentario;
+            anotacaoExiste.Conteudo = anotacaoDto.Conteudo;
             anotacaoExiste.GestorId = anotacaoDto.GestorId;
 
             _repository.Atualizar(anotacaoExiste);

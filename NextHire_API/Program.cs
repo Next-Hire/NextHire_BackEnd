@@ -1,25 +1,48 @@
+
 using DotNetEnv;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using NextHire_API.Contexts;
 using NextHire_API.Interfaces;
 using NextHire_API.Repository;
 using NextHire_API.Applications.Services;
 using Npgsql;
-using NextHire_API.Domains; 
+using NextHire_API.Domains;
+using NextHireAPI.Interfaces;
+using NextHireAPI.Repository;
+using NextHireAPI.Applications.Services;
+using StackExchange.Redis;
+using System.Text;
+using NextHireAPI.Applications.Auth;
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 var builder = WebApplication.CreateBuilder(args);
 
-string conexaoBanco = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+var conexaoBanco = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+var redisConnection = Environment.GetEnvironmentVariable("REDIS_CONNECTION");
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+
+if (string.IsNullOrWhiteSpace(conexaoBanco))
+    throw new Exception("CONNECTION_STRING não configurada.");
+
+if (string.IsNullOrWhiteSpace(redisConnection))
+    throw new Exception("REDIS_CONNECTION não configurada.");
+
+if (string.IsNullOrWhiteSpace(jwtKey))
+    throw new Exception("JWT_KEY não configurada.");
+
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+    throw new Exception("JWT_KEY precisa ter no mínimo 32 bytes.");
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect(redisConnection)
+);
+
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-// builder.Services.AddOpenApi();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -33,6 +56,7 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Insira o token JWT desta forma: Bearer {seu_token}"
     });
+
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
         [new OpenApiSecuritySchemeReference("Bearer", document)] = []
@@ -41,6 +65,7 @@ builder.Services.AddSwaggerGen(options =>
 
 // ==============================================================================
 // Criar a fonte de dados e mapear os ENUMs do PostgreSQL
+
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(conexaoBanco);
 
 dataSourceBuilder.MapEnum<ClassificacaoQuestaoEnum>("classificacao_questao_enum");
@@ -55,6 +80,7 @@ dataSourceBuilder.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
 var dataSource = dataSourceBuilder.Build();
 
 // Registar o DbContext usando a fonte de dados com os enums configurados
+
 builder.Services.AddDbContext<NextHireContext>(options =>
     options.UseNpgsql(dataSource, npgsql =>
     {
@@ -67,41 +93,56 @@ builder.Services.AddDbContext<NextHireContext>(options =>
         npgsql.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
         npgsql.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
     }));
-// ==============================================================================
 
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddJwtBearer(options =>
-//    {
-//        var chave = builder.Configuration["Jwt:Key"]!;
+//? JWT CONFIG
 
-//        var issuer = builder.Configuration["Jwt:Issuer"]!;
+var issuer = builder.Configuration["Jwt:Issuer"];
+var audience = builder.Configuration["Jwt:Audience"];
 
-//        var audience = builder.Configuration["Jwt:Audience"]!;
+if (string.IsNullOrWhiteSpace(issuer))
+    throw new Exception("Jwt:Issuer não configurado.");
 
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuer = true,
+if (string.IsNullOrWhiteSpace(audience))
+    throw new Exception("Jwt:Audience não configurado.");
 
-//            ValidateAudience = true,
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
-//            ValidateLifetime = true,
+builder.Services.AddAuthorization();
 
-//            ValidateIssuerSigningKey = true,
+// Redis
+builder.Services.AddScoped<RedisService>();
 
-//            ValidIssuer = issuer,
+// Auth
+builder.Services.AddScoped<AutenticacaoService>();
+builder.Services.AddScoped<TokenJWT>();
 
-//            ValidAudience = audience,
-
-//            IssuerSigningKey = new SymmetricSecurityKey(
-//                Encoding.UTF8.GetBytes(chave)
-//            )
-//        };
-//    //});
-
+// Area Ocupacao
 builder.Services.AddScoped<IAreaOcupacaoRepository, AreaOcupacaoRepository>();
 builder.Services.AddScoped<AreaOcupacaoService>();
 builder.Services.AddScoped<IAnotacaoRepository, AnotacaoRepository>();
 builder.Services.AddScoped<AnotacaoService>();
+
+// Experiencia profissional
+builder.Services.AddScoped<IExperienciaProfissionalRepository, ExperienciaProfissionalRepository>();
+builder.Services.AddScoped<ExperienciaProfissionalService>();
+
+// Usuario
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<UsuarioService>();
 
 // cors btw
 
@@ -115,19 +156,21 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 //if (!app.Environment.IsDevelopment())
 //    app.UseHttpsRedirection();
 
 // Mapeia a pasta 'wwwroot' ou 'uploads' para o caminho web '/uploads'
+
 string caminhoUploads = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "uploads");
 
 if (!Directory.Exists(caminhoUploads))
@@ -142,11 +185,13 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 // Mantém o suporte a arquivos estáticos padrão de wwwroot
+
 app.UseStaticFiles();
 
 app.UseCors("CorsPolicy");
 
 // ATENÇÃO: Autenticação SEMPRE ANTES da Autorização
+
 app.UseAuthentication();
 app.UseAuthorization();
 

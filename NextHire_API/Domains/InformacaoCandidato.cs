@@ -10,7 +10,7 @@ public partial class InformacaoCandidato
 
     public int CandidatoId { get; set; }
 
-    public DateTime DataNascimento { get; set; }
+    public DateOnly DataNascimento { get; set; }
 
     public string FormacaoAcademica { get; set; } = null!;
 

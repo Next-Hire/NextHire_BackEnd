@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore;
 using NextHire_API.Applications.Services;
 using NextHire_API.DTOs.AnotacaoDto;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NextHire_API.Controllers
 {

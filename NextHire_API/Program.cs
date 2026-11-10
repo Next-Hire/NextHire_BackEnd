@@ -149,6 +149,10 @@ builder.Services.AddScoped<ExperienciaProfissionalService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<UsuarioService>();
 
+// Comentario
+builder.Services.AddScoped<IComentarioRepository, ComentarioRepository>();
+builder.Services.AddScoped<ComentarioService>();
+
 // cors btw
 
 builder.Services.AddCors(options =>

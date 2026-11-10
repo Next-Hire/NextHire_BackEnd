@@ -153,6 +153,10 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<IComentarioRepository, ComentarioRepository>();
 builder.Services.AddScoped<ComentarioService>();
 
+// Vaga
+builder.Services.AddScoped<IVagaRepository, VagaRepository>();
+builder.Services.AddScoped<VagaService>();
+
 // cors btw
 
 builder.Services.AddCors(options =>

@@ -27,15 +27,15 @@ CREATE TABLE IF NOT EXISTS experiencia_profissional (
     experiencia_profissional_id SERIAL PRIMARY KEY,
     nome_empresa VARCHAR,
     cargo VARCHAR,
-    data_entrada TIMESTAMP(0) NOT NULL,
-    data_saida TIMESTAMP(0),
+    data_entrada DATE NOT NULL,
+    data_saida DATE,
     atualmente_trabalho BOOLEAN DEFAULT true,
     usuario_id INTEGER NOT NULL REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS comentario (
-    comentario_id SERIAL PRIMARY KEY,
-    comentario TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS anotacao (
+    anotacao_id SERIAL PRIMARY KEY,
+    anotacao TEXT NOT NULL,
     candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
     gestor_id INTEGER NOT NULL REFERENCES usuario(usuario_id)
 );
@@ -176,8 +176,8 @@ CREATE TABLE IF NOT EXISTS candidato_entrevista (
     CONSTRAINT pk_candidato_entrevista PRIMARY KEY(candidato_id, entrevista_id)
 );
 
-CREATE TABLE IF NOT EXISTS anotacao(
-    anotacao_id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS comentario(
+    comentario_id SERIAL PRIMARY KEY,
     texto TEXT NOT NULL,
     data_comentario TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     gestor_id INTEGER NOT NULL REFERENCES usuario(usuario_id),

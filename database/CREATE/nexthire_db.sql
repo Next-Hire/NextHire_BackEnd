@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS experiencia_profissional (
 
 CREATE TABLE IF NOT EXISTS anotacao (
     anotacao_id SERIAL PRIMARY KEY,
-    anotacao TEXT NOT NULL,
+    conteudo TEXT NOT NULL,
     candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
     gestor_id INTEGER NOT NULL REFERENCES usuario(usuario_id)
 );

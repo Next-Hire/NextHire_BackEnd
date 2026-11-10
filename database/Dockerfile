@@ -1,10 +1,7 @@
-# Usa a imagem oficial do PostgreSQL
-FROM postgres:latest
+FROM postgres:18
 
-# Define variáveis de ambiente padrão para o banco (substitua pelos seus dados)
 ENV POSTGRES_USER=nexthire
-ENV POSTGRES_PASSWORD=nexthire
 ENV POSTGRES_DB=nexthire_db
 
-# Copia o script da pasta CREATE para o diretório de inicialização do Postgres
-COPY CREATE/nexthire_db.sql /docker-entrypoint-initdb.d/
+COPY CREATE/nexthire_db.sql /docker-entrypoint-initdb.d/01_nexthire_db.sql
+COPY INSERT/nexthire_database_insert.sql /docker-entrypoint-initdb.d/02_nexthire_database_insert.sql

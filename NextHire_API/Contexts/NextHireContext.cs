@@ -695,10 +695,10 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.AnalistaRh).HasColumnName("analista_rh");
             entity.Property(e => e.DataAbertura)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("date")
                 .HasColumnName("data_abertura");
             entity.Property(e => e.DataFechamento)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("date")
                 .HasColumnName("data_fechamento");
             entity.Property(e => e.Descricao)
                 .IsRequired()

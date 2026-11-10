@@ -52,6 +52,7 @@ namespace NextHire_API.Applications.Services
             {
                 throw new Exception("O nome da habilidade não pode ser nulo ou vazio.");
             }
+
             _repository.Adicionar(habilidade);
             return lerDto(habilidade);
         }
@@ -66,6 +67,10 @@ namespace NextHire_API.Applications.Services
             if (habilidade.Nome == null || habilidade.Nome.Trim() == "")
             {
                 throw new Exception("O nome da habilidade não pode ser nulo ou vazio.");
+            }
+            if (id < 0)
+            {
+                throw new Exception("O ID da habilidade deve ser um valor positivo.");
             }
 
             Habilidade habilidadeAtualizada = new Habilidade

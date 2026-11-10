@@ -133,8 +133,13 @@ builder.Services.AddScoped<TokenJWT>();
 // Area Ocupacao
 builder.Services.AddScoped<IAreaOcupacaoRepository, AreaOcupacaoRepository>();
 builder.Services.AddScoped<AreaOcupacaoService>();
+
 builder.Services.AddScoped<IAnotacaoRepository, AnotacaoRepository>();
 builder.Services.AddScoped<AnotacaoService>();
+
+
+builder.Services.AddScoped<IHabilidadesRepository, HabilidadeRepositiory>();
+builder.Services.AddScoped<HabilidadesService>();
 
 // Experiencia profissional
 builder.Services.AddScoped<IExperienciaProfissionalRepository, ExperienciaProfissionalRepository>();

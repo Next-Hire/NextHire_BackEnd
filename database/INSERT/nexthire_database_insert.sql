@@ -34,7 +34,7 @@ VALUES
 
 -- ANOTAÇÕES
 INSERT INTO anotacao
-(anotacao_id, comentario, candidato_id, gestor_id)
+(anotacao_id, conteudo, candidato_id, gestor_id)
 VALUES
 (1, 'Candidato apresenta boa experiência com desenvolvimento backend.', 5, 3),
 (2, 'Possui conhecimentos sólidos em análise de dados.', 6, 3),

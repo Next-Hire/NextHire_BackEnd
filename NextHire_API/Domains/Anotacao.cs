@@ -10,7 +10,7 @@ public partial class Anotacao
 
     public int CandidatoId { get; set; }
 
-    public string Comentario { get; set; } = null!;
+    public string Conteudo { get; set; } = null!;
 
     public int GestorId { get; set; }
 

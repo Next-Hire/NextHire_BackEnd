@@ -147,9 +147,9 @@ public partial class NextHireContext : DbContext
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasColumnName("anotacao_id");
             entity.Property(e => e.CandidatoId).HasColumnName("candidato_id");
-            entity.Property(e => e.Comentario)
+            entity.Property(e => e.Conteudo)
                 .IsRequired()
-                .HasColumnName("comentario");
+                .HasColumnName("conteudo");
             entity.Property(e => e.GestorId).HasColumnName("gestor_id");
             entity.HasOne(d => d.Candidato).WithMany(p => p.AnotacaoCandidato)
                 .HasForeignKey(d => d.CandidatoId)
@@ -524,8 +524,11 @@ public partial class NextHireContext : DbContext
                 .HasColumnName("processo_seletivo_id");
             entity.Property(e => e.DataAbertura)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
                 .HasColumnName("data_abertura");
-            entity.Property(e => e.DataFechamento).HasColumnName("data_fechamento");
+            entity.Property(e => e.DataFechamento)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("data_fechamento");
             entity.Property(e => e.StatusProcessoSeletivo)
                 .HasDefaultValue(true)
                 .HasColumnName("status_processo_seletivo");
@@ -692,8 +695,11 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.AnalistaRh).HasColumnName("analista_rh");
             entity.Property(e => e.DataAbertura)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
                 .HasColumnName("data_abertura");
-            entity.Property(e => e.DataFechamento).HasColumnName("data_fechamento");
+            entity.Property(e => e.DataFechamento)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("data_fechamento");
             entity.Property(e => e.Descricao)
                 .IsRequired()
                 .HasColumnName("descricao");

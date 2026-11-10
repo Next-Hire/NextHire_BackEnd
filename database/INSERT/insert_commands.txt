@@ -1,5 +1,5 @@
 ON CMD OR BASH?
-docker exec -i nexthire1 psql -U postgres -d nexthire < seed.sql
+docker exec -i <<nome imagem>> psql -U nexthire -d nexthire_db < <<caminho_do_arquivo>>
 
 USING POWERSHELL?
-Get-Content .\seed.sql | docker exec -i nexthire1 psql -U postgres -d nexthire
+Get-Content <<caminho arquivo>> | docker exec -i <<nome_imagem>> psql -U nexthire -d nexthire

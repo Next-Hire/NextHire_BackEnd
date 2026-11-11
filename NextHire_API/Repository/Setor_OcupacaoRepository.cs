@@ -39,11 +39,23 @@ namespace NextHire_API.Repository
         =>
             await _ctx.SetorOcupacao
                 .AsNoTracking()
+                .Include(varAux => varAux.Empresa) // <-- Inclui a navegação da Empresa corretamente
                 .Include(varAux => varAux.AreaOcupacao)
                 .Include(varAux => varAux.Gestor)
-                .Include(varAux => (varAux.Empresa.EmpresaId == idEmpresa || varAux.Empresa.Nome == empresaNome))
-                .Where(varAux => (varAux.EmpresaId == idEmpresa || varAux.Empresa.Nome == empresaNome))
-                .ToListAsync() ?? null;
+                .Where(varAux => (varAux.EmpresaId == idEmpresa || varAux.Empresa.Nome == empresaNome)) // <-- Filtro mantido aqui
+                .ToListAsync();
+        
+        /*
+         
+                     await _ctx.SetorOcupacao
+               .AsNoTracking()
+               .Include(varAux => varAux.Empresa) // <-- Inclui a navegação da Empresa corretamente
+               .Include(varAux => varAux.AreaOcupacao)
+               .Include(varAux => varAux.Gestor)
+               .Where(varAux => (varAux.EmpresaId == idEmpresa || varAux.Empresa.Nome == empresaNome)) // <-- Filtro mantido aqui
+               .ToListAsync() ?? null;
+          
+         */
 
         public async Task<SetorOcupacao?> ObterSetorPorId(int id)
             =>
@@ -195,9 +207,14 @@ namespace NextHire_API.Repository
 
         public async Task<SetorOcupacao?> ExcluirSetor(int setorId)
         {
-            SetorOcupacao? querySetor = await _ctx.SetorOcupacao.FindAsync(setorId);
+            SetorOcupacao? querySetor = await _ctx.SetorOcupacao
+                .Include(varAux => varAux.Gestor)
+                .FirstOrDefaultAsync( varAux => varAux.SetorOcupacaoId == setorId);
             if(querySetor == null || querySetor.SetorOcupacaoId == 0)
                 return null;
+
+
+            querySetor.Gestor.Clear();
  
             _ctx.SetorOcupacao.Remove(querySetor);
             await _ctx.SaveChangesAsync();

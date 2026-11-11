@@ -1,4 +1,10 @@
-﻿version: '3.8'
+# utilize docker-compose up -d para rodar o container
+# caso existir o container anterior rodando de:
+# docker stop nexthire_database 
+# docker rm -f nexthire_database
+# e se necessário docker compose down --remove-orphans
+
+
 
 services:
   nexthire-db:

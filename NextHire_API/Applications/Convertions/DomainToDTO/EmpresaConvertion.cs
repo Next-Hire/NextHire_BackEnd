@@ -9,7 +9,16 @@ namespace NextHire_API.Applications.Convertions.DomainToConversion
         {
             return new CriarEmpresaDTO
             {
-                nome = empresa.Nome
+                nome = empresa.Nome,
+            };
+        }
+        
+        public static AtualizarEmpresaDTO atualizarEmpresaDTO(Empresa empresa)
+        {
+            return new AtualizarEmpresaDTO
+            {
+                nome = empresa.Nome,
+                statusEmpresa = empresa.StatusEmpresa ?? true
             };
         }
 

@@ -46,14 +46,17 @@ namespace NextHire_API.Applications.Convertions.DomainToConversion
                 Empresa = new LerEmpresaDTO
                 {
                     EmpresaId = setorOcup.EmpresaId,
-                    nome = setorOcup.Empresa.Nome
+                    nome = setorOcup.Empresa.Nome,
+                    statusEmpresa = setorOcup.Empresa.StatusEmpresa ?? true
                     
                 },
                 
-                Area = new AreaSetor_OcupacaoDTO
+                Area = new AreaSetor_OcupacaoDTO()
                 {
                     area_ocupacao_id = setorOcup.AreaOcupacaoId,
-                    nome = setorOcup.AreaOcupacao.Nome
+                    nome = setorOcup.AreaOcupacao.Nome,
+                    status = true
+                    
                 },
                 
                 Gestores = setorOcup.Gestor?.Select(varAux => new GestorSetor_OcupacaoDTO
@@ -61,6 +64,24 @@ namespace NextHire_API.Applications.Convertions.DomainToConversion
                     usuarioId = varAux.UsuarioId,
                     nome = varAux.Nome
                 }).ToList() ?? new List<GestorSetor_OcupacaoDTO>()
+            };
+        }
+        
+        
+        public static AtualizarSetor_OcupacaoDTO AtualizarSetorOcupacao(SetorOcupacao setorOcup)
+        {
+            return new AtualizarSetor_OcupacaoDTO
+            {
+                
+                nomeSetor = setorOcup.Nome,
+                areaId = setorOcup.AreaOcupacaoId,
+                nomeArea = setorOcup.AreaOcupacao.Nome,
+
+                empresaId = setorOcup.EmpresaId,
+                nomeEmpresa = setorOcup.Empresa.Nome,
+                
+                gestorIds = setorOcup.Gestor.Select(varAux => varAux.UsuarioId).ToList(),
+                nomeGestor = setorOcup.Gestor.Select(varAux => varAux.Nome).ToList()
             };
         }
 

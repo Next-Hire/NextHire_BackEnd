@@ -55,7 +55,7 @@ namespace NextHire_API.DTOs.Setor_OcupacaoDTOs
 
     public class AtualizarSetor_OcupacaoDTO
     {
-        public int? setor_OcupacaoId { get; set; }
+        
         [Required(ErrorMessage = "Nome do setor é obrigatório")]
         public string nomeSetor { get; set; } = string.Empty;
         
@@ -80,6 +80,7 @@ namespace NextHire_API.DTOs.Setor_OcupacaoDTOs
     {
         public int area_ocupacao_id { get; set; }
         public string nome { get; set; } = null!;
+        public bool status { get; set; }
     }
 
     public class GestorSetor_OcupacaoDTO
@@ -87,6 +88,8 @@ namespace NextHire_API.DTOs.Setor_OcupacaoDTOs
         public int? usuarioId { get; set; }
         public string nome { get; set; }
     }
+    
+    
 
     
 }

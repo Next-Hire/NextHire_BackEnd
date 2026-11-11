@@ -130,7 +130,7 @@ namespace NextHire_API.Applications.Services
             return Setor_OcupacaoConvertion.CriarSetorOcupacao(novoSetor);
         }
         
-        public async Task<LerSetor_OcupacaoDTO2?> Atualizar(int setorId, AtualizarSetor_OcupacaoDTO atualizarSetorDTO)
+        public async Task<AtualizarSetor_OcupacaoDTO?> Atualizar(int setorId, AtualizarSetor_OcupacaoDTO atualizarSetorDTO)
         {
             SetorOcupacao? setorQuery = await _repSetorOcupacao.ObterSetorPorId(setorId);
             if (setorQuery == null)
@@ -174,7 +174,7 @@ namespace NextHire_API.Applications.Services
             }
 
             await _repSetorOcupacao.Atualizar(setorQuery);
-            return Setor_OcupacaoConvertion.lerSetoresOcupacoes(setorQuery);
+            return Setor_OcupacaoConvertion.AtualizarSetorOcupacao(setorQuery);
         }
 
 

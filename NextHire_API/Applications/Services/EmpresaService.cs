@@ -51,7 +51,7 @@ namespace NextHire_API.Applications.Services
             return EmpresaConvertion.criarEmpresaDTO(Empresa);
         }
 
-        public async Task<LerEmpresaDTO> Atualizar(int EmpresaId, string? nome, bool? status)
+        public async Task<AtualizarEmpresaDTO> Atualizar(int EmpresaId, string? nome, bool? status)
         {
             Empresa? EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
                 ?? throw new DomainException("Empresa não encontrada!");
@@ -61,7 +61,7 @@ namespace NextHire_API.Applications.Services
 
 
             await _rep.Atualizar(EmpresaQuery.EmpresaId, EmpresaQuery);
-            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
+            return EmpresaConvertion.atualizarEmpresaDTO(EmpresaQuery);
         }
 
         public async Task<LerEmpresaDTO> Remover(int EmpresaId)

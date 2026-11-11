@@ -131,7 +131,7 @@ namespace NextHire_API.Applications.Services
         public ListarInformacaoCandidatoDto Atualizar(int id, AtualizarInformacaoCandidatoDto dto)
         {
             if (id <= 0)
-                throw new DomainException("O ID da informação do candidato deve ser maior que zero.");
+                throw new DomainException("O ID da informação do candidato não é válido.");
 
             if (dto == null)
                 throw new DomainException("Os dados para atualização são obrigatórios.");

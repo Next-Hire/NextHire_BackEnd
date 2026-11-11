@@ -28,7 +28,6 @@ namespace NextHire_API.Repository
             if (informacaoExistente == null)
                 throw new KeyNotFoundException("Informações do candidato não encontradas.");
 
-            // Não altera InfoCandidatoId nem CandidatoId.
             informacaoExistente.DataNascimento = informacaoCandidato.DataNascimento;
             informacaoExistente.FormacaoAcademica = informacaoCandidato.FormacaoAcademica;
             informacaoExistente.Idioma = informacaoCandidato.Idioma;

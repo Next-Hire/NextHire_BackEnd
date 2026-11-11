@@ -12,24 +12,107 @@ namespace NextHire_API.Repository
         private readonly NextHireContext _ctx;
         public CandidatoQuestaoRepository(NextHireContext context)  => _ctx = context;
 
-        public async Task<List<CandidatoQuestao>> Listar(int candidatoId, int vagaId) => 
-            await _ctx.CandidatoQuestao
-                .Where(cq => cq.CandidatoId == candidatoId && cq.Questao.VagaId == vagaId)
-                .ToListAsync();
 
-        public async Task<List<CandidatoQuestao>> ListaDeAcertos(int candidatoId, int vagaId)
-        {
-            var candidatoQuery = await _ctx.Usuario.FindAsync(candidatoId) ?? null;
-            var vagaQuery = await _ctx.Vaga.FindAsync(vagaId) ?? null;
-
-            return await _ctx.CandidatoQuestao
+        public async Task<CandidatoQuestao?> BuscarPorId(int questaoId, int candidatoId)
+            => await _ctx.CandidatoQuestao
                 .Include(varAux => varAux.Questao)
                     .ThenInclude(varAux => varAux.Alternativa)
-                    .Where(varAux => varAux.CandidatoId == candidatoId && varAux.Questao.VagaId == vagaId)
-                    .ToListAsync();
-        }
+                .FirstOrDefaultAsync(varAux => varAux.QuestaoId == questaoId 
+                                               && varAux.CandidatoId == candidatoId);
 
-        public async Task<List<CandidatoQuestao>> 
+        public async Task<bool?> ExisteRespostaCandidato(int questaoId, int candidatoId)
+            => await _ctx.CandidatoQuestao
+                .AnyAsync(varAux => varAux.QuestaoId == questaoId && varAux.CandidatoId == candidatoId);
+        
+        
+        public async Task<List<CandidatoQuestao?>> ListarPorCandidato(int candidatoId)
+            => await _ctx.CandidatoQuestao
+                .AsNoTracking()
+                .Where(varAux => varAux.CandidatoId == candidatoId)
+                .Include(varAux => varAux.Questao)
+                .ToListAsync();
+
+        public async Task<List<CandidatoQuestao?>> ListarPorQuestao(int questaoId)
+            => await _ctx.CandidatoQuestao
+                .AsNoTracking()
+                .Where(varAux => varAux.QuestaoId == questaoId)
+                .Include(varAux => varAux.Candidato)
+                .ToListAsync();
+
+        public async Task<List<CandidatoQuestao?>> ListarCandidatoEVaga(int candidatoId, int vagaId)
+            => await _ctx.CandidatoQuestao
+                .AsNoTracking()
+                .Where(varAux => varAux.CandidatoId == candidatoId &&
+                                 varAux.Questao.VagaId == vagaId)
+                .Include(varAux => varAux.Questao)
+                .ToListAsync();
+
+        public async Task<List<Questao?>> ListarPorQuestoesEmBranco(int candidatoId, int vagaId) =>
+            await _ctx.Questao
+                .Where(varAux => varAux.VagaId == vagaId &&
+                                 !varAux.CandidatoQuestao.Any(varAux => varAux.CandidatoId == candidatoId))
+                .ToListAsync();
+        
+        
+
+
+
+        public async Task<List<CandidatoQuestao>> ListarRepostasCertas(int candidatoId) =>
+            await _ctx.CandidatoQuestao
+                .AsNoTracking()
+                .Where(candQues => candQues.CandidatoId == candidatoId)
+                .Include(varAux => varAux.Questao)
+                    .ThenInclude(varAux => varAux.Alternativa)
+                .ToListAsync();
+
+        public async Task<List<CandidatoQuestao?>> ListarRespostasComGabarito(int candidatoId, int? vagaId = null)
+        {
+            IQueryable<CandidatoQuestao?> candQuestaoQuery =  _ctx.CandidatoQuestao
+                .AsNoTracking()
+                .Where(varAux => varAux.CandidatoId == candidatoId);
+
+            if (vagaId.HasValue) // caso haja id da vaga para atrelar à query
+                candQuestaoQuery = candQuestaoQuery.Where(varAux => varAux.Questao.VagaId == vagaId);
+            
+            // QuestaoQuery inteira e + alternativa dela.
+            return await candQuestaoQuery
+                .Include(varAux => varAux.Questao)
+                    .ThenInclude(varAux => varAux.Alternativa) // tentei puxar pelas alternativas certas somente mas não foi
+                .ToListAsync(); 
+
+        }
+        
+        
+                public async Task<List<CandidatoQuestao>> ListaDeAcertos(int candidatoId, int vagaId)
+                {
+                    var candidatoQuery = await _ctx.Usuario.FindAsync(candidatoId) ?? null;
+                    var vagaQuery = await _ctx.Vaga.FindAsync(vagaId) ?? null;
+        
+                    return await _ctx.CandidatoQuestao
+                        .Include(varAux => varAux.Questao)
+                            .ThenInclude(varAux => varAux.Alternativa)
+                            .Where(varAux => varAux.CandidatoId == candidatoId && varAux.Questao.VagaId == vagaId)
+                            .ToListAsync();
+                }
+                
+                
+                public async Task<CandidatoQuestao?> Excluir(int id)
+                {
+                    var candidatoQuestao = await _ctx.CandidatoQuestao.FindAsync(id);
+                    if (candidatoQuestao != null)
+                    {
+                        _ctx.CandidatoQuestao.Remove(candidatoQuestao);
+                        await _ctx.SaveChangesAsync();
+                    }
+                    return candidatoQuestao;
+                }
+                
+                
+                
+    }
+}
+
+        // public async Task<List<CandidatoQuestao>> 
 
 
         //public async Task<List<RespostaCandidatoQuestaoDTO>> ListaDeAcertos(int candidatoId)
@@ -78,15 +161,3 @@ namespace NextHire_API.Repository
 
         //}
 
-        public async Task<CandidatoQuestao?> Excluir(int id)
-        {
-            var candidatoQuestao = await _ctx.CandidatoQuestao.FindAsync(id);
-            if (candidatoQuestao != null)
-            {
-                _ctx.CandidatoQuestao.Remove(candidatoQuestao);
-                await _ctx.SaveChangesAsync();
-            }
-            return candidatoQuestao;
-        }
-    }
-}

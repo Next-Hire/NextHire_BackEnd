@@ -2,20 +2,17 @@
 {
     public class RespostaCandidatoQuestaoDTO
     {
-        public int QuestaoId { get; set; }
+        public int? questaoId { get; set; }
+        
+        public string? textoQuestao { get; set; } = string.Empty;
+        
 
-        public string tituloQuestao { get; set; } = null!;
+    }
 
-       
-
-        public string alternativaEscolhida { get; set; } = null!;
-
-        public string tipoQuestaoEnum { get; set; } = null!;
-
-        public int AlternativaEscolhidaId { get; set; }
-
-        public bool estaCerta { get; set; }
-
+    public class RespostaQuestaoPayload
+    {
+        public List<int> alternativaIds { get; set; } = new();
+        public string? textoAlternativa { get; set; } = string.Empty;
     }
 
 

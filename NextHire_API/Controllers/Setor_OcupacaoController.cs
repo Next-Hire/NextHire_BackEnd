@@ -121,11 +121,11 @@ namespace NextHire_API.Controllers
         }
 
         [HttpPut("Atualizar/{setorId}")]
-        public async Task<ActionResult<LerSetor_OcupacaoDTO2>> Atualizar(int setorId, [FromBody] AtualizarSetor_OcupacaoDTO atualizarDTO)
+        public async Task<ActionResult<AtualizarSetor_OcupacaoDTO>> Atualizar(int setorId, [FromBody] AtualizarSetor_OcupacaoDTO atualizarDTO)
         {
             try
             {
-                LerSetor_OcupacaoDTO2 setorAtualizado = await _service.Atualizar(setorId, atualizarDTO);
+                var setorAtualizado = await _service.Atualizar(setorId, atualizarDTO);
                 return Ok(setorAtualizado);
             }
             catch (DomainException ex)

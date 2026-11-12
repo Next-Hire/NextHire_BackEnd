@@ -140,6 +140,11 @@ builder.Services.AddScoped<AreaOcupacaoService>();
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 builder.Services.AddScoped<EmpresaService>();
 
+
+
+builder.Services.AddScoped<ICandidato_QuestaoRepository, CandidatoQuestaoRepository>();
+builder.Services.AddScoped<CandidatoQuestaoService>();
+
 // Setor Ocupacao
 builder.Services.AddScoped<ISetor_OcupacaoRepository, Setor_OcupacaoRepository>();
 builder.Services.AddScoped<Setor_OcupacaoService>();

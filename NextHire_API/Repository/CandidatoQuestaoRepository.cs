@@ -32,14 +32,14 @@ namespace NextHire_API.Repository
                 .Include(varAux => varAux.Questao)
                 .ToListAsync();
 
-        public async Task<List<CandidatoQuestao?>> ListarPorQuestao(int questaoId)
+        public async Task<List<CandidatoQuestao>> ListarPorQuestao(int questaoId)
             => await _ctx.CandidatoQuestao
                 .AsNoTracking()
                 .Where(varAux => varAux.QuestaoId == questaoId)
                 .Include(varAux => varAux.Candidato)
-                .ToListAsync();
+                .ToListAsync() ?? null;
 
-        public async Task<List<CandidatoQuestao?>> ListarCandidatoEVaga(int candidatoId, int vagaId)
+        public async Task<List<CandidatoQuestao>> ListarCandidatoEVaga(int candidatoId, int vagaId)
             => await _ctx.CandidatoQuestao
                 .AsNoTracking()
                 .Where(varAux => varAux.CandidatoId == candidatoId &&
@@ -94,11 +94,18 @@ namespace NextHire_API.Repository
                             .Where(varAux => varAux.CandidatoId == candidatoId && varAux.Questao.VagaId == vagaId)
                             .ToListAsync();
                 }
-                
-                
-                public async Task<CandidatoQuestao?> Excluir(int id)
+
+                public async Task<CandidatoQuestao?> Adicionar(CandidatoQuestao candQuestao)
                 {
-                    var candidatoQuestao = await _ctx.CandidatoQuestao.FindAsync(id);
+                    await _ctx.CandidatoQuestao.AddAsync(candQuestao);
+                    await _ctx.SaveChangesAsync();
+                    return candQuestao;
+                }
+                
+                
+                public async Task<CandidatoQuestao?> Excluir(int candidatoId, int questaoId)
+                {
+                    var candidatoQuestao = await _ctx.CandidatoQuestao.FindAsync(questaoId, candidatoId);
                     if (candidatoQuestao != null)
                     {
                         _ctx.CandidatoQuestao.Remove(candidatoQuestao);

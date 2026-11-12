@@ -165,6 +165,9 @@ builder.Services.AddScoped<VagaService>();
 builder.Services.AddScoped<IInformacaoCandidatoRepository, InformacaoCandidatoRepository>();
 builder.Services.AddScoped<InformacaoCandidatoService>();
 
+builder.Services.AddScoped<ISetor_OcupacaoRepository, Setor_OcupacaoRepository>();
+builder.Services.AddScoped<Setor_OcupacaoService>();
+
 // cors btw
 
 builder.Services.AddCors(options =>

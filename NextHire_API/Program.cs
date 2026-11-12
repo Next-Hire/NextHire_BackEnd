@@ -44,6 +44,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 
 builder.Services.AddControllers();
 
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -136,6 +137,9 @@ builder.Services.AddScoped<AreaOcupacaoService>();
 
 builder.Services.AddScoped<IAnotacaoRepository, AnotacaoRepository>();
 builder.Services.AddScoped<AnotacaoService>();
+
+builder.Services.AddScoped<EmpresaService>();
+builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 
 
 builder.Services.AddScoped<IHabilidadesRepository, HabilidadeRepositiory>();

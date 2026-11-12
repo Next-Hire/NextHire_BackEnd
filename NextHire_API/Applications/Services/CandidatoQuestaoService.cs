@@ -111,7 +111,9 @@ public class CandidatoQuestaoService
         var salva = await _rep.Adicionar(novaResposta);
 
         var completa = await _rep.BuscarPorId(salva!.QuestaoId, salva.CandidatoId);
-        return CandidatoQuestaoToDto.LerCandidatoQuestao(completa!);
+        if (completa == null)
+            throw new DomainException("Questionário não encontrado. ");
+        return CandidatoQuestaoToDto.LerCandidatoQuestao(completa);
     }
 
     public async Task<LerCandidatoQuestaoDTO?> Excluir(int candidatoId, int questaoId)

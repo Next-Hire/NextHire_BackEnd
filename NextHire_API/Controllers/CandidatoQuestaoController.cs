@@ -1,12 +1,13 @@
 
-using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
-using NextHireAPI.Applications.Services;
-using NextHire_API.Exceptions;
-using System.Net.Mail;
 using NextHire_API.Applications.Services;
+using NextHire_API.Domains;
 using NextHire_API.DTOs.CandidatoQuestaoDTO;
+using NextHire_API.Exceptions;
+using NextHireAPI.Applications.Services;
 using NextHireAPI.Domains;
+using System.Collections.Concurrent;
+using System.Net.Mail;
 
 
 namespace NextHireAPI.Controllers
@@ -32,11 +33,11 @@ namespace NextHireAPI.Controllers
 
         // GET: api/CandidatoQuestao/questao/1/candidato/10
         [HttpGet("questao/{questaoId}/candidato/{candidatoId}")]
-        public async Task<IActionResult> BuscarPorId(int questaoId, int candidatoId)
+        public async Task<ActionResult<LerCandidatoQuestaoDTO>> BuscarPorId(int questaoId, int candidatoId)
         {
             try
             {
-                var response = await _candQuestaoService.BuscarPorId(questaoId, candidatoId);
+                LerCandidatoQuestaoDTO? response = await _candQuestaoService.BuscarPorId(questaoId, candidatoId);
                 return Ok(response);
             }
             catch (DomainException e)
@@ -48,34 +49,70 @@ namespace NextHireAPI.Controllers
 
         // GET: api/CandidatoQuestao/candidato/10
         [HttpGet("candidato/{candidatoId}")]
-        public async Task<IActionResult> ListarPorCandidato(int candidatoId)
+        public async Task<ActionResult<List<LerCandidatoQuestaoDTO>>> ListarPorCandidato(int candidatoId)
         {
-            var lista = await _candQuestaoService.ListarPorCandidato(candidatoId);
-            return Ok(lista);
+            try
+            {
+                List<LerCandidatoQuestaoDTO> lista = await _candQuestaoService.ListarPorCandidato(candidatoId);
+                return Ok(lista);
+            }
+
+            catch(DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
         }
 
         // GET: api/CandidatoQuestao/questao/1
         [HttpGet("questao/{questaoId}")]
-        public async Task<IActionResult> ListarPorQuestao(int questaoId)
+        public async Task<ActionResult<List<LerCandidatoQuestaoDTO>>> ListarPorQuestao(int questaoId)
         {
-            var lista = await _candQuestaoService.ListarPorQuestao(questaoId);
-            return Ok(lista);
+
+            try
+            {
+                List<LerCandidatoQuestaoDTO> lista = await _candQuestaoService.ListarPorQuestao(questaoId);
+                return Ok(lista);
+            }
+
+            catch(DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
         }
 
         // GET: api/CandidatoQuestao/candidato/10/vaga/5
         [HttpGet("candidato/{candidatoId}/vaga/{vagaId}")]
-        public async Task<IActionResult> ListarCandidatoEVaga(int candidatoId, int vagaId)
+        public async Task<ActionResult<List<LerCandidatoQuestaoDTO>>> ListarCandidatoEVaga(int candidatoId, int vagaId)
         {
-            var lista = await _candQuestaoService.ListarCandidatoEVaga(candidatoId, vagaId);
-            return Ok(lista);
+            try
+            {
+                List<LerCandidatoQuestaoDTO> lista = await _candQuestaoService.ListarCandidatoEVaga(candidatoId, vagaId);
+                return Ok(lista);
+            }
+
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // GET: api/CandidatoQuestao/em-branco/candidato/10/vaga/5
         [HttpGet("em-branco/candidato/{candidatoId}/vaga/{vagaId}")]
-        public async Task<IActionResult> ListarPorQuestoesEmBranco(int candidatoId, int vagaId)
+        public async Task<ActionResult<List<Questao?>>> ListarPorQuestoesEmBranco(int candidatoId, int vagaId)
         {
-            var questoes = await _candQuestaoService.ListarPorQuestoesEmBranco(candidatoId, vagaId);
-            return Ok(questoes);
+            try
+            {
+                var query = await _candQuestaoService.ListarPorQuestoesEmBranco(candidatoId, vagaId);
+                return Ok(query);
+            }
+
+            catch(DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+ 
         }
 
         // // GET: api/CandidatoQuestao/gabarito/candidato/10?vagaId=5 (vagaId opcional)
@@ -88,10 +125,18 @@ namespace NextHireAPI.Controllers
 
         // GET: api/CandidatoQuestao/certas/candidato/10
         [HttpGet("certas/candidato/{candidatoId}")]
-        public async Task<IActionResult> ListarRepostasCertas(int candidatoId)
+        public async Task<ActionResult<List<LerCandidatoQuestaoGabaritoDTO>>> ListarRepostasCertas(int candidatoId)
         {
-            var lista = await _candQuestaoService.ListarRepostasCertas(candidatoId);
-            return Ok(lista);
+            try
+            {
+                List<LerCandidatoQuestaoGabaritoDTO> query = await _candQuestaoService.ListarRepostasCertas(candidatoId);
+                return Ok(query);
+            }
+
+            catch(DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         // GET: api/CandidatoQuestao/acertos/candidato/10/vaga/5
@@ -108,33 +153,36 @@ namespace NextHireAPI.Controllers
 
         // POST: api/CandidatoQuestao
         [HttpPost]
-        public async Task<IActionResult> Adicionar([FromBody] CriarCandidatoQuestaoDTO dto)
+        public async Task<ActionResult<LerCandidatoQuestaoDTO>> Adicionar([FromBody] CriarCandidatoQuestaoDTO dto)
         {
+
             try
             {
-                var criada = await _candQuestaoService.Adicionar(dto);
-                return CreatedAtAction(
-                    nameof(BuscarPorId),
-                    new { questaoId = criada.questaoId, candidatoId = criada.candidatoId },
-                    criada
-                );
+                LerCandidatoQuestaoDTO criar = await _candQuestaoService.Adicionar(dto);
+                return Created();
             }
-            catch (InvalidOperationException ex)
+
+            catch(DomainException ex)
             {
-                // Retorna 400 Bad Request se o candidato já tiver respondido à questão
-                return BadRequest(new { mensagem = ex.Message });
+                return BadRequest(ex.Message);
             }
         }
 
         // DELETE: api/CandidatoQuestao/candidato/10/questao/1
         [HttpDelete("candidato/{candidatoId}/questao/{questaoId}")]
-        public async Task<IActionResult> Excluir(int candidatoId, int questaoId)
+        public async Task<ActionResult<LerCandidatoQuestaoDTO>> Excluir(int candidatoId, int questaoId)
         {
-            var excluida = await _candQuestaoService.Excluir(candidatoId, questaoId);
-            if (excluida == null)
-                return NotFound(new { mensagem = "Resposta não encontrada para exclusão." });
+            try
+            {
+                LerCandidatoQuestaoDTO? query = await _candQuestaoService.Excluir(candidatoId, questaoId);
+                return Ok(query);
+            }
 
-            return Ok(excluida);
+            catch(DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+ 
         }
     }
 }

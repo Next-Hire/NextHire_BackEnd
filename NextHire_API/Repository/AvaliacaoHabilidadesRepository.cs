@@ -14,20 +14,32 @@ namespace NextHire_API.Repository
             _context = context;
         }
 
+        // Include recebe propriedades de navegação, não os campos FK (IDs).
+        // A navegação da entrevista segue até o processo seletivo e a vaga.
+        private IQueryable<AvaliacaoHabilidade> Consulta()
+        {
+            return _context.AvaliacaoHabilidade
+                .Include(a => a.Candidato)
+                .Include(a => a.Habilidade)
+                .Include(a => a.Entrevista)
+                    .ThenInclude(e => e.ProcessoSeletivo)
+                        .ThenInclude(p => p.Vaga);
+        }
+
         public async Task<List<AvaliacaoHabilidade>> Listar()
         {
-            return await _context.AvaliacaoHabilidade
-                .AsNoTracking()
+            return await Consulta()
                 .OrderBy(a => a.CandidatoId)
                 .ThenBy(a => a.EntrevistaId)
                 .ThenBy(a => a.HabilidadeId)
                 .ToListAsync();
         }
 
-        public async Task<AvaliacaoHabilidade?> BuscarPorChave(
+        // Mantém tracking nesta consulta porque Atualizar e Deletar modificam a entidade.
+        public async Task<AvaliacaoHabilidade?> BuscarPorId(
             int candidatoId, int entrevistaId, int habilidadeId)
         {
-            return await _context.AvaliacaoHabilidade.FirstOrDefaultAsync(a =>
+            return await Consulta().FirstOrDefaultAsync(a =>
                 a.CandidatoId == candidatoId &&
                 a.EntrevistaId == entrevistaId &&
                 a.HabilidadeId == habilidadeId);
@@ -35,7 +47,7 @@ namespace NextHire_API.Repository
 
         public async Task<List<AvaliacaoHabilidade>> BuscarPorCandidato(int candidatoId)
         {
-            return await _context.AvaliacaoHabilidade
+            return await Consulta()
                 .AsNoTracking()
                 .Where(a => a.CandidatoId == candidatoId)
                 .OrderBy(a => a.EntrevistaId)
@@ -55,11 +67,11 @@ namespace NextHire_API.Repository
         public async Task<AvaliacaoHabilidade?> Atualizar(
             int candidatoId, int entrevistaId, int habilidadeId, int nivelAvaliado)
         {
-            var avaliacaoExistente = await BuscarPorChave(candidatoId, entrevistaId, habilidadeId);
+            var avaliacaoExistente = await BuscarPorId(candidatoId, entrevistaId, habilidadeId);
             if (avaliacaoExistente == null)
                 return null;
 
-            // Preserva todos os campos que compõem a chave primária.
+            // Altera somente o campo não pertencente à chave composta.
             avaliacaoExistente.NivelAvaliado = nivelAvaliado;
             await _context.SaveChangesAsync();
 
@@ -68,7 +80,7 @@ namespace NextHire_API.Repository
 
         public async Task Deletar(int candidatoId, int entrevistaId, int habilidadeId)
         {
-            var avaliacao = await BuscarPorChave(candidatoId, entrevistaId, habilidadeId);
+            var avaliacao = await BuscarPorId(candidatoId, entrevistaId, habilidadeId);
             if (avaliacao == null)
                 throw new KeyNotFoundException("Avaliação de habilidade não encontrada.");
 

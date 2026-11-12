@@ -5,7 +5,7 @@ namespace NextHire_API.Interfaces
     public interface IAvaliacaoHabilidadeRepository
     {
         Task<List<AvaliacaoHabilidade>> Listar();
-        Task<AvaliacaoHabilidade?> BuscarPorChave(int candidatoId, int entrevistaId, int habilidadeId);
+        Task<AvaliacaoHabilidade?> BuscarPorId(int candidatoId, int entrevistaId, int habilidadeId);
         Task<List<AvaliacaoHabilidade>> BuscarPorCandidato(int candidatoId);
         Task Adicionar(AvaliacaoHabilidade avaliacaoHabilidade);
         Task<AvaliacaoHabilidade?> Atualizar(int candidatoId, int entrevistaId, int habilidadeId, int nivelAvaliado);

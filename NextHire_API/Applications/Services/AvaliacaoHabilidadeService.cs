@@ -14,13 +14,29 @@ namespace NextHire_API.Applications.Services
             _repository = repository;
         }
 
+        // Converte os dados da avaliação e das entidades relacionadas.
+        // As navegações são carregadas pelo Repository usando Include/ThenInclude.
         private static ListarAvaliacaoHabilidadeDto ConverterParaDto(AvaliacaoHabilidade avaliacao)
         {
             return new ListarAvaliacaoHabilidadeDto
             {
                 CandidatoId = avaliacao.CandidatoId,
+                NomeCandidato = avaliacao.Candidato?.Nome ?? string.Empty,
+                EmailCandidato = avaliacao.Candidato?.Email ?? string.Empty,
+
                 EntrevistaId = avaliacao.EntrevistaId,
+                NomeEntrevista = avaliacao.Entrevista?.NomeEntrevista ?? string.Empty,
+                HorarioInicio = DateOnly.FromDateTime(avaliacao.Entrevista.HorarioInicio),
+                HorarioFim = DateOnly.FromDateTime(avaliacao.Entrevista?.HorarioFim ?? default),
+
+                ProcessoSeletivoId = avaliacao.Entrevista?.ProcessoSeletivo?.ProcessoSeletivoId ?? 0,
+                TituloProcesso = avaliacao.Entrevista?.ProcessoSeletivo?.TituloProcesso ?? string.Empty,
+
+                VagaId = avaliacao.Entrevista?.ProcessoSeletivo?.Vaga?.VagaId ?? 0,
+                TituloVaga = avaliacao.Entrevista?.ProcessoSeletivo?.Vaga?.Titulo ?? string.Empty,
+
                 HabilidadeId = avaliacao.HabilidadeId,
+                NomeHabilidade = avaliacao.Habilidade?.Nome ?? string.Empty,
                 NivelAvaliado = avaliacao.NivelAvaliado
             };
         }
@@ -47,12 +63,13 @@ namespace NextHire_API.Applications.Services
             return avaliacoes.Select(ConverterParaDto).ToList();
         }
 
+        // O nome BuscarPorChave corresponde à action chamada pelo Controller.
         public async Task<ListarAvaliacaoHabilidadeDto> BuscarPorChave(
             int candidatoId, int entrevistaId, int habilidadeId)
         {
             ValidarChave(candidatoId, entrevistaId, habilidadeId);
 
-            var avaliacao = await _repository.BuscarPorChave(candidatoId, entrevistaId, habilidadeId);
+            var avaliacao = await _repository.BuscarPorId(candidatoId, entrevistaId, habilidadeId);
             if (avaliacao == null)
                 throw new KeyNotFoundException("Avaliação de habilidade não encontrada.");
 
@@ -76,7 +93,7 @@ namespace NextHire_API.Applications.Services
             ValidarChave(dto.CandidatoId, dto.EntrevistaId, dto.HabilidadeId);
             ValidarNivel(dto.NivelAvaliado);
 
-            var avaliacaoExistente = await _repository.BuscarPorChave(
+            var avaliacaoExistente = await _repository.BuscarPorId(
                 dto.CandidatoId, dto.EntrevistaId, dto.HabilidadeId);
 
             if (avaliacaoExistente != null)
@@ -91,11 +108,20 @@ namespace NextHire_API.Applications.Services
             };
 
             await _repository.Adicionar(avaliacao);
-            return ConverterParaDto(avaliacao);
+
+            // Busca novamente para carregar Candidato, Habilidade, Entrevista, ProcessoSeletivo e Vaga.
+            var avaliacaoComRelacionamentos = await _repository.BuscarPorId(
+                dto.CandidatoId, dto.EntrevistaId, dto.HabilidadeId);
+
+            if (avaliacaoComRelacionamentos == null)
+                throw new InvalidOperationException("A avaliação foi cadastrada, mas não foi possível recuperá-la.");
+
+            return ConverterParaDto(avaliacaoComRelacionamentos);
         }
 
         public async Task<ListarAvaliacaoHabilidadeDto> Atualizar(
-            int candidatoId, int entrevistaId, int habilidadeId, AtualizarAvaliacaoHabilidadeDto dto)
+            int candidatoId, int entrevistaId, int habilidadeId,
+            AtualizarAvaliacaoHabilidadeDto dto)
         {
             ValidarChave(candidatoId, entrevistaId, habilidadeId);
 

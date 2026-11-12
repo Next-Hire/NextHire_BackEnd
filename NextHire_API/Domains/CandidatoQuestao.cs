@@ -11,6 +11,8 @@ public partial class CandidatoQuestao
     public int CandidatoId { get; set; }
 
     public string RepostaQuestao { get; set; } = null!;
+    //Alterações para JSONB:
+    //public RepostaQuestaoPayload RespostaQuestao { get; set; } = null!;
 
     public virtual Usuario Candidato { get; set; } = null!;
 

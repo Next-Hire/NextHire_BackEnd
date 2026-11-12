@@ -225,6 +225,40 @@ public partial class NextHireContext : DbContext
                 .HasForeignKey(d => d.QuestaoId)
                 .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("candidato_questao_questao_id_fkey");
 
+
+            /*
+             Versão
+
+                        entity.HasKey(e => new { e.QuestaoId, e.CandidatoId }).HasName("pk_candidato_questao");
+            entity.ToTable("candidato_questao", "public");
+
+            entity.Property(e => e.QuestaoId).HasColumnName("questao_id");
+            entity.Property(e => e.CandidatoId).HasColumnName("candidato_id");
+
+            // ALTERACAO: Mapeamento de propriedade simples com conversão de/para JSON
+            entity.Property(e => e.RepostaQuestao)
+                .IsRequired()
+                .HasColumnType("jsonb")
+                .HasColumnName("reposta_questao")
+                .HasConversion(
+                    // Converte o objeto C# em string JSON ao enviar para o PostgreSQL
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    // Converte a string JSON do PostgreSQL de volta para o objeto C#
+                    v => JsonSerializer.Deserialize<RespostaQuestaoPayload>(v, (JsonSerializerOptions?)null)!
+                );
+
+            entity.HasOne(d => d.Candidato).WithMany(p => p.CandidatoQuestao)
+                .HasForeignKey(d => d.CandidatoId)
+                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("candidato_questao_candidato_id_fkey");
+
+            entity.HasOne(d => d.Questao).WithMany(p => p.CandidatoQuestao)
+                .HasForeignKey(d => d.QuestaoId)
+                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("candidato_questao_questao_id_fkey");
+             
+             
+             
+             */
+
         });
 
         modelBuilder.Entity<CandidatoVaga>(entity =>

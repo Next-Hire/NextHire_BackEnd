@@ -5,6 +5,7 @@ using Microsoft.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NextHire_API.Contexts;
+using NextHire_API.Applications.Services;
 using NextHire_API.Interfaces;
 using NextHire_API.Repository;
 using NextHire_API.Applications.Services;

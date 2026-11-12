@@ -9,7 +9,6 @@ namespace NextHire_API.Applications.Services
 {
     public class EmpresaService
     {
-
         private readonly IEmpresaRepository _rep;
 
         public EmpresaService(IEmpresaRepository rep) => _rep = rep;

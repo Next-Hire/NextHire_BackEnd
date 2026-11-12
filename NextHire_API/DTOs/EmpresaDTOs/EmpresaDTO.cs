@@ -23,8 +23,6 @@ namespace NextHire_API.DTOs.EmpresaDTOs
         public string nome { get; set; } = string.Empty;
         public bool statusEmpresa { get; set; }
     }
-    
-    
 
     
 }

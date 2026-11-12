@@ -1,9 +1,9 @@
 ﻿using NextHire_API.Applications.Convertions.DomainToConversion;
+using NextHire_API.Applications.Convertions.DomainToDTO;
 using NextHire_API.Domains;
 using NextHire_API.DTOs.EmpresaDTOs;
 using NextHire_API.Exceptions;
 using NextHire_API.Interfaces;
-using System.Security.Cryptography.X509Certificates;
 
 namespace NextHire_API.Applications.Services
 {
@@ -13,65 +13,69 @@ namespace NextHire_API.Applications.Services
 
         public EmpresaService(IEmpresaRepository rep) => _rep = rep;
 
-        public async Task<lerEmpresaDTO> ObterPorId(int empresaId)
+        public async Task<LerEmpresaDTO> ObterPorId(int EmpresaId)
         {
-            var empresaQuery = await _rep.BuscarPorId(empresaId) 
-                    ?? throw new DomainException("Empresa não encontrada!");
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            Empresa EmpresaQuery = await _rep.BuscarPorId(EmpresaId);
+                    if(EmpresaQuery == null || EmpresaQuery.EmpresaId == 0)
+                     throw new DomainException("Nenhuma Empresa cadastrada!");
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
-        public async Task<IEnumerable<lerEmpresaDTO>> ListagemTotal()
+        public async Task<IEnumerable<LerEmpresaDTO>> ListagemTotal()
         {
-            IEnumerable<empresa?> empresasQuery = await _rep.Listar();
-            return empresasQuery.Select(EmpresaConvertion.listarEmpresas);
+            IEnumerable<Empresa?> EmpresasQuery = await _rep.Listar();
+            if(EmpresasQuery == null || !EmpresasQuery.Any())
+                throw new DomainException("Nenhuma Empresa cadastrada!");
+            return EmpresasQuery.Select(EmpresaConvertion.listarEmpresas);
         }
 
-        public async Task<lerEmpresaDTO> ObterPorEmpresa(string nome)
+        public async Task<LerEmpresaDTO> ObterPorEmpresa(string nome)
         {
-            empresa? empresaQuery = await _rep.BuscarNome(nome) 
-                    ?? throw new DomainException("Empresa Não encontrada!");
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            Empresa? EmpresaQuery = await _rep.BuscarPorNome(nome);
+            if (EmpresaQuery == null || EmpresaQuery.EmpresaId == 0)
+                throw new DomainException("Nenhuma Empresa cadastrada!");
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
-        public async Task<criarEmpresaDTO> Adicionar(empresa empresaCons)
+        public async Task<CriarEmpresaDTO> Adicionar(CriarEmpresaDTO EmpresaCons)
         {
-            if(await _rep.empresaExiste(empresaCons.nome))
+            if (await _rep.EmpresaExiste(EmpresaCons.nome))
                 throw new DomainException("Empresa já cadastrada!");
 
-            empresa empresa = new empresa
+            Empresa Empresa = new Empresa
             {
-                nome = empresaCons.nome,
-
+                Nome = EmpresaCons.nome,
+                //StatusEmpresa = true
             };
 
-            await _rep.Adicionar(empresa);
-            return EmpresaConvertion.criarEmpresaDTO(empresa);
+            await _rep.Adicionar(Empresa);
+            return EmpresaConvertion.criarEmpresaDTO(Empresa);
         }
 
-        public async Task<lerEmpresaDTO> Atualizar(int empresaId, empresa empresaCons)
+        public async Task<LerEmpresaDTO> Atualizar(int EmpresaId, string? nome, bool? status)
         {
-            empresa? empresaQuery = await _rep.BuscarPorId(empresaId) 
+            Empresa? EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
                 ?? throw new DomainException("Empresa não encontrada!");
 
-            empresaQuery.nome = empresaCons.nome;
+            EmpresaQuery.Nome = nome;
+            EmpresaQuery.StatusEmpresa = status;
 
 
-            await _rep.Atualizar(empresaQuery.empresa_id, empresaQuery);
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            await _rep.Atualizar(EmpresaQuery.EmpresaId, EmpresaQuery);
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
 
-        public async Task<lerEmpresaDTO> Remover(int empresaId)
+        public async Task<LerEmpresaDTO> Remover(int EmpresaId)
         {
-            empresa? empresaQuery = await _rep.BuscarPorId(empresaId)
+            Empresa? EmpresaQuery = await _rep.BuscarPorId(EmpresaId)
                 ?? throw new DomainException("Empresa não encontrada!");
 
-            empresaQuery.status_empresa = false;
+            EmpresaQuery.StatusEmpresa = false;
 
 
-            await _rep.Remover(empresaQuery.empresa_id);
-            return EmpresaConvertion.listarEmpresas(empresaQuery);
+            await _rep.Remover(EmpresaQuery.EmpresaId);
+            return EmpresaConvertion.listarEmpresas(EmpresaQuery);
         }
-
 
     }
 }

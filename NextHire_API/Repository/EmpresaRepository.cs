@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NextHire_API.Applications.Services;
 using NextHire_API.Contexts;
 using NextHire_API.Domains;
 using NextHire_API.Interfaces;
@@ -8,56 +7,56 @@ namespace NextHire_API.Repository
 {
     public class EmpresaRepository : IEmpresaRepository
     {
+
         private readonly NextHireContext _ctx;
 
         public EmpresaRepository(NextHireContext ctx) => _ctx = ctx;
 
-        public async Task<IEnumerable<empresa>> Listar()
-         =>   await _ctx.empresa.ToListAsync() 
-            ?? throw new InvalidOperationException("");
-        
+        public async Task<IEnumerable<Empresa?>> Listar() 
+            => await _ctx.Empresa.ToListAsync();
+        public async Task<Empresa?> BuscarPorNome(string nome) =>
+             await _ctx.Empresa.FirstOrDefaultAsync(varAux => varAux.Nome == nome) 
+                    ?? null;
 
-        public async Task<empresa?> BuscarNome(string nome) =>  
-            await _ctx.empresa.FirstOrDefaultAsync(varAux => varAux.nome == nome);
+        public async Task<Empresa?> BuscarPorId(int id) =>
+     await _ctx.Empresa.FindAsync(id)
+            ?? null; // Descobrir como fazer com que o throw new InvalidOperationException()
+                     // não pare a api
 
-        public async Task<empresa?> BuscarPorId(int empresaId)
+        public async Task<bool> EmpresaExiste(string nome)
+            => await _ctx.Empresa.AnyAsync(varAux => varAux.Nome == nome);
+
+        public async Task<Empresa?> Adicionar(Empresa EmpresaConstrutor)
         {
-            //empresa empresaQuery = _ctx.empresa.FindAsync(empresaId);
-            empresa empresaQuery = await _ctx.empresa.FindAsync(empresaId) 
-                ?? throw new InvalidOperationException("Empresa não encontrada");
-            return empresaQuery;
-        }
-
-        public async Task<bool> empresaExiste(string nome)
-            => await _ctx.empresa.AnyAsync(varAux => varAux.nome == nome);
-
-        public async Task<empresa?> Adicionar(empresa empresa)
-        {
-            await _ctx.empresa.AddAsync(empresa);
+            await _ctx.Empresa.AddAsync(EmpresaConstrutor);
             await _ctx.SaveChangesAsync();
-            return empresa;
+            return EmpresaConstrutor;
         }
 
-
-        public async Task<empresa?> Atualizar(int empresaId, empresa? empresa)
+        public async Task<Empresa?> Atualizar(int id, Empresa EmpresaConstrutor)
         {
-            empresa? empresaQuery = await _ctx.empresa.FindAsync(empresaId) 
-                    ?? throw new InvalidOperationException("Empresa não encontrada");
-            _ctx.Entry(empresaQuery).CurrentValues.SetValues(empresa);
+            Empresa? EmpresaQuery = await _ctx.Empresa.FindAsync(id) 
+                ?? null; // throw new InvalidOperationException()
+
+            EmpresaQuery.Nome = EmpresaConstrutor.Nome;
+
             await _ctx.SaveChangesAsync();
-            return empresaQuery;
+            return EmpresaQuery;
         }
 
-        public async Task<empresa?> Remover(int empresaId)
+
+        public async Task<Empresa?> Remover(int id)
         {
-            empresa? empresaQuery = await _ctx.empresa.FindAsync(empresaId)
-                ?? throw new InvalidOperationException("Empresa não encontrada");
-            empresaQuery.status_empresa = false;
-            await _ctx.SaveChangesAsync();
-            return empresaQuery;
-        }
+            Empresa? EmpresaQuery = await _ctx.Empresa.FindAsync(id) 
+                   ?? throw new InvalidOperationException("Empresa não encontrada");
 
- 
+            EmpresaQuery.StatusEmpresa = false;
+            await _ctx.SaveChangesAsync();
+
+            return EmpresaQuery;
+
+
+        }
 
     }
 }

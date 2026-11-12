@@ -92,7 +92,7 @@ namespace NextHire_API.Controllers
 
         [HttpGet("BuscarPorEmpresa")]
         public async Task<ActionResult<IEnumerable<LerSetor_OcupacaoDTO2?>>> ObterSetoresPorEmpresa(
-            [FromQuery] int? empresaId, 
+            [FromQuery] int empresaId, 
             [FromQuery] string? nomeEmpresa)
         {
             try
@@ -138,7 +138,7 @@ namespace NextHire_API.Controllers
         public async Task<ActionResult<LerSetor_OcupacaoDTO2>> RemoverSetor(
             int setorId, 
             [FromQuery] int areaId, 
-            [FromQuery] int? empresaId, 
+            [FromQuery] int empresaId, 
             [FromQuery] string? nomeEmpresa, 
             [FromQuery] string? nomeArea)
         {

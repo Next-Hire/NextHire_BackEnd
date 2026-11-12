@@ -84,7 +84,7 @@ namespace NextHire_API.Applications.Services
             return setorQuery.Select(varAux => Setor_OcupacaoConvertion.lerSetoresOcupacoes(varAux)).ToList();
         }
 
-        public async Task<IEnumerable<LerSetor_OcupacaoDTO2>> ObterSetoresPorEmpresa(int? empresaId,
+        public async Task<IEnumerable<LerSetor_OcupacaoDTO2>> ObterSetoresPorEmpresa(int empresaId,
             string? nomeEmpresa)
         {
             Empresa? empresaQuery = await _repEmpresa.BuscarPorId(empresaId) ??
@@ -178,7 +178,7 @@ namespace NextHire_API.Applications.Services
         }
 
 
-        public async Task<LerSetor_OcupacaoDTO2?> RemoverSetor(int setorId, int areaId, int? empresaId, string? nomeEmpresa, string? nomeArea)
+        public async Task<LerSetor_OcupacaoDTO2?> RemoverSetor(int setorId, int areaId, int empresaId, string? nomeEmpresa, string? nomeArea)
         {
             AreaOcupacao? areaOcupacaoQuery =  _repArea.BuscarPorNome(nomeArea) ??_repArea.BuscarPorId(areaId);
             Empresa? empresaQuery =

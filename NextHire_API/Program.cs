@@ -165,6 +165,9 @@ builder.Services.AddScoped<VagaService>();
 builder.Services.AddScoped<IInformacaoCandidatoRepository, InformacaoCandidatoRepository>();
 builder.Services.AddScoped<InformacaoCandidatoService>();
 
+builder.Services.AddScoped<IAvaliacaoHabilidadeRepository, AvaliacaoHabilidadesRepository>();
+builder.Services.AddScoped<AvaliacaoHabilidadeService>();
+
 // cors btw
 
 builder.Services.AddCors(options =>
@@ -178,6 +181,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configure the HTTP request pipeline.
 

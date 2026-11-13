@@ -10,7 +10,7 @@ public partial class Entrevista
 
     public DateTime HorarioFim { get; set; }
 
-    public DateTime? HorarioInicio { get; set; }
+    public DateTime HorarioInicio { get; set; }
 
     public string NomeEntrevista { get; set; } = null!;
 

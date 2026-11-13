@@ -17,6 +17,7 @@ using NextHireAPI.Applications.Services;
 using StackExchange.Redis;
 using System.Text;
 using NextHireAPI.Applications.Auth;
+using NextHire_API.Applications.S3;
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -161,6 +162,9 @@ builder.Services.AddScoped<ComentarioService>();
 // Vaga
 builder.Services.AddScoped<IVagaRepository, VagaRepository>();
 builder.Services.AddScoped<VagaService>();
+
+// Curriculo
+builder.Services.AddScoped<CurriculoService>();
 
 builder.Services.AddScoped<IInformacaoCandidatoRepository, InformacaoCandidatoRepository>();
 builder.Services.AddScoped<InformacaoCandidatoService>();

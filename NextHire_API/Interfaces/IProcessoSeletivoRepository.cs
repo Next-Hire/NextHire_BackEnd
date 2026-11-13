@@ -6,7 +6,7 @@ namespace NextHire_API.Interfaces
     {
         public Task<List<ProcessoSeletivo?>> Listar();
 
-        public Task<List<ProcessoSeletivo?>> BuscarPorSetor();
+        public Task<List<ProcessoSeletivo?>> BuscarPorSetor(); //
         public Task<ProcessoSeletivo?> BuscarPorId(int processoSeletivoId);
         public Task<List<ProcessoSeletivo?>> BuscarPorSetor(int setorId, string? nomeSetor = null);
         public Task<List<ProcessoSeletivo?>> BuscarPorArea(int areaId, string? nomearea = null);

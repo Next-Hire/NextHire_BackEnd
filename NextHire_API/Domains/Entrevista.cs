@@ -18,6 +18,8 @@ public partial class Entrevista
 
     public bool? StatusEntrevista { get; set; }
 
+    public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();
+
     public virtual ICollection<Comentario> Comentario { get; set; } = new List<Comentario>();
 
     public virtual ProcessoSeletivo ProcessoSeletivo { get; set; } = null!;

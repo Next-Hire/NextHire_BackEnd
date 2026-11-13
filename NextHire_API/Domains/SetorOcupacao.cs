@@ -18,6 +18,8 @@ public partial class SetorOcupacao
 
     public virtual Empresa Empresa { get; set; } = null!;
 
+    public virtual ICollection<Vaga> Vaga { get; set; } = new List<Vaga>();
+
     public virtual ICollection<Usuario> Gestor { get; set; } = new List<Usuario>();
 
 }

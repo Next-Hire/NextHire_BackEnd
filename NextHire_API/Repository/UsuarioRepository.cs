@@ -34,6 +34,9 @@ namespace NextHireAPI.Repository
         public async Task<List<Usuario>> ListarCandidatos()
             => await _context.Usuario
                 .Where(u => u.TipoUsuario == TipoUsuarioEnum.Candidato)
+                .Include(varAux => varAux.ExperienciaProfissional)
+                .Include(varAux => varAux.HabilidadeCandidato)
+                .Include(varAux => varAux.InformacaoCandidato)
                 .ToListAsync();
 
         public async Task<Usuario> BuscarFuncionarioPorId(int funcionarioId)

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Mail;
 using Microsoft.EntityFrameworkCore.Storage;
+using NextHire_API.Exceptions;
 
 namespace NextHireAPI.Applications.Services
 {
@@ -38,6 +39,14 @@ namespace NextHireAPI.Applications.Services
             {
                 return false;
             }
+        }
+
+        public static bool ValidarNome(string nome)
+        {
+            if (string.IsNullOrEmpty(nome))
+                throw new DomainException("Nome é obrigatório");
+
+            return true;
         }
 
         public static MailAddress ConverteParaMailAdress(string emailStr)

@@ -10,10 +10,12 @@ namespace NextHire_API.DTOs.CandidatoQuestaoDTO;
 public class RespostaQuestaoPayloadDTO
 {
 // JsonElement aceita tanto true/false como texto normal tbm
-    public JsonElement? resposta { get; set; }
+    //public JsonElement? resposta { get; set; }
+    public List<int>? alternativaId { get; set; }
     
     // textos para multipla escolha
-    public List<string>? respostas { get; set; }
+    //public List<string>? respostas { get; set; }
+    public string? TextoResposta { get; set; }
 }
 
 // DTO para post

@@ -14,16 +14,12 @@ namespace NextHire_API.Repository
             _context = context;
         }
 
-        // Include recebe propriedades de navegação, não os campos FK (IDs).
-        // A navegação da entrevista segue até o processo seletivo e a vaga.
         private IQueryable<AvaliacaoHabilidade> Consulta()
         {
             return _context.AvaliacaoHabilidade
                 .Include(a => a.Candidato)
                 .Include(a => a.Habilidade)
-                .Include(a => a.Entrevista)
-                    .ThenInclude(e => e.ProcessoSeletivo)
-                        .ThenInclude(p => p.Vaga);
+                .Include(a => a.Entrevista);
         }
 
         public async Task<List<AvaliacaoHabilidade>> Listar()
@@ -35,7 +31,6 @@ namespace NextHire_API.Repository
                 .ToListAsync();
         }
 
-        // Mantém tracking nesta consulta porque Atualizar e Deletar modificam a entidade.
         public async Task<AvaliacaoHabilidade?> BuscarPorId(
             int candidatoId, int entrevistaId, int habilidadeId)
         {
@@ -70,8 +65,6 @@ namespace NextHire_API.Repository
             var avaliacaoExistente = await BuscarPorId(candidatoId, entrevistaId, habilidadeId);
             if (avaliacaoExistente == null)
                 return null;
-
-            // Altera somente o campo não pertencente à chave composta.
             avaliacaoExistente.NivelAvaliado = nivelAvaliado;
             await _context.SaveChangesAsync();
 

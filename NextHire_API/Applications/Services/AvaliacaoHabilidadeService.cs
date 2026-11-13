@@ -14,8 +14,6 @@ namespace NextHire_API.Applications.Services
             _repository = repository;
         }
 
-        // Converte os dados da avaliação e das entidades relacionadas.
-        // As navegações são carregadas pelo Repository usando Include/ThenInclude.
         private static ListarAvaliacaoHabilidadeDto ConverterParaDto(AvaliacaoHabilidade avaliacao)
         {
             return new ListarAvaliacaoHabilidadeDto
@@ -28,12 +26,6 @@ namespace NextHire_API.Applications.Services
                 NomeEntrevista = avaliacao.Entrevista?.NomeEntrevista ?? string.Empty,
                 HorarioInicio = DateOnly.FromDateTime(avaliacao.Entrevista.HorarioInicio),
                 HorarioFim = DateOnly.FromDateTime(avaliacao.Entrevista?.HorarioFim ?? default),
-
-                ProcessoSeletivoId = avaliacao.Entrevista?.ProcessoSeletivo?.ProcessoSeletivoId ?? 0,
-                TituloProcesso = avaliacao.Entrevista?.ProcessoSeletivo?.TituloProcesso ?? string.Empty,
-
-                VagaId = avaliacao.Entrevista?.ProcessoSeletivo?.Vaga?.VagaId ?? 0,
-                TituloVaga = avaliacao.Entrevista?.ProcessoSeletivo?.Vaga?.Titulo ?? string.Empty,
 
                 HabilidadeId = avaliacao.HabilidadeId,
                 NomeHabilidade = avaliacao.Habilidade?.Nome ?? string.Empty,
@@ -63,7 +55,6 @@ namespace NextHire_API.Applications.Services
             return avaliacoes.Select(ConverterParaDto).ToList();
         }
 
-        // O nome BuscarPorChave corresponde à action chamada pelo Controller.
         public async Task<ListarAvaliacaoHabilidadeDto> BuscarPorChave(
             int candidatoId, int entrevistaId, int habilidadeId)
         {
@@ -109,7 +100,6 @@ namespace NextHire_API.Applications.Services
 
             await _repository.Adicionar(avaliacao);
 
-            // Busca novamente para carregar Candidato, Habilidade, Entrevista, ProcessoSeletivo e Vaga.
             var avaliacaoComRelacionamentos = await _repository.BuscarPorId(
                 dto.CandidatoId, dto.EntrevistaId, dto.HabilidadeId);
 

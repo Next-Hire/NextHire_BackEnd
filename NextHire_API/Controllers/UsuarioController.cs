@@ -147,7 +147,7 @@ namespace NextHireAPI.Controllers
             }
         }
 
-        [HttpPut("/senha")]
+        [HttpPut("senha")]
         public async Task<IActionResult> AtualizarSenha([FromBody] AtualizarSenhaDto dados)
         {
             try

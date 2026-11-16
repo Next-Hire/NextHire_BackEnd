@@ -37,12 +37,12 @@ namespace NextHire_API.Controllers
         [HttpPost("parse")]
         public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculo_JSON(IFormFile file)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("Nenhum arquivo enviado.");
-
-            string[]? tiposPerm = { "application/pdf", "image/jpeg", "image/png" };
-            if (!tiposPerm.Contains(file.ContentType))
-                return BadRequest("Formato inválido.. Envie PDF, JPG ou PNG.");
+            // if (file == null || file.Length == 0)
+            //     return BadRequest("Nenhum arquivo enviado.");
+            //
+            // string[]? tiposPerm = { "application/pdf", "image/jpeg", "image/png" };
+            // if (!tiposPerm.Contains(file.ContentType))
+            //     return BadRequest("Formato inválido.. Envie PDF, JPG ou PNG.");
 
             try
             {
@@ -56,6 +56,27 @@ namespace NextHire_API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
+            }
+        }
+        
+        [HttpPost("upload")]
+        public async Task<ActionResult<string>> UploadCurriculo(IFormFile file)
+        {
+            // if (file == null || file.Length == 0)
+            //     return BadRequest("Nenhum arquivo enviado.");
+            //
+            // var s3Key = await _curriculoService.UploadCurriculoAsync(file);
+            //
+            // return Ok(new { CaminhoS3 = s3Key });
+            try
+            {
+                var s3Key = await _curriculoService.UploadCurriculoAsync(file);
+                return Ok(s3Key);
+            }
+            catch (DomainException e)
+            {
+                return BadRequest(e.Message);
+
             }
         }
 

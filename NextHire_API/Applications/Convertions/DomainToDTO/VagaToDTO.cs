@@ -21,6 +21,8 @@ namespace NextHire_API.Applications.Convertions
                 //? Para trabalhar com jsonb com o linq do EF Core
                 IdiomasDesejados = LerIdiomas(vaga.IdiomasDesejados),
                 StatusVaga = vaga.StatusVaga,
+                Remuneracao = vaga.Remuneracao,
+                TipoVaga = vaga.TipoVaga.ToString(),
                 TempoExperienciaDesejado = vaga.TempoExperienciaDesejado,
                 Titulo = vaga.Titulo
             };
@@ -36,6 +38,8 @@ namespace NextHire_API.Applications.Convertions
                 Descricao = vaga.Descricao,
                 EmpresaId = vaga.EmpresaId,
                 IdiomasDesejados = JsonSerializer.Serialize(vaga.IdiomasDesejados),
+                Remuneracao = vaga.Remuneracao ?? 0,
+                TipoVaga = ConverterTipoVaga(vaga.TipoVaga ?? string.Empty),
                 TempoExperienciaDesejado = vaga.TempoExperienciaDesejado,
                 Titulo = vaga.Titulo
             };
@@ -50,12 +54,25 @@ namespace NextHire_API.Applications.Convertions
                 Descricao = vaga.Descricao,
                 EmpresaId = vaga.EmpresaId,
                 IdiomasDesejados = JsonSerializer.Serialize(vaga.IdiomasDesejados),
+                Remuneracao = vaga.Remuneracao,
+                TipoVaga = ConverterTipoVaga(vaga.TipoVaga),
                 TempoExperienciaDesejado = vaga.TempoExperienciaDesejado,
                 StatusVaga = true,
                 Titulo = vaga.Titulo,
                 SetorId = vaga.SetorOcupacaoId
             };
         }
+
+        /// <summary>Converte a string técnica do tipo de vaga para o enum do PostgreSQL.</summary>
+        public static TipoVagaEnum ConverterTipoVaga(string valor)
+            => valor.Trim().ToLowerInvariant() switch
+            {
+                "nova_funcao" => TipoVagaEnum.NovaFuncao,
+                "substituicao" => TipoVagaEnum.Substituicao,
+                "expansao_equipe" => TipoVagaEnum.ExpansaoEquipe,
+                _ => throw new Exceptions.DomainException(
+                    $"tipo_vaga inválido: {valor}. Valores aceitos: nova_funcao, substituicao, expansao_equipe.")
+            };
 
 
         //? Função para ler a string jsonb e retornar uma lista de strings

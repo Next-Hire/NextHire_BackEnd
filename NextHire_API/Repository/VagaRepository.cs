@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NextHire_API.Contexts;
 using NextHire_API.Domains;
+using NextHire_API.Exceptions;
 using NextHire_API.Interfaces;
 
 namespace NextHire_API.Repository
@@ -34,7 +35,7 @@ namespace NextHire_API.Repository
                 .Include(v => v.AnalistaRhNavigation)
                 .OrderBy(v => v.DataAbertura)
                 .FirstOrDefaultAsync(v => v.VagaId == vagaId)
-                    ?? throw new Exception("Vaga não encontrada.");
+                    ?? throw new DomainException("Vaga não encontrada.");
 
         public async Task<List<Vaga>> ListarPorTitulo(string titulo)
             => await _context.Vaga
@@ -61,7 +62,7 @@ namespace NextHire_API.Repository
         public async Task Atualizar(int vagaId, Vaga vaga)
         {
             var vagaExistente = await _context.Vaga.FindAsync(vagaId)
-                ?? throw new Exception("Vaga não encontrada.");
+                ?? throw new DomainException("Vaga não encontrada.");
 
             vagaExistente.AnalistaRh = vaga.AnalistaRh;
             vagaExistente.SetorId = vaga.SetorId;
@@ -69,11 +70,13 @@ namespace NextHire_API.Repository
             vagaExistente.Descricao = vaga.Descricao;
             vagaExistente.EmpresaId = vaga.EmpresaId;
             vagaExistente.IdiomasDesejados = vaga.IdiomasDesejados;
+            vagaExistente.Remuneracao = vaga.Remuneracao;
+            vagaExistente.TipoVaga = vaga.TipoVaga;
             vagaExistente.TempoExperienciaDesejado = vaga.TempoExperienciaDesejado;
             vagaExistente.Titulo = vaga.Titulo;
 
             if (!_context.Entry(vagaExistente).Properties.Any(p => p.IsModified))
-                throw new Exception("Nenhuma alteração foi feita na vaga.");
+                throw new DomainException("Nenhuma alteração foi feita na vaga.");
 
             await _context.SaveChangesAsync();
         }
@@ -82,7 +85,7 @@ namespace NextHire_API.Repository
         {
             var vaga = await _context.Vaga.FindAsync(id);
             if (vaga == null)
-                throw new Exception("Vaga não encontrada.");
+                throw new DomainException("Vaga não encontrada.");
 
             _context.Vaga.Remove(vaga);
             await _context.SaveChangesAsync();

@@ -20,6 +20,8 @@ public partial class Vaga
 
     public string IdiomasDesejados { get; set; } = null!;
 
+    public decimal Remuneracao { get; set; }
+
     public int SetorId { get; set; }
 
     public bool? StatusVaga { get; set; }
@@ -33,6 +35,8 @@ public partial class Vaga
     public ModeloTrabaloEnum ModeloTrabalhoVaga { get; set; }
 
     public NivelPrioridadeEnum NivelPrioridadeVaga { get; set; }
+
+    public TipoVagaEnum TipoVaga { get; set; }
 
     public virtual Usuario AnalistaRhNavigation { get; set; } = null!;
 

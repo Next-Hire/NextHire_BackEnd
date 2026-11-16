@@ -19,6 +19,11 @@ namespace NextHire_API.DTOs.VagaDTO
 
         public List<string> IdiomasDesejados { get; set; } = new();
 
+        public decimal? Remuneracao { get; set; }
+
+        /// <summary>Valores aceitos: nova_funcao | substituicao | expansao_equipe</summary>
+        public string? TipoVaga { get; set; }
+
         public decimal? TempoExperienciaDesejado { get; set; }
 
         public string Titulo { get; set; } = null!;

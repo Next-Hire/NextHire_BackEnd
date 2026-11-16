@@ -5,7 +5,7 @@ CREATE TYPE status_relacao_enum AS ENUM('avanca', 'nao_avanca', 'considera');
 
 CREATE TYPE modelo_vaga_enum AS ENUM('hybrido', 'presencial', 'semi-presencial');
 CREATE TYPE prioridade_vaga_enum AS ENUM('Baixo', 'Medio', 'Alto');
-CREATE TYPE tipo_vaga_enum AS ENUM('nova_funcao', 'substituicao', 'expasao_equipe');
+CREATE TYPE tipo_vaga_enum AS ENUM('nova_funcao', 'substituicao', 'expansao_equipe');
 
 
 CREATE TYPE nivel_prioridade_enum AS ENUM('alta', 'media', 'baixa');

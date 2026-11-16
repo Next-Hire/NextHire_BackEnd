@@ -84,6 +84,12 @@ namespace NextHireAPI.Applications.Services
             if (vaga.EmpresaId <= 0)
                 throw new DomainException("Informe uma empresa válida.");
 
+            if (vaga.Remuneracao <= 0)
+                throw new DomainException("Informe a remuneração da vaga (valor maior que zero).");
+
+            //? valida o tipo da vaga (lança DomainException se for inválido)
+            VagaToDTO.ConverterTipoVaga(vaga.TipoVaga);
+
             await _repository.Adicionar(VagaToDTO.AdicionarVagaDtoToDomain(vaga));
         }
 
@@ -94,6 +100,15 @@ namespace NextHireAPI.Applications.Services
 
             if (vaga == null)
                 throw new DomainException("Informe os dados para atualização.");
+
+            if (vaga.Remuneracao is null or <= 0)
+                throw new DomainException("Informe a remuneração da vaga (valor maior que zero).");
+
+            if (string.IsNullOrWhiteSpace(vaga.TipoVaga))
+                throw new DomainException("Informe o tipo da vaga.");
+
+            //? valida o tipo da vaga (lança DomainException se for inválido)
+            VagaToDTO.ConverterTipoVaga(vaga.TipoVaga);
 
             await _repository.Atualizar(vagaId, VagaToDTO.AtualizarVagaDtoToDomain(vaga));
         }

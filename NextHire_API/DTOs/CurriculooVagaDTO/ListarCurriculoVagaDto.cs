@@ -17,5 +17,10 @@ namespace NextHire_API.DTOs.CandidatoVagaDTO
         public int VagaId { get; set; }
 
         public DateTime? DataHoraInscricao { get; set; }
+
+        /// <summary>
+        /// Conteúdo do currículo (jsonb) normalizado como JSON string.
+        /// </summary>
+        public string? CurriculoConvertido { get; set; }
     }
 }

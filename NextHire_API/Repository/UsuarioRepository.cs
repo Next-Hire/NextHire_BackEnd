@@ -59,8 +59,8 @@ namespace NextHireAPI.Repository
                 .Include(u => u.AnotacaoGestor)
                 .Include(u => u.AreaOcupacao)
                 .Include(u => u.CandidatoQuestao)
-                .Include(u => u.CandidatoVaga)
                 .Include(u => u.CurriculoCandidato)
+                    .ThenInclude(c => c.CurriculoVaga)
                 .FirstOrDefaultAsync(u => u.UsuarioId == candidatoId)
                 ?? throw new DomainException($"O candidato com o ID: {candidatoId} não foi localizado,");
 

@@ -6,12 +6,18 @@ namespace NextHire_API.Domains;
 
 public partial class AvaliacaoHabilidade
 {
+    public int HabilidadeId { get; set; }
+
     public int CandidatoId { get; set; }
 
     public int EntrevistaId { get; set; }
 
-    public int HabilidadeId { get; set; }
-
     public int NivelAvaliado { get; set; }
+
+    public virtual Usuario Candidato { get; set; } = null!;
+
+    public virtual Entrevista Entrevista { get; set; } = null!;
+
+    public virtual Habilidade Habilidade { get; set; } = null!;
 
 }

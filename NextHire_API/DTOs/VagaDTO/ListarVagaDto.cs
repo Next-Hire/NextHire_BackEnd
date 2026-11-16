@@ -13,9 +13,9 @@ namespace NextHire_API.DTOs.VagaDTO
 
         public int AnalistaRh { get; set; }
 
-        public DateOnly? DataAbertura { get; set; }
+        public DateTime? DataAbertura { get; set; }
 
-        public DateOnly DataFechamento { get; set; }
+        public DateTime DataFechamento { get; set; }
 
         public string Descricao { get; set; } = null!;
 
@@ -26,6 +26,12 @@ namespace NextHire_API.DTOs.VagaDTO
         public List<string> IdiomasDesejados { get; set; } = null!;
 
         public bool? StatusVaga { get; set; }
+
+        public string NivelPrioridade { get; set; } = null!;
+
+        public decimal Remuneracao { get; set; }
+
+        public string TipoVaga { get; set; } = null!;
 
         public decimal? TempoExperienciaDesejado { get; set; }
 

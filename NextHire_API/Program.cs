@@ -73,12 +73,13 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder(conexaoBanco);
 
 dataSourceBuilder.MapEnum<ClassificacaoQuestaoEnum>("classificacao_questao_enum");
 dataSourceBuilder.MapEnum<EscalaTrabalhoEnum>("escala_trabalho_enum");
-dataSourceBuilder.MapEnum<ModeloTrabaloEnum>("modelo_trabalo_enum");
+dataSourceBuilder.MapEnum<ModeloTrabaloEnum>("modelo_trabalho_enum");
 dataSourceBuilder.MapEnum<NivelPrioridadeEnum>("nivel_prioridade_enum");
 dataSourceBuilder.MapEnum<SituacaoProfissionalEnum>("situacao_profissional_enum");
 dataSourceBuilder.MapEnum<StatusRelacaoEnum>("status_relacao_enum");
 dataSourceBuilder.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
 dataSourceBuilder.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
+dataSourceBuilder.MapEnum<TipoVagaEnum>("tipo_vaga_enum");
 
 var dataSource = dataSourceBuilder.Build();
 
@@ -89,12 +90,13 @@ builder.Services.AddDbContext<NextHireContext>(options =>
     {
         npgsql.MapEnum<ClassificacaoQuestaoEnum>("classificacao_questao_enum");
         npgsql.MapEnum<EscalaTrabalhoEnum>("escala_trabalho_enum");
-        npgsql.MapEnum<ModeloTrabaloEnum>("modelo_trabalo_enum");
+        npgsql.MapEnum<ModeloTrabaloEnum>("modelo_trabalho_enum");
         npgsql.MapEnum<NivelPrioridadeEnum>("nivel_prioridade_enum");
         npgsql.MapEnum<SituacaoProfissionalEnum>("situacao_profissional_enum");
         npgsql.MapEnum<StatusRelacaoEnum>("status_relacao_enum");
         npgsql.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
         npgsql.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
+        npgsql.MapEnum<TipoVagaEnum>("tipo_vaga_enum");
     }));
 
 //? JWT CONFIG
@@ -140,6 +142,10 @@ builder.Services.AddScoped<AreaOcupacaoService>();
 builder.Services.AddScoped<IAnotacaoRepository, AnotacaoRepository>();
 builder.Services.AddScoped<AnotacaoService>();
 
+// Curriculo Vaga
+builder.Services.AddScoped<ICurriculoVagaRepository, CurriculoVagaRepository>();
+builder.Services.AddScoped<CurriculoVagaService>();
+
 builder.Services.AddScoped<EmpresaService>();
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 
@@ -150,6 +156,15 @@ builder.Services.AddScoped<HabilidadesService>();
 // Experiencia profissional
 builder.Services.AddScoped<IExperienciaProfissionalRepository, ExperienciaProfissionalRepository>();
 builder.Services.AddScoped<ExperienciaProfissionalService>();
+
+// SetorOcupacao
+builder.Services.AddScoped<ISetor_OcupacaoRepository, Setor_OcupacaoRepository>();
+builder.Services.AddScoped<Setor_OcupacaoService>();
+
+// CandidatoQuestão
+builder.Services.AddScoped<ICandidato_QuestaoRepository, CandidatoQuestaoRepository>();
+builder.Services.AddScoped<CandidatoQuestaoService>();
+
 
 // Usuario
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -170,6 +185,9 @@ builder.Services.AddHttpClient<GeminiCurriculoService>();
 builder.Services.AddScoped<IInformacaoCandidatoRepository, InformacaoCandidatoRepository>();
 builder.Services.AddScoped<InformacaoCandidatoService>();
 
+builder.Services.AddScoped<IAvaliacaoHabilidadeRepository, AvaliacaoHabilidadesRepository>();
+builder.Services.AddScoped<AvaliacaoHabilidadeService>();
+
 // cors btw
 
 builder.Services.AddCors(options =>
@@ -183,6 +201,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configure the HTTP request pipeline.
 

@@ -10,15 +10,19 @@ public partial class Vaga
 
     public int AnalistaRh { get; set; }
 
-    public DateOnly? DataAbertura { get; set; }
+    public DateTime? DataAbertura { get; set; }
 
-    public DateOnly DataFechamento { get; set; }
+    public DateTime DataFechamento { get; set; }
 
     public string Descricao { get; set; } = null!;
 
     public int EmpresaId { get; set; }
 
     public string IdiomasDesejados { get; set; } = null!;
+
+    public decimal Remuneracao { get; set; }
+
+    public int SetorId { get; set; }
 
     public bool? StatusVaga { get; set; }
 
@@ -32,15 +36,19 @@ public partial class Vaga
 
     public NivelPrioridadeEnum NivelPrioridadeVaga { get; set; }
 
+    public TipoVagaEnum TipoVaga { get; set; }
+
     public virtual Usuario AnalistaRhNavigation { get; set; } = null!;
 
-    public virtual ICollection<CandidatoVaga> CandidatoVaga { get; set; } = new List<CandidatoVaga>();
+    public virtual ICollection<CurriculoVaga> CurriculoVaga { get; set; } = new List<CurriculoVaga>();
 
     public virtual Empresa Empresa { get; set; } = null!;
 
     public virtual ICollection<ProcessoSeletivo> ProcessoSeletivo { get; set; } = new List<ProcessoSeletivo>();
 
     public virtual ICollection<Questao> Questao { get; set; } = new List<Questao>();
+
+    public virtual SetorOcupacao Setor { get; set; } = null!;
 
     public virtual ICollection<Usuario> Gestor { get; set; } = new List<Usuario>();
 

@@ -9,13 +9,23 @@ namespace NextHire_API.DTOs.VagaDTO
     {
         public int AnalistaId { get; set; }
 
-        public DateOnly DataFechamento { get; set; }
+        public int SetorOcupacaoId { get; set; }
+
+        public DateTime DataFechamento { get; set; }
 
         public string Descricao { get; set; } = null!;
 
         public int EmpresaId { get; set; }
 
         public List<string> IdiomasDesejados { get; set; } = new();
+
+        public decimal Remuneracao { get; set; }
+
+        /// <summary>Valores aceitos: alta | media | baixa (padrão: baixa)</summary>
+        public string NivelPrioridade { get; set; } = "baixa";
+
+        /// <summary>Valores aceitos: nova_funcao | substituicao | expansao_equipe</summary>
+        public string TipoVaga { get; set; } = string.Empty;
 
         public decimal? TempoExperienciaDesejado { get; set; }
 

@@ -2,9 +2,15 @@ CREATE TYPE tipo_usuario_enum AS ENUM('candidato', 'gestor', 'analista_rh', 'adm
 CREATE TYPE tipo_questao_enum AS ENUM('verdadeiro_falso', 'unica_escolha', 'multipla_escolha', 'dissertativa');
 CREATE TYPE classificacao_questao_enum AS ENUM('comportamental', 'tecnica', 'situacional');
 CREATE TYPE status_relacao_enum AS ENUM('avanca', 'nao_avanca', 'considera');
+
+CREATE TYPE modelo_vaga_enum AS ENUM('hibrido', 'presencial', 'semi-presencial');
+CREATE TYPE prioridade_vaga_enum AS ENUM('baixo', 'medio', 'alto');
+CREATE TYPE tipo_vaga_enum AS ENUM('nova_funcao', 'substituicao', 'expansao_equipe');
+
+
 CREATE TYPE nivel_prioridade_enum AS ENUM('alta', 'media', 'baixa');
 CREATE TYPE escala_trabalho_enum AS ENUM('12x36', '5x2', '4x3', '15x15', '30x30');
-CREATE TYPE modelo_trabalo_enum AS ENUM('hibrido', 'presencial', 'remoto');
+CREATE TYPE modelo_trabalho_enum AS ENUM('hibrido', 'presencial', 'remoto');
 CREATE TYPE situacao_profissional_enum AS ENUM ('empregado', 'desempregado');
 
 CREATE TABLE IF NOT EXISTS empresa (
@@ -16,7 +22,7 @@ CREATE TABLE IF NOT EXISTS empresa (
 CREATE TABLE IF NOT EXISTS usuario(
     usuario_id SERIAL PRIMARY KEY,
     nome TEXT NOT NULL,
-    email VARCHAR NOT NULL,
+    email VARCHAR UNIQUE NOT NULL,
     senha VARCHAR NOT NULL,
     primeiro_acesso BOOLEAN DEFAULT true,
     status_usuario BOOLEAN DEFAULT true,
@@ -76,27 +82,25 @@ CREATE TABLE IF NOT EXISTS vaga (
     data_abertura TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_fechamento TIMESTAMP NOT NULL,
     descricao TEXT NOT NULL,
-    status_vaga BOOLEAN DEFAULT true,
+    remuneracao DECIMAL(10, 2) NOT NULL,
     idiomas_desejados JSONB NOT NULL,
     tempo_experiencia_desejado NUMERIC(10,2),
     escala_vaga escala_trabalho_enum NOT NULL,
-    modelo_trabalho_vaga modelo_trabalo_enum NOT NULL,
+    status_vaga BOOLEAN DEFAULT true,
+
+    modelo_trabalho_vaga modelo_trabalho_enum NOT NULL,
     nivel_prioridade_vaga nivel_prioridade_enum NOT NULL,
+    tipo_vaga tipo_vaga_enum NOT NULL,
+
     empresa_id INTEGER NOT NULL REFERENCES empresa(empresa_id),
-    analista_rh INTEGER NOT NULL REFERENCES usuario(usuario_id)
+    analista_rh INTEGER NOT NULL REFERENCES usuario(usuario_id),
+    setor_id INTEGER NOT NULL REFERENCES setor_ocupacao(setor_ocupacao_id)
 );
 
 CREATE TABLE IF NOT EXISTS gestor_vaga(
     gestor_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
     vaga_id INTEGER NOT NULL REFERENCES vaga(vaga_id),
     CONSTRAINT pk_gestor_vaga PRIMARY KEY(gestor_id, vaga_id)
-);
-
-CREATE TABLE IF NOT EXISTS candidato_vaga (
-    candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
-    vaga_id INTEGER NOT NULL REFERENCES vaga(vaga_id),
-    data_hora_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_candidato_vaga PRIMARY KEY (candidato_id, vaga_id)
 );
 
 CREATE TABLE IF NOT EXISTS habilidade (
@@ -188,7 +192,8 @@ CREATE TABLE IF NOT EXISTS avaliacao_habilidade(
     habilidade_id INTEGER NOT NULL REFERENCES habilidade(habilidade_id),
     candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
     entrevista_id INTEGER NOT NULL REFERENCES entrevista(entrevista_id),
-    nivel_avaliado INT NOT NULL
+    nivel_avaliado INT NOT NULL,
+    CONSTRAINT pk_avaliacao_habilidade PRIMARY KEY (habilidade_id, candidato_id, entrevista_id)
 );
 
 CREATE TABLE IF NOT EXISTS informacao_candidato(
@@ -206,4 +211,11 @@ CREATE TABLE IF NOT EXISTS curriculo_candidato (
     curriculo_candidato_id SERIAL PRIMARY KEY,
     curriculo_convertido JSONB NOT NULL,
     candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id)
+);
+
+CREATE TABLE IF NOT EXISTS curriculo_vaga (
+    curriculo_id INTEGER NOT NULL REFERENCES curriculo_candidato(curriculo_candidato_id),
+    vaga_id INTEGER NOT NULL REFERENCES vaga(vaga_id),
+    data_hora_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_curriculo_vaga PRIMARY KEY (curriculo_id, vaga_id)
 );

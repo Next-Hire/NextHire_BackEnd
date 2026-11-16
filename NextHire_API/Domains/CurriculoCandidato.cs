@@ -14,4 +14,6 @@ public partial class CurriculoCandidato
 
     public virtual Usuario Candidato { get; set; } = null!;
 
+    public virtual ICollection<CurriculoVaga> CurriculoVaga { get; set; } = new List<CurriculoVaga>();
+
 }

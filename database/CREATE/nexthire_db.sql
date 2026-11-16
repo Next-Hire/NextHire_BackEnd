@@ -3,14 +3,14 @@ CREATE TYPE tipo_questao_enum AS ENUM('verdadeiro_falso', 'unica_escolha', 'mult
 CREATE TYPE classificacao_questao_enum AS ENUM('comportamental', 'tecnica', 'situacional');
 CREATE TYPE status_relacao_enum AS ENUM('avanca', 'nao_avanca', 'considera');
 
-CREATE TYPE modelo_vaga_enum AS ENUM('hybrido', 'presencial', 'semi-presencial');
-CREATE TYPE prioridade_vaga_enum AS ENUM('Baixo', 'Medio', 'Alto');
-CREATE TYPE tipo_vaga_enum AS ENUM('nova_funcao', 'substituicao', 'expasao_equipe');
+CREATE TYPE modelo_vaga_enum AS ENUM('hibrido', 'presencial', 'semi-presencial');
+CREATE TYPE prioridade_vaga_enum AS ENUM('baixo', 'medio', 'alto');
+CREATE TYPE tipo_vaga_enum AS ENUM('nova_funcao', 'substituicao', 'expansao_equipe');
 
 
 CREATE TYPE nivel_prioridade_enum AS ENUM('alta', 'media', 'baixa');
 CREATE TYPE escala_trabalho_enum AS ENUM('12x36', '5x2', '4x3', '15x15', '30x30');
-CREATE TYPE modelo_trabalo_enum AS ENUM('hibrido', 'presencial', 'remoto');
+CREATE TYPE modelo_trabalho_enum AS ENUM('hibrido', 'presencial', 'remoto');
 CREATE TYPE situacao_profissional_enum AS ENUM ('empregado', 'desempregado');
 
 CREATE TABLE IF NOT EXISTS empresa (
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS vaga (
     escala_vaga escala_trabalho_enum NOT NULL,
     status_vaga BOOLEAN DEFAULT true,
 
-    modelo_trabalho_vaga modelo_trabalo_enum NOT NULL,
+    modelo_trabalho_vaga modelo_trabalho_enum NOT NULL,
     nivel_prioridade_vaga nivel_prioridade_enum NOT NULL,
     tipo_vaga tipo_vaga_enum NOT NULL,
 

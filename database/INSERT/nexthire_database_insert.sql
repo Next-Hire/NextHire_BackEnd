@@ -210,7 +210,7 @@ VALUES
     '5x2',
     'presencial',
     'alta',
-    'expasao_equipe',
+    'expansao_equipe',
     2,
     9,
     4

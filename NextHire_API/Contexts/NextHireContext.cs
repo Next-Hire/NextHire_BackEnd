@@ -68,7 +68,7 @@ public partial class NextHireContext : DbContext
             "escala_trabalho_enum");
         modelBuilder.HasPostgresEnum<global::NextHire_API.Domains.ModeloTrabaloEnum>(
             "public",
-            "modelo_trabalo_enum");
+            "modelo_trabalho_enum");
         modelBuilder.HasPostgresEnum<global::NextHire_API.Domains.NivelPrioridadeEnum>(
             "public",
             "nivel_prioridade_enum");

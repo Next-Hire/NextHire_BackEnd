@@ -72,7 +72,7 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder(conexaoBanco);
 
 dataSourceBuilder.MapEnum<ClassificacaoQuestaoEnum>("classificacao_questao_enum");
 dataSourceBuilder.MapEnum<EscalaTrabalhoEnum>("escala_trabalho_enum");
-dataSourceBuilder.MapEnum<ModeloTrabaloEnum>("modelo_trabalo_enum");
+dataSourceBuilder.MapEnum<ModeloTrabaloEnum>("modelo_trabalho_enum");
 dataSourceBuilder.MapEnum<NivelPrioridadeEnum>("nivel_prioridade_enum");
 dataSourceBuilder.MapEnum<SituacaoProfissionalEnum>("situacao_profissional_enum");
 dataSourceBuilder.MapEnum<StatusRelacaoEnum>("status_relacao_enum");
@@ -89,7 +89,7 @@ builder.Services.AddDbContext<NextHireContext>(options =>
     {
         npgsql.MapEnum<ClassificacaoQuestaoEnum>("classificacao_questao_enum");
         npgsql.MapEnum<EscalaTrabalhoEnum>("escala_trabalho_enum");
-        npgsql.MapEnum<ModeloTrabaloEnum>("modelo_trabalo_enum");
+        npgsql.MapEnum<ModeloTrabaloEnum>("modelo_trabalho_enum");
         npgsql.MapEnum<NivelPrioridadeEnum>("nivel_prioridade_enum");
         npgsql.MapEnum<SituacaoProfissionalEnum>("situacao_profissional_enum");
         npgsql.MapEnum<StatusRelacaoEnum>("status_relacao_enum");

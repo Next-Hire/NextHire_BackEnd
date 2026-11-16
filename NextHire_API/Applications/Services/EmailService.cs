@@ -22,6 +22,19 @@ namespace NextHireAPI.Applications.Services
             return CodigoGerado;
         }
 
+        public static bool ValidarNome(string nome)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+                return false;
+            // Verifica se o nome contém apenas letras e espaços
+            foreach (char c in nome)
+            {
+                if (!char.IsLetter(c) && !char.IsWhiteSpace(c))
+                    return false;
+            }
+            return true;
+        }
+
         public static bool ValidarEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))

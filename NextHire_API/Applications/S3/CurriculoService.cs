@@ -22,6 +22,8 @@ namespace NextHire_API.Applications.S3
         private readonly string session_token = Environment.GetEnvironmentVariable("AWS_SESSION_TOKEN");
         private readonly string nome_bucket = Environment.GetEnvironmentVariable("bucket_name");
 
+        
+
         public CurriculoService(NextHireContext ctx)
         {
             var credentials = new SessionAWSCredentials(access_key_id, secret_Key, session_token);

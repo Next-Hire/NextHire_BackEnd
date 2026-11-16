@@ -234,12 +234,12 @@ namespace NextHireAPI.Controllers
             }
         }
 
-        /// <summary>Remove um usuário do sistema.</summary>
-        /// <param name="usuarioId">ID do usuário a ser removido.</param>
-        /// <returns>Mensagem de confirmação da remoção.</returns>
+        /// <summary>Desativa um usuário do sistema (soft delete). Somente o próprio usuário (via token) ou um Administrador.</summary>
+        /// <param name="usuarioId">ID do usuário a ser desativado.</param>
+        /// <returns>Mensagem de confirmação da desativação.</returns>
         [HttpDelete("{usuarioId}")]
-        [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Remove um usuário", Description = "Exclui definitivamente o usuário informado do sistema. Requer perfil de Administrador.")]
+        [Authorize(Policy = "MesmoUsuarioOuAdm")]
+        [SwaggerOperation(Summary = "Desativa um usuário (soft delete)", Description = "Desativa o usuário informado (status_usuario = false), sem excluir o registro do banco. Somente o próprio usuário autenticado (ID do token igual ao da rota) ou um Administrador pode desativar.")]
         [SwaggerResponse(204, "Usuário removido com sucesso.")]
         [SwaggerResponse(400, "Usuário não encontrado ou erro ao remover.")]
         public async Task<IActionResult> RemoverUsuario(int usuarioId)

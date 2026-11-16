@@ -134,7 +134,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    //? Política: somente o próprio usuário (via token) ou um Administrador pode executar a ação
+    options.AddPolicy("MesmoUsuarioOuAdm", policy =>
+        policy.Requirements.Add(new NextHireAPI.Applications.Validations.SameUserRequirement()));
+});
+
+//? Handler que avalia a política MesmoUsuarioOuAdm
+builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationHandler,
+    NextHireAPI.Applications.Validations.SameUserOrAdmHandler>();
 
 // Redis
 builder.Services.AddScoped<RedisService>();

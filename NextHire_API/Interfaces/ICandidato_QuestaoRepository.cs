@@ -9,6 +9,7 @@ namespace NextHire_API.Interfaces
         public Task<CandidatoQuestao?> BuscarPorId(int questaoId, int candidatoId);
         
         public Task<List<CandidatoQuestao?>> ListarRepostasCertas(int candidatoId); // Feito
+        public Task<List<CandidatoQuestao?>> ListarRespostasComGabarito(int candidatoId, int? vagaId = null); // Feito
         public Task<List<CandidatoQuestao?>> ListarPorQuestao(int questaoId);
         
         public Task<List<CandidatoQuestao?>> ListarCandidatoEVaga(int candidatoId, int vagaId);

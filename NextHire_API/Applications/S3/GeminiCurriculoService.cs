@@ -15,7 +15,7 @@ namespace NextHire_API.Applications.S3
         public GeminiCurriculoService(HttpClient httpClient)
         {
             _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY")
-            ?? throw new Exception("GEMINI_API_KEY não configurada."); ;
+            ?? throw new DomainException("GEMINI_API_KEY não configurada."); ;
             _httpClient = httpClient;
         }
 
@@ -80,7 +80,7 @@ namespace NextHire_API.Applications.S3
             },
                 generationConfig = new
                 {
-                    responseMimeType = "application/json", // Força saída JSON
+                    responseMimeType = "application/json", // Forca saída em JSON
                     responseSchema = responseSchema,       // Garante a estrutura exata
                     temperature = 0.1                      // Baixa criatividade para evitar alucinações
                 }
@@ -90,11 +90,11 @@ namespace NextHire_API.Applications.S3
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
             // 4. Enviar requisição e processar resposta
-            var response = await _httpClient.PostAsync(url, content);
-            var responseString = await response.Content.ReadAsStringAsync();
+            HttpResponseMessage? response = await _httpClient.PostAsync(url, content);
+            string? responseString = await response.Content.ReadAsStringAsync();
 
             //caso possua erro
-            var statusCodeError = ((int)response.StatusCode);
+            int statusCodeError = ((int)response.StatusCode);
 
             if (!response.IsSuccessStatusCode)
                 throw new DomainException($"Erro do GoogleGemini ({statusCodeError}): {responseString}");

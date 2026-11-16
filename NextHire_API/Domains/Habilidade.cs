@@ -10,6 +10,8 @@ public partial class Habilidade
 
     public string Nome { get; set; } = null!;
 
+    public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();
+
     public virtual ICollection<HabilidadeCandidato> HabilidadeCandidato { get; set; } = new List<HabilidadeCandidato>();
 
     public virtual ICollection<Vaga> Vaga { get; set; } = new List<Vaga>();

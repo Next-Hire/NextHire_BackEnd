@@ -24,9 +24,9 @@ public partial class Usuario
 
     public virtual ICollection<Anotacao> AnotacaoGestor { get; set; } = new List<Anotacao>();
 
-    public virtual ICollection<CandidatoQuestao> CandidatoQuestao { get; set; } = new List<CandidatoQuestao>();
+    public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();
 
-    public virtual ICollection<CandidatoVaga> CandidatoVaga { get; set; } = new List<CandidatoVaga>();
+    public virtual ICollection<CandidatoQuestao> CandidatoQuestao { get; set; } = new List<CandidatoQuestao>();
 
     public virtual ICollection<Comentario> Comentario { get; set; } = new List<Comentario>();
 

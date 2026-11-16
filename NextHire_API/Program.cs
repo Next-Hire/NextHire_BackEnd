@@ -5,6 +5,7 @@ using Microsoft.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NextHire_API.Contexts;
+using NextHire_API.Applications.Services;
 using NextHire_API.Interfaces;
 using NextHire_API.Repository;
 using NextHire_API.Applications.Services;
@@ -43,6 +44,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 );
 
 builder.Services.AddControllers();
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -137,6 +139,13 @@ builder.Services.AddScoped<AreaOcupacaoService>();
 builder.Services.AddScoped<IAnotacaoRepository, AnotacaoRepository>();
 builder.Services.AddScoped<AnotacaoService>();
 
+// Curriculo Vaga
+builder.Services.AddScoped<ICurriculoVagaRepository, CurriculoVagaRepository>();
+builder.Services.AddScoped<CurriculoVagaService>();
+
+builder.Services.AddScoped<EmpresaService>();
+builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+
 
 builder.Services.AddScoped<IHabilidadesRepository, HabilidadeRepositiory>();
 builder.Services.AddScoped<HabilidadesService>();
@@ -144,6 +153,15 @@ builder.Services.AddScoped<HabilidadesService>();
 // Experiencia profissional
 builder.Services.AddScoped<IExperienciaProfissionalRepository, ExperienciaProfissionalRepository>();
 builder.Services.AddScoped<ExperienciaProfissionalService>();
+
+// SetorOcupacao
+builder.Services.AddScoped<ISetor_OcupacaoRepository, Setor_OcupacaoRepository>();
+builder.Services.AddScoped<Setor_OcupacaoService>();
+
+// CandidatoQuestão
+builder.Services.AddScoped<ICandidato_QuestaoRepository, CandidatoQuestaoRepository>();
+builder.Services.AddScoped<CandidatoQuestaoService>();
+
 
 // Usuario
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -156,6 +174,12 @@ builder.Services.AddScoped<ComentarioService>();
 // Vaga
 builder.Services.AddScoped<IVagaRepository, VagaRepository>();
 builder.Services.AddScoped<VagaService>();
+
+builder.Services.AddScoped<IInformacaoCandidatoRepository, InformacaoCandidatoRepository>();
+builder.Services.AddScoped<InformacaoCandidatoService>();
+
+builder.Services.AddScoped<IAvaliacaoHabilidadeRepository, AvaliacaoHabilidadesRepository>();
+builder.Services.AddScoped<AvaliacaoHabilidadeService>();
 
 // cors btw
 
@@ -170,6 +194,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Configure the HTTP request pipeline.
 

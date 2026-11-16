@@ -10,13 +10,15 @@ public partial class Entrevista
 
     public DateTime HorarioFim { get; set; }
 
-    public DateTime? HorarioInicio { get; set; }
+    public DateTime HorarioInicio { get; set; }
 
     public string NomeEntrevista { get; set; } = null!;
 
     public int ProcessoSeletivoId { get; set; }
 
     public bool? StatusEntrevista { get; set; }
+
+    public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();
 
     public virtual ICollection<Comentario> Comentario { get; set; } = new List<Comentario>();
 

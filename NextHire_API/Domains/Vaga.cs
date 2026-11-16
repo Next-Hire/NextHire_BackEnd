@@ -20,6 +20,8 @@ public partial class Vaga
 
     public string IdiomasDesejados { get; set; } = null!;
 
+    public int SetorId { get; set; }
+
     public bool? StatusVaga { get; set; }
 
     public decimal? TempoExperienciaDesejado { get; set; }
@@ -34,13 +36,15 @@ public partial class Vaga
 
     public virtual Usuario AnalistaRhNavigation { get; set; } = null!;
 
-    public virtual ICollection<CandidatoVaga> CandidatoVaga { get; set; } = new List<CandidatoVaga>();
+    public virtual ICollection<CurriculoVaga> CurriculoVaga { get; set; } = new List<CurriculoVaga>();
 
     public virtual Empresa Empresa { get; set; } = null!;
 
     public virtual ICollection<ProcessoSeletivo> ProcessoSeletivo { get; set; } = new List<ProcessoSeletivo>();
 
     public virtual ICollection<Questao> Questao { get; set; } = new List<Questao>();
+
+    public virtual SetorOcupacao Setor { get; set; } = null!;
 
     public virtual ICollection<Usuario> Gestor { get; set; } = new List<Usuario>();
 

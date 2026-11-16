@@ -9,7 +9,7 @@ using System.Runtime.ConstrainedExecution;
 namespace NextHire_API.Controllers
 {
     /// <summary>Endpoints de gerenciamento de áreas de ocupação, incluindo listagem, cadastro, atualização e remoção.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AreaOcupacaoController : ControllerBase
     {

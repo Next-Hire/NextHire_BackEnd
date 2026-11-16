@@ -8,7 +8,7 @@ using NextHire_API.Exceptions;
 namespace NextHire_API.Controllers
 {
     /// <summary>Endpoints de gerenciamento das avaliações de habilidades dos candidatos nas entrevistas.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AvaliacaoHabilidadeController : ControllerBase
     {

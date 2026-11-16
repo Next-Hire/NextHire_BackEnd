@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace NextHire_API.Controllers
 {
     /// <summary>Endpoints de gerenciamento das anotações privadas dos candidatos.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AnotacaoController : ControllerBase
     {

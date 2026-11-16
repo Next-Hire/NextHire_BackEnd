@@ -9,7 +9,7 @@ using NextHire_API.Exceptions;
 namespace NextHire_API.Controllers
 {
     /// <summary>Endpoints de gerenciamento de setores de ocupação dentro das áreas de uma empresa.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class Setor_OcupacaoController : ControllerBase
     {

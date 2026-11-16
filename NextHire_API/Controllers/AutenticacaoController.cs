@@ -8,7 +8,7 @@ using NextHireAPI.DTOs.Autenticacao;
 namespace NextHire.Controllers
 {
     /// <summary>Endpoints de autenticação de usuários, responsáveis pela emissão do token JWT.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AutenticacaoController : ControllerBase
     {

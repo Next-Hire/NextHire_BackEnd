@@ -8,7 +8,7 @@ using NextHire_API.DTOs.HabilidadeDto;
 namespace NextHire_API.Controllers
 {
     /// <summary>Endpoints de gerenciamento do catálogo de habilidades.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class HabilidadeController : ControllerBase
     {

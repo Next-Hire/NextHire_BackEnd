@@ -9,7 +9,7 @@ using NextHire_API.Exceptions;
 namespace NextHire_API.Controllers
 {
     /// <summary>Endpoints de gerenciamento de empresas, incluindo listagem, busca, cadastro e atualização.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class EmpresaController : ControllerBase
     {

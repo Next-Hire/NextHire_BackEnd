@@ -8,7 +8,7 @@ using NextHire_API.Exceptions;
 namespace NextHire_API.Controllers
 {
     /// <summary>Endpoints de informações pessoais do candidato: nascimento, formação etc.</summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class InformacaoCandidatoController : ControllerBase
     {

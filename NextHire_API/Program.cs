@@ -150,6 +150,15 @@ builder.Services.AddScoped<HabilidadesService>();
 builder.Services.AddScoped<IExperienciaProfissionalRepository, ExperienciaProfissionalRepository>();
 builder.Services.AddScoped<ExperienciaProfissionalService>();
 
+// SetorOcupacao
+builder.Services.AddScoped<ISetor_OcupacaoRepository, Setor_OcupacaoRepository>();
+builder.Services.AddScoped<Setor_OcupacaoService>();
+
+// CandidatoQuestão
+builder.Services.AddScoped<ICandidato_QuestaoRepository, CandidatoQuestaoRepository>();
+builder.Services.AddScoped<CandidatoQuestaoService>();
+
+
 // Usuario
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<UsuarioService>();

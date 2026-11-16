@@ -17,7 +17,7 @@ namespace NextHire_API.Repository
             => await _ctx.CandidatoQuestao
                 .Include(varAux => varAux.Questao)
                     .ThenInclude(varAux => varAux.Alternativa)
-                .FirstOrDefaultAsync(varAux => varAux.QuestaoId == questaoId 
+                .FirstOrDefaultAsync(varAux => varAux.QuestaoId == questaoId
                                                && varAux.CandidatoId == candidatoId);
 
         public async Task<bool?> ExisteRespostaCandidato(int questaoId, int candidatoId)

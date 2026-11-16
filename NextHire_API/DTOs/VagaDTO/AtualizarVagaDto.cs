@@ -21,6 +21,9 @@ namespace NextHire_API.DTOs.VagaDTO
 
         public decimal? Remuneracao { get; set; }
 
+        /// <summary>Valores aceitos: alta | media | baixa</summary>
+        public string NivelPrioridade { get; set; } = string.Empty;
+
         /// <summary>Valores aceitos: nova_funcao | substituicao | expansao_equipe</summary>
         public string? TipoVaga { get; set; }
 

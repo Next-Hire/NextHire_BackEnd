@@ -15,42 +15,47 @@ namespace NextHire_API.Repository
             _context = context;
         }
 
+        //? Ordem de importância: abertas primeiro (fechadas no fim),
+        //? prioridade alta -> media -> baixa, abertura mais recente primeiro,
+        //? e data de fechamento como último desempate (fecha antes = mais urgente)
+        private static readonly Func<IQueryable<Vaga>, IOrderedQueryable<Vaga>> OrdemImportancia = query
+            => query
+                .OrderByDescending(v => v.StatusVaga ?? false)
+                .ThenBy(v => v.NivelPrioridadeVaga)
+                .ThenByDescending(v => v.DataAbertura)
+                .ThenBy(v => v.DataFechamento);
+
         public async Task<List<Vaga>> Listar()
-            => await _context.Vaga
+            => await OrdemImportancia(_context.Vaga
                 .Include(v => v.AnalistaRhNavigation)
-                .Include(v => v.Empresa)
-                .OrderBy(v => v.DataAbertura)
+                .Include(v => v.Empresa))
                 .ToListAsync();
 
         public async Task<List<Vaga>> ListarPorEmpresaId(int empresaId)
-            => await _context.Vaga
+            => await OrdemImportancia(_context.Vaga
                 .Include(v => v.Empresa)
-                .OrderBy(v => v.DataAbertura)
-                .Where(v => v.EmpresaId == empresaId)
+                .Where(v => v.EmpresaId == empresaId))
                 .ToListAsync();
 
         public async Task<Vaga> BuscarPorId(int vagaId)
             => await _context.Vaga
                 .Include(v => v.Empresa)
                 .Include(v => v.AnalistaRhNavigation)
-                .OrderBy(v => v.DataAbertura)
                 .FirstOrDefaultAsync(v => v.VagaId == vagaId)
                     ?? throw new DomainException("Vaga não encontrada.");
 
         public async Task<List<Vaga>> ListarPorTitulo(string titulo)
-            => await _context.Vaga
+            => await OrdemImportancia(_context.Vaga
                 .Include(v => v.Empresa)
                 .Include(v => v.AnalistaRhNavigation)
-                .OrderBy(v => v.DataAbertura)
-                .Where(v => v.Titulo.Contains(titulo))
+                .Where(v => v.Titulo.Contains(titulo)))
                 .ToListAsync();
 
         public async Task<List<Vaga>> ListarPorStatus(bool status)
-            => await _context.Vaga
+            => await OrdemImportancia(_context.Vaga
                 .Include(v => v.Empresa)
                 .Include(v => v.AnalistaRhNavigation)
-                .OrderBy(v => v.DataAbertura)
-                .Where(v => v.StatusVaga == status)
+                .Where(v => v.StatusVaga == status))
                 .ToListAsync();
 
         public async Task Adicionar(Vaga vaga)
@@ -71,6 +76,7 @@ namespace NextHire_API.Repository
             vagaExistente.EmpresaId = vaga.EmpresaId;
             vagaExistente.IdiomasDesejados = vaga.IdiomasDesejados;
             vagaExistente.Remuneracao = vaga.Remuneracao;
+            vagaExistente.NivelPrioridadeVaga = vaga.NivelPrioridadeVaga;
             vagaExistente.TipoVaga = vaga.TipoVaga;
             vagaExistente.TempoExperienciaDesejado = vaga.TempoExperienciaDesejado;
             vagaExistente.Titulo = vaga.Titulo;

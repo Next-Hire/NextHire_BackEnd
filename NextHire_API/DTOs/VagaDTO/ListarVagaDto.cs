@@ -27,6 +27,8 @@ namespace NextHire_API.DTOs.VagaDTO
 
         public bool? StatusVaga { get; set; }
 
+        public string NivelPrioridade { get; set; } = null!;
+
         public decimal Remuneracao { get; set; }
 
         public string TipoVaga { get; set; } = null!;

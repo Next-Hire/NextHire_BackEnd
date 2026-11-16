@@ -157,9 +157,9 @@ INSERT INTO gestor_setor (gestor_id, setor_ocupacao_id) VALUES
 -- setor_id agora é NOT NULL no schema (vaga 1 → setor 1, vaga 2 → setor 2,
 -- vaga 3 → setor 4; todos pertencem à empresa da respectiva vaga)
 INSERT INTO vaga
-(vaga_id, titulo, data_abertura, data_fechamento, descricao, status_vaga,
+(vaga_id, titulo, data_abertura, data_fechamento, descricao, remuneracao, status_vaga,
  idiomas_desejados, tempo_experiencia_desejado, escala_vaga,
- modelo_trabalho_vaga, nivel_prioridade_vaga, empresa_id, analista_rh, setor_id)
+ modelo_trabalho_vaga, nivel_prioridade_vaga, tipo_vaga, empresa_id, analista_rh, setor_id)
 VALUES
 (
     1,
@@ -167,12 +167,14 @@ VALUES
     '2026-10-01',
     '2026-12-31',
     'Desenvolvimento e manutenção de APIs REST utilizando C#, .NET, PostgreSQL e Entity Framework Core.',
+    8500.00,
     TRUE,
     '["Português", "Inglês"]'::JSONB,
     2.00,
     '5x2',
     'hibrido',
     'alta',
+    'nova_funcao',
     1,
     2,
     1
@@ -183,12 +185,14 @@ VALUES
     '2026-10-05',
     '2026-12-20',
     'Análise de dados, construção de dashboards, consultas SQL e desenvolvimento de indicadores de negócio.',
+    7200.00,
     TRUE,
     '["Português", "Inglês"]'::JSONB,
     2.00,
     '5x2',
     'remoto',
     'media',
+    'substituicao',
     1,
     2,
     2
@@ -199,12 +203,14 @@ VALUES
     '2026-10-10',
     '2027-01-15',
     'Desenvolvimento de sistemas para gestão hospitalar, integração de APIs e manutenção de aplicações.',
+    9200.00,
     TRUE,
     '["Português"]'::JSONB,
     2.00,
     '5x2',
     'presencial',
     'alta',
+    'expasao_equipe',
     2,
     9,
     4

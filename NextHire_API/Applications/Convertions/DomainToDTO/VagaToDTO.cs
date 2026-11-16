@@ -31,6 +31,7 @@ namespace NextHire_API.Applications.Convertions
             return new Vaga
             {
                 AnalistaRh = vaga.AnalistaRh,
+                SetorId = vaga.SetorOcupacaoId,
                 DataFechamento = vaga.DataFechamento,
                 Descricao = vaga.Descricao,
                 EmpresaId = vaga.EmpresaId,
@@ -51,7 +52,8 @@ namespace NextHire_API.Applications.Convertions
                 IdiomasDesejados = JsonSerializer.Serialize(vaga.IdiomasDesejados),
                 TempoExperienciaDesejado = vaga.TempoExperienciaDesejado,
                 StatusVaga = true,
-                Titulo = vaga.Titulo
+                Titulo = vaga.Titulo,
+                SetorId = vaga.SetorOcupacaoId
             };
         }
 

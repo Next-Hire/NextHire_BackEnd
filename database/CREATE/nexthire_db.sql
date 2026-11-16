@@ -2,6 +2,12 @@ CREATE TYPE tipo_usuario_enum AS ENUM('candidato', 'gestor', 'analista_rh', 'adm
 CREATE TYPE tipo_questao_enum AS ENUM('verdadeiro_falso', 'unica_escolha', 'multipla_escolha', 'dissertativa');
 CREATE TYPE classificacao_questao_enum AS ENUM('comportamental', 'tecnica', 'situacional');
 CREATE TYPE status_relacao_enum AS ENUM('avanca', 'nao_avanca', 'considera');
+
+CREATE TYPE modelo_vaga_enum AS ENUM('hybrido', 'presencial', 'semi-presencial');
+CREATE TYPE prioridade_vaga_enum AS ENUM('Baixo', 'Medio', 'Alto');
+CREATE TYPE tipo_vaga_enum AS ENUM('nova_funcao', 'substituicao', 'expasao_equipe');
+
+
 CREATE TYPE nivel_prioridade_enum AS ENUM('alta', 'media', 'baixa');
 CREATE TYPE escala_trabalho_enum AS ENUM('12x36', '5x2', '4x3', '15x15', '30x30');
 CREATE TYPE modelo_trabalo_enum AS ENUM('hibrido', 'presencial', 'remoto');
@@ -76,12 +82,16 @@ CREATE TABLE IF NOT EXISTS vaga (
     data_abertura TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_fechamento TIMESTAMP NOT NULL,
     descricao TEXT NOT NULL,
-    status_vaga BOOLEAN DEFAULT true,
+    remuneracao DECIMAL(10, 2) NOT NULL,
     idiomas_desejados JSONB NOT NULL,
     tempo_experiencia_desejado NUMERIC(10,2),
     escala_vaga escala_trabalho_enum NOT NULL,
+    status_vaga BOOLEAN DEFAULT true,
+
     modelo_trabalho_vaga modelo_trabalo_enum NOT NULL,
     nivel_prioridade_vaga nivel_prioridade_enum NOT NULL,
+    tipo_vaga tipo_vaga_enum NOT NULL,
+
     empresa_id INTEGER NOT NULL REFERENCES empresa(empresa_id),
     analista_rh INTEGER NOT NULL REFERENCES usuario(usuario_id),
     setor_id INTEGER NOT NULL REFERENCES setor_ocupacao(setor_ocupacao_id)

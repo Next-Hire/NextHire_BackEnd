@@ -9,6 +9,8 @@ namespace NextHire_API.DTOs.VagaDTO
     {
         public int AnalistaRh { get; set; }
 
+        public int SetorOcupacaoId { get; set; }
+
         public DateTime DataFechamento { get; set; }
 
         public string Descricao { get; set; } = null!;

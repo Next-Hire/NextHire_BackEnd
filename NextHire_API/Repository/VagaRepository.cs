@@ -64,6 +64,7 @@ namespace NextHire_API.Repository
                 ?? throw new Exception("Vaga não encontrada.");
 
             vagaExistente.AnalistaRh = vaga.AnalistaRh;
+            vagaExistente.SetorId = vaga.SetorId;
             vagaExistente.DataFechamento = vaga.DataFechamento;
             vagaExistente.Descricao = vaga.Descricao;
             vagaExistente.EmpresaId = vaga.EmpresaId;

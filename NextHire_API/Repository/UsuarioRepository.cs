@@ -64,6 +64,10 @@ namespace NextHireAPI.Repository
                 .FirstOrDefaultAsync(u => u.UsuarioId == candidatoId)
                 ?? throw new DomainException($"O candidato com o ID: {candidatoId} não foi localizado,");
 
+        public async Task<bool> EmailExiste(string email) => 
+            await _context.Usuario.AnyAsync(varAux => varAux.Email == email);
+
+
         public async Task AdicionarFuncionarios(int empresaId, List<Usuario> funcionarios)
         {
             Empresa empresa = _context.Empresa

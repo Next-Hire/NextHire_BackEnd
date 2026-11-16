@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NextHire_API.Applications.S3;
+using NextHire_API.DTOs.CurriculoAWS;
 using NextHire_API.Exceptions;
 
 namespace NextHire_API.Controllers
@@ -34,14 +35,14 @@ namespace NextHire_API.Controllers
         }
 
         [HttpPost("parse")]
-        public async Task<IActionResult> ParseCurriculo(IFormFile file)
+        public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculo_JSON(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Nenhum arquivo enviado.");
 
-            var tiposPermitidos = new[] { "application/pdf", "image/jpeg", "image/png" };
-            if (!tiposPermitidos.Contains(file.ContentType))
-                return BadRequest("Formato inválido. Envie PDF, JPG ou PNG.");
+            string[]? tiposPerm = { "application/pdf", "image/jpeg", "image/png" };
+            if (!tiposPerm.Contains(file.ContentType))
+                return BadRequest("Formato inválido.. Envie PDF, JPG ou PNG.");
 
             try
             {

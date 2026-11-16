@@ -19,11 +19,12 @@ namespace NextHire_API.Applications.S3
             _httpClient = httpClient;
         }
 
-        public async Task<CurriculoDTO> ExtrairDadosAsync(IFormFile arquivo)
+        public async Task<CurriculoDTO?> ExtrairDadosAsync(IFormFile arquivo)
         {
             using var memoryStream = new MemoryStream();
             await arquivo.CopyToAsync(memoryStream);
-            var base64File = Convert.ToBase64String(memoryStream.ToArray());
+            string? base64File = Convert.ToBase64String(memoryStream.ToArray());
+            
 
             // 2. Definir o Schema JSON esperado pelo Gemini
             var responseSchema = new
@@ -56,7 +57,7 @@ namespace NextHire_API.Applications.S3
                 required = new[] { "nomeCompleto", "experiencias", "habilidades" }
             };
 
-            // 3. Montar o payload da requisição
+            // Montando o payload da requisição
             var requestBody = new
             {
                 contents = new[]
@@ -92,10 +93,11 @@ namespace NextHire_API.Applications.S3
             var response = await _httpClient.PostAsync(url, content);
             var responseString = await response.Content.ReadAsStringAsync();
 
+            //caso possua erro
+            var statusCodeError = ((int)response.StatusCode);
+
             if (!response.IsSuccessStatusCode)
-            {
-                throw new DomainException($"Erro Gemini ({(int)response.StatusCode}): {responseString}");
-            }
+                throw new DomainException($"Erro do GoogleGemini ({statusCodeError}): {responseString}");
             using var doc = JsonDocument.Parse(responseString);
 
             // Extrai o texto JSON gerado dentro da estrutura padrão de resposta do Gemini
@@ -106,7 +108,8 @@ namespace NextHire_API.Applications.S3
                 .GetProperty("text")
                 .GetString();
 
-            if (string.IsNullOrEmpty(jsonResult)) return null;
+            if (string.IsNullOrEmpty(jsonResult))
+                throw new DomainException("JSON não gerado"); // retornar null talvez
 
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             return JsonSerializer.Deserialize<CurriculoDTO>(jsonResult, options);

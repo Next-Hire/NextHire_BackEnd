@@ -132,8 +132,14 @@ namespace NextHireAPI.Applications.Services
 
         public async Task EnviarCodigo(string emailDestinatario)
         {
-            if (!EmailService.ValidarEmail(emailDestinatario))
-                throw new DomainException("Digite um email valido");
+            if (await _repository.EmailExiste(emailDestinatario) == false)
+                throw new DomainException("Email não encontrado");
+
+            if (!emailDestinatario.Contains('@'))
+                throw new DomainException("Email inválido.");
+
+            EmailService.ValidarEmail(emailDestinatario);
+ 
 
             MailAddress emailConvertido = EmailService.ConverteParaMailAdress(emailDestinatario);
 

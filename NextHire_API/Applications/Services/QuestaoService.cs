@@ -307,11 +307,15 @@ public class QuestaoService
         switch (questao.TipoQuestao)
         {
             case TipoQuestaoEnum.VerdadeiroFalso:
+                // O agente gera as alternativas "Verdadeiro" / "Falso";
+                // mantém compatibilidade com o formato antigo "Sim" / "Não" e com booleanos.
                 if (payload.resposta?.ValueKind == JsonValueKind.True)
-                    return textosCorretos.Contains("Sim");
+                    return textosCorretos.Contains("Verdadeiro") || textosCorretos.Contains("Sim");
                 if (payload.resposta?.ValueKind == JsonValueKind.False)
-                    return textosCorretos.Contains("Não");
-                return false;
+                    return textosCorretos.Contains("Falso") || textosCorretos.Contains("Não");
+
+                var textoVf = payload.resposta?.GetString()?.Trim();
+                return !string.IsNullOrEmpty(textoVf) && textosCorretos.Contains(textoVf);
 
             case TipoQuestaoEnum.UnicaEscolha:
                 var textoEscolhido = payload.resposta?.GetString()?.Trim();

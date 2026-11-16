@@ -261,7 +261,7 @@ public class NextAgentService
             "unica_escolha" => TipoQuestaoEnum.UnicaEscolha,
             "multipla_escolha" => TipoQuestaoEnum.MultiplaEscolha,
             "dissertativa" => TipoQuestaoEnum.Dissertativa,
-            _ => throw new Exception($"tipo_questao inválido: {valor}.")
+            _ => throw new DomainException($"tipo_questao inválido: {valor}. Valores aceitos: verdadeiro_falso, unica_escolha, multipla_escolha, dissertativa.")
         };
 
     public static ClassificacaoQuestaoEnum ConverterClassificacaoQuestao(string valor)
@@ -270,6 +270,6 @@ public class NextAgentService
             "comportamental" => ClassificacaoQuestaoEnum.Comportamental,
             "tecnica" => ClassificacaoQuestaoEnum.Tecnica,
             "situacional" => ClassificacaoQuestaoEnum.Situacional,
-            _ => throw new Exception($"classificacao_questao inválida: {valor}.")
+            _ => throw new DomainException($"classificacao_questao inválida: {valor}. Valores aceitos: comportamental, tecnica, situacional.")
         };
 }

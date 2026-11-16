@@ -172,9 +172,10 @@ namespace NextHireAPI.Controllers
         /// <param name="usuarioAtualizado">Novos dados do usuário.</param>
         /// <returns>Resposta vazia com status 204.</returns>
         [HttpPatch("{usuarioId}")]
-        [Authorize(Roles = "Candidato,Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Atualiza os dados gerais de um usuário", Description = "Atualiza os dados gerais (candidato ou funcionário) do usuário informado. Requer qualquer perfil autenticado (Candidato, Gestor, Analista de RH ou Administrador).")]
+        [Authorize(Policy = "SomenteProprioUsuario")]
+        [SwaggerOperation(Summary = "Atualiza os dados gerais de um usuário", Description = "Atualiza os dados gerais (candidato ou funcionário) do usuário informado. Somente o próprio usuário autenticado (ID do token igual ao da rota) pode executar a alteração.")]
         [SwaggerResponse(204, "Usuário atualizado com sucesso.")]
+        [SwaggerResponse(403, "Usuário autenticado não corresponde ao usuário da rota.")]
         [SwaggerResponse(400, "Dados inválidos, usuário inexistente ou nenhuma alteração detectada.")]
         public async Task<IActionResult> AtualizarUsuarioGeral(
             int usuarioId,

@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace NextHire_API.Domains;
 
-public partial class CandidatoVaga
+public partial class CurriculoVaga
 {
-    public int CandidatoId { get; set; }
+    public int CurriculoId { get; set; }
 
     public int VagaId { get; set; }
 
     public DateTime? DataHoraInscricao { get; set; }
 
-    public virtual Usuario Candidato { get; set; } = null!;
+    public virtual CurriculoCandidato Curriculo { get; set; } = null!;
 
     public virtual Vaga Vaga { get; set; } = null!;
 

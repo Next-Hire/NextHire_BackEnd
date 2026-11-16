@@ -139,6 +139,10 @@ builder.Services.AddScoped<AreaOcupacaoService>();
 builder.Services.AddScoped<IAnotacaoRepository, AnotacaoRepository>();
 builder.Services.AddScoped<AnotacaoService>();
 
+// Curriculo Vaga
+builder.Services.AddScoped<ICurriculoVagaRepository, CurriculoVagaRepository>();
+builder.Services.AddScoped<CurriculoVagaService>();
+
 builder.Services.AddScoped<EmpresaService>();
 builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 

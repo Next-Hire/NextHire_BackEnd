@@ -179,6 +179,10 @@
             {
               "Name": "titulo",
               "PropertyName": "Titulo"
+            },
+            {
+              "Name": "setor_id",
+              "PropertyName": "SetorId"
             }
           ],
           "Navigations": [
@@ -218,6 +222,21 @@
               "NewName": null,
               "FkName": "vaga_empresa_id_fkey",
               "ToEntity": "Empresa",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "CurriculoVaga",
+              "NewName": null,
+              "FkName": "curriculo_vaga_vaga_id_fkey",
+              "ToEntity": "CurriculoVaga",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            },
+            {
+              "Name": "Setor",
+              "NewName": null,
+              "FkName": "vaga_setor_id_fkey",
+              "ToEntity": "SetorOcupacao",
               "Multiplicity": "1"
             }
           ]
@@ -385,6 +404,14 @@
               "FkName": "curriculo_candidato_candidato_id_fkey",
               "ToEntity": "Usuario",
               "Multiplicity": "1"
+            },
+            {
+              "Name": "CurriculoVaga",
+              "NewName": null,
+              "FkName": "curriculo_vaga_curriculo_id_fkey",
+              "ToEntity": "CurriculoVaga",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
             }
           ]
         },
@@ -556,6 +583,14 @@
               "ToEntity": "Vaga",
               "IsPrincipal": true,
               "Multiplicity": "*"
+            },
+            {
+              "Name": "AvaliacaoHabilidade",
+              "NewName": null,
+              "FkName": "avaliacao_habilidade_candidato_id_fkey",
+              "ToEntity": "AvaliacaoHabilidade",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
             }
           ]
         },
@@ -632,6 +667,14 @@
               "FkName": "setor_ocupacao_empresa_id_fkey",
               "ToEntity": "Empresa",
               "Multiplicity": "1"
+            },
+            {
+              "Name": "Vaga",
+              "NewName": null,
+              "FkName": "vaga_setor_id_fkey",
+              "ToEntity": "Vaga",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
             }
           ]
         },
@@ -657,6 +700,14 @@
               "ToEntity": "HabilidadeCandidato",
               "IsPrincipal": true,
               "Multiplicity": "*"
+            },
+            {
+              "Name": "AvaliacaoHabilidade",
+              "NewName": null,
+              "FkName": "avaliacao_habilidade_habilidade_id_fkey",
+              "ToEntity": "AvaliacaoHabilidade",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
             }
           ]
         },
@@ -680,6 +731,29 @@
             {
               "Name": "nivel_avaliado",
               "PropertyName": "NivelAvaliado"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Candidato",
+              "NewName": null,
+              "FkName": "avaliacao_habilidade_candidato_id_fkey",
+              "ToEntity": "Usuario",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Entrevista",
+              "NewName": null,
+              "FkName": "avaliacao_habilidade_entrevista_id_fkey",
+              "ToEntity": "Entrevista",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Habilidade",
+              "NewName": null,
+              "FkName": "avaliacao_habilidade_habilidade_id_fkey",
+              "ToEntity": "Habilidade",
+              "Multiplicity": "1"
             }
           ]
         },
@@ -956,6 +1030,49 @@
               "NewName": null,
               "FkName": "entrevista_processo_seletivo_id_fkey",
               "ToEntity": "ProcessoSeletivo",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "AvaliacaoHabilidade",
+              "NewName": null,
+              "FkName": "avaliacao_habilidade_entrevista_id_fkey",
+              "ToEntity": "AvaliacaoHabilidade",
+              "IsPrincipal": true,
+              "Multiplicity": "*"
+            }
+          ]
+        },
+        {
+          "Name": "curriculo_vaga",
+          "EntityName": "CurriculoVaga",
+          "IncludeUnknownColumns": true,
+          "Properties": [
+            {
+              "Name": "curriculo_id",
+              "PropertyName": "CurriculoId"
+            },
+            {
+              "Name": "vaga_id",
+              "PropertyName": "VagaId"
+            },
+            {
+              "Name": "data_hora_inscricao",
+              "PropertyName": "DataHoraInscricao"
+            }
+          ],
+          "Navigations": [
+            {
+              "Name": "Curriculo",
+              "NewName": null,
+              "FkName": "curriculo_vaga_curriculo_id_fkey",
+              "ToEntity": "CurriculoCandidato",
+              "Multiplicity": "1"
+            },
+            {
+              "Name": "Vaga",
+              "NewName": null,
+              "FkName": "curriculo_vaga_vaga_id_fkey",
+              "ToEntity": "Vaga",
               "Multiplicity": "1"
             }
           ]

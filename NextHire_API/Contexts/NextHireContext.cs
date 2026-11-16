@@ -84,6 +84,9 @@ public partial class NextHireContext : DbContext
         modelBuilder.HasPostgresEnum<global::NextHire_API.Domains.TipoUsuarioEnum>(
             "public",
             "tipo_usuario_enum");
+        modelBuilder.HasPostgresEnum<global::NextHire_API.Domains.TipoVagaEnum>(
+            "public",
+            "tipo_vaga_enum");
         modelBuilder.Entity<Alternativa>(entity =>
         {
             entity.HasKey(e => e.AlternativaId).HasName("alternativa_pkey");
@@ -686,6 +689,9 @@ public partial class NextHireContext : DbContext
                 .IsRequired()
                 .HasColumnType("jsonb")
                 .HasColumnName("idiomas_desejados");
+            entity.Property(e => e.Remuneracao)
+                .HasPrecision(10, 2)
+                .HasColumnName("remuneracao");
             entity.Property(e => e.SetorId).HasColumnName("setor_id");
             entity.Property(e => e.StatusVaga)
                 .HasDefaultValue(true)
@@ -702,6 +708,8 @@ public partial class NextHireContext : DbContext
                 .HasColumnName("modelo_trabalho_vaga");
             entity.Property(e => e.NivelPrioridadeVaga)
                 .HasColumnName("nivel_prioridade_vaga");
+            entity.Property(e => e.TipoVaga)
+                .HasColumnName("tipo_vaga");
             entity.HasOne(d => d.AnalistaRhNavigation).WithMany(p => p.VagaNavigation)
                 .HasForeignKey(d => d.AnalistaRh)
                 .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("vaga_analista_rh_fkey");

@@ -78,6 +78,7 @@ dataSourceBuilder.MapEnum<SituacaoProfissionalEnum>("situacao_profissional_enum"
 dataSourceBuilder.MapEnum<StatusRelacaoEnum>("status_relacao_enum");
 dataSourceBuilder.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
 dataSourceBuilder.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
+dataSourceBuilder.MapEnum<TipoVagaEnum>("tipo_vaga_enum");
 
 var dataSource = dataSourceBuilder.Build();
 
@@ -94,6 +95,7 @@ builder.Services.AddDbContext<NextHireContext>(options =>
         npgsql.MapEnum<StatusRelacaoEnum>("status_relacao_enum");
         npgsql.MapEnum<TipoQuestaoEnum>("tipo_questao_enum");
         npgsql.MapEnum<TipoUsuarioEnum>("tipo_usuario_enum");
+        npgsql.MapEnum<TipoVagaEnum>("tipo_vaga_enum");
     }));
 
 //? JWT CONFIG

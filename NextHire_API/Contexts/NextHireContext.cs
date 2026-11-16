@@ -199,12 +199,36 @@ public partial class NextHireContext : DbContext
 
         modelBuilder.Entity<AvaliacaoHabilidade>(entity =>
         {
-            entity.HasNoKey();
-            entity.ToTable("avaliacao_habilidade", "public");
-            entity.Property(e => e.CandidatoId).HasColumnName("candidato_id");
-            entity.Property(e => e.EntrevistaId).HasColumnName("entrevista_id");
-            entity.Property(e => e.HabilidadeId).HasColumnName("habilidade_id");
-            entity.Property(e => e.NivelAvaliado).HasColumnName("nivel_avaliado");
+            modelBuilder.Entity<AvaliacaoHabilidade>(entity =>
+            {
+                entity.HasKey(e => new { e.CandidatoId, e.EntrevistaId, e.HabilidadeId })
+                    .HasName("pk_avaliacao_habilidade");
+
+                entity.ToTable("avaliacao_habilidade", "public");
+
+                entity.Property(e => e.CandidatoId).HasColumnName("candidato_id");
+                entity.Property(e => e.EntrevistaId).HasColumnName("entrevista_id");
+                entity.Property(e => e.HabilidadeId).HasColumnName("habilidade_id");
+                entity.Property(e => e.NivelAvaliado).HasColumnName("nivel_avaliado");
+
+                entity.HasOne(d => d.Candidato)
+                    .WithMany()
+                    .HasForeignKey(d => d.CandidatoId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("avaliacao_habilidade_candidato_id_fkey");
+
+                entity.HasOne(d => d.Entrevista)
+                    .WithMany()
+                    .HasForeignKey(d => d.EntrevistaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("avaliacao_habilidade_entrevista_id_fkey");
+
+                entity.HasOne(d => d.Habilidade)
+                    .WithMany()
+                    .HasForeignKey(d => d.HabilidadeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("avaliacao_habilidade_habilidade_id_fkey");
+            });
         });
 
         modelBuilder.Entity<CandidatoQuestao>(entity =>
@@ -269,7 +293,7 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.VagaId).HasColumnName("vaga_id");
             entity.Property(e => e.DataHoraInscricao)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+
                 .HasColumnName("data_hora_inscricao");
             entity.HasOne(d => d.Candidato).WithMany(p => p.CandidatoVaga)
                 .HasForeignKey(d => d.CandidatoId)
@@ -290,7 +314,7 @@ public partial class NextHireContext : DbContext
                 .HasColumnName("comentario_id");
             entity.Property(e => e.DataComentario)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+
                 .HasColumnName("data_comentario");
             entity.Property(e => e.EntrevistaId).HasColumnName("entrevista_id");
             entity.Property(e => e.GestorId).HasColumnName("gestor_id");
@@ -372,11 +396,11 @@ public partial class NextHireContext : DbContext
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasColumnName("entrevista_id");
             entity.Property(e => e.HorarioFim)
-                .HasColumnType("timestamp without time zone")
+
                 .HasColumnName("horario_fim");
             entity.Property(e => e.HorarioInicio)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+
                 .HasColumnName("horario_inicio");
             entity.Property(e => e.NomeEntrevista)
                 .IsRequired()
@@ -558,10 +582,10 @@ public partial class NextHireContext : DbContext
                 .HasColumnName("processo_seletivo_id");
             entity.Property(e => e.DataAbertura)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+
                 .HasColumnName("data_abertura");
             entity.Property(e => e.DataFechamento)
-                .HasColumnType("timestamp without time zone")
+
                 .HasColumnName("data_fechamento");
             entity.Property(e => e.StatusProcessoSeletivo)
                 .HasDefaultValue(true)

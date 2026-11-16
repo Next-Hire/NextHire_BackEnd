@@ -34,6 +34,7 @@ namespace NextHire_API.Repository
         public async Task<List<Vaga>> ListarPorEmpresaId(int empresaId)
             => await OrdemImportancia(_context.Vaga
                 .Include(v => v.Empresa)
+                .Include(v => v.AnalistaRhNavigation)
                 .Where(v => v.EmpresaId == empresaId))
                 .ToListAsync();
 

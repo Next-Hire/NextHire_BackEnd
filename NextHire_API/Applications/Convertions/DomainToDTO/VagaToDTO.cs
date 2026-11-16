@@ -11,12 +11,12 @@ namespace NextHire_API.Applications.Convertions
             return new ListarVagaDto
             {
                 VagaId = vaga.VagaId,
-                NomeAnalista = vaga.AnalistaRhNavigation.Nome ?? "Analista não encontrado",
+                NomeAnalista = vaga.AnalistaRhNavigation?.Nome ?? "Analista não encontrado",
                 AnalistaRh = vaga.AnalistaRh,
                 DataAbertura = vaga.DataAbertura,
                 DataFechamento = vaga.DataFechamento,
                 Descricao = vaga.Descricao,
-                NomeEmpresa = vaga.Empresa.Nome,
+                NomeEmpresa = vaga.Empresa?.Nome ?? "Empresa não encontrada",
                 EmpresaId = vaga.EmpresaId,
                 //? Para trabalhar com jsonb com o linq do EF Core
                 IdiomasDesejados = LerIdiomas(vaga.IdiomasDesejados),

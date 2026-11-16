@@ -46,6 +46,25 @@ namespace NextHireAPI.Convertions.DomainToDTO
 
         public static ListarCandidatoDto CandidatoToDto(Usuario usuario)
         {
+            //? Limpa as referências de volta (candidato) das coleções aninhadas
+            //? para evitar ciclos de objeto na serialização JSON (erro 500)
+            foreach (var curriculo in usuario.CurriculoCandidato)
+            {
+                curriculo.Candidato = null;
+
+                foreach (var candidatura in curriculo.CurriculoVaga)
+                    candidatura.Curriculo = null;
+            }
+
+            foreach (var experiencia in usuario.ExperienciaProfissional)
+                experiencia.Usuario = null;
+
+            foreach (var habilidade in usuario.HabilidadeCandidato)
+                habilidade.Candidato = null;
+
+            foreach (var info in usuario.InformacaoCandidato)
+                info.Candidato = null;
+
             return new ListarCandidatoDto
             {
                 CandidatoId = usuario.UsuarioId,

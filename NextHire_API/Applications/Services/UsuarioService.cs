@@ -132,6 +132,9 @@ namespace NextHireAPI.Applications.Services
 
         public async Task EnviarCodigo(string emailDestinatario)
         {
+            if (!await _repository.EmailExiste(emailDestinatario))
+                throw new DomainException("Digite um email existente.");
+            
             if (!EmailService.ValidarEmail(emailDestinatario))
                 throw new DomainException("Digite um email valido");
 

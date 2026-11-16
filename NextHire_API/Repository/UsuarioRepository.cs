@@ -48,11 +48,17 @@ namespace NextHireAPI.Repository
             return funcionario;
         }
 
+        public async Task<bool> EmailExiste(string email)
+            =>
+                await _context.Usuario.AnyAsync(varAux => varAux.Email.Trim().ToLower() == email.Trim().ToLower());
+        
         public async Task<Usuario> BuscarUsuarioPorEmail(string email)
             => await _context.Usuario
                 .FirstOrDefaultAsync(u => u.Email == email)
                 ?? throw new DomainException($"Usuario não localizado,");
 
+        
+        
         public async Task<Usuario> BuscarCandidatoPorId(int candidatoId)
             => await _context.Usuario
                 .Include(u => u.AnotacaoCandidato)

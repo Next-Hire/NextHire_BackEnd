@@ -145,6 +145,11 @@ namespace NextHireAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
+
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPut("senha")]

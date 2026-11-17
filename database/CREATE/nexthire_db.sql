@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS habilidade (
 CREATE TABLE IF NOT EXISTS habilidade_vaga (
     habilidade_id INTEGER NOT NULL REFERENCES habilidade(habilidade_id),
     vaga_id INTEGER NOT NULL REFERENCES vaga(vaga_id),
+    nivel_habilidade INTEGER NOT NULL,
     CONSTRAINT pk_habilidade_vaga PRIMARY KEY(habilidade_id, vaga_id)
 );
 

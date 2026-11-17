@@ -60,7 +60,17 @@ namespace NextHireAPI.Convertions.DomainToDTO
                 experiencia.Usuario = null;
 
             foreach (var habilidade in usuario.HabilidadeCandidato)
+            {
                 habilidade.Candidato = null;
+
+                //? a navegação Habilidade agora é incluída na busca; limpa os
+                //? retornos para não reintroduzir ciclos na serialização
+                if (habilidade.Habilidade != null)
+                {
+                    habilidade.Habilidade.HabilidadeCandidato.Clear();
+                    habilidade.Habilidade.Vaga.Clear();
+                }
+            }
 
             foreach (var info in usuario.InformacaoCandidato)
                 info.Candidato = null;
@@ -75,7 +85,10 @@ namespace NextHireAPI.Convertions.DomainToDTO
                 TipoUsuario = usuario.TipoUsuario,
                 CurriculoCandidato = usuario.CurriculoCandidato,
                 ExperienciaProfissional = usuario.ExperienciaProfissional,
-                HabilidadeCandidato = usuario.HabilidadeCandidato,
+            //? Listagem de habilidades do candidato ordenada do maior nível para o menor
+            HabilidadeCandidato = usuario.HabilidadeCandidato
+                .OrderByDescending(hc => hc.Nivel)
+                .ToList(),
                 InformacaoCandidato = usuario.InformacaoCandidato
             };
         }

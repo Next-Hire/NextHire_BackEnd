@@ -241,22 +241,22 @@ INSERT INTO habilidade (habilidade_id, nome) VALUES
 (12, 'Comunicação');
 
 -- ─── HABILIDADES EXIGIDAS PELAS VAGAS ──────────────────────────────────────
-INSERT INTO habilidade_vaga (habilidade_id, vaga_id) VALUES
-(1, 1),
-(2, 1),
-(3, 1),
-(4, 1),
-(10, 1),
-(11, 1),
-(5, 2),
-(6, 2),
-(7, 2),
-(3, 2),
-(1, 3),
-(2, 3),
-(3, 3),
-(8, 3),
-(11, 3);
+INSERT INTO habilidade_vaga (habilidade_id, vaga_id, nivel_habilidade) VALUES
+(1, 1, 4),
+(2, 1, 4),
+(3, 1, 3),
+(4, 1, 4),
+(10, 1, 5),
+(11, 1, 3),
+(5, 2, 4),
+(6, 2, 3),
+(7, 2, 5),
+(3, 2, 4),
+(1, 3, 3),
+(2, 3, 4),
+(3, 3, 3),
+(8, 3, 5),
+(11, 3, 4);
 
 -- ─── HABILIDADES DOS CANDIDATOS ────────────────────────────────────────────
 INSERT INTO habilidade_candidato (habilidade_id, candidato_id, nivel) VALUES

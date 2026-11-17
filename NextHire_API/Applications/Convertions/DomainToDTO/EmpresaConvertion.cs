@@ -1,10 +1,13 @@
 ﻿using NextHire_API.Domains;
+using NextHire_API.DTOs;
 using NextHire_API.DTOs.EmpresaDTOs;
 
 namespace NextHire_API.Applications.Convertions.DomainToConversion
 {
     public class EmpresaConvertion
     {
+
+        
         public static CriarEmpresaDTO criarEmpresaDTO(Empresa empresa)
         {
             return new CriarEmpresaDTO

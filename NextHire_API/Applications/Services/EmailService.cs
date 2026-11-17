@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Mail;
 using Microsoft.EntityFrameworkCore.Storage;
+using NextHire_API.Exceptions;
 
 namespace NextHireAPI.Applications.Services
 {
@@ -37,19 +38,28 @@ namespace NextHireAPI.Applications.Services
 
         public static bool ValidarEmail(string email)
         {
+                var addr = new MailAddress(email);
+                return addr.Address == email.Trim();
+        }
+
+        public static void ValidarEmail2(string email)
+        {
             if (string.IsNullOrWhiteSpace(email))
-                return false;
+                throw new DomainException("Insira um e-mail.");
+
+            email = email.Trim();
 
             try
             {
                 var addr = new MailAddress(email);
-                // Compara se o endereço normalizado é igual ao original
-                // Isso evita que entradas como "  @  " sejam aceitas
-                return addr.Address == email.Trim();
+
+                // Garante que não há display name e que possui um domínio com ponto (ex: .com)
+                if (addr.Address != email || !addr.Host.Contains('.'))
+                    throw new DomainException("E-mail inválido.");
             }
             catch
             {
-                return false;
+                throw new DomainException("E-mail inválido.");
             }
         }
 

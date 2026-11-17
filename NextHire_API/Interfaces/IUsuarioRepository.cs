@@ -15,6 +15,7 @@ namespace NextHireAPI.Interfaces
         public Task<Usuario> BuscarFuncionarioPorId(int funcionarioId);
 
         public Task<Usuario> BuscarCandidatoPorId(int candidatoId);
+        public Task<bool> EmailExiste(string email);
 
         //? Optei por adicionar a configuracao do id da empresa na service.
         public Task AdicionarFuncionarios(int empresaId, List<Usuario> funcionarios);

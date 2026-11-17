@@ -34,19 +34,31 @@ namespace NextHire_API.Controllers
             }
         }
 
-        [HttpPost("parse")]
-        public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculo_JSON(IFormFile file)
+        [HttpPost("curriculo/url/")]
+        public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorUrl(string url)
         {
-            // if (file == null || file.Length == 0)
-            //     return BadRequest("Nenhum arquivo enviado.");
-            //
-            // string[]? tiposPerm = { "application/pdf", "image/jpeg", "image/png" };
-            // if (!tiposPerm.Contains(file.ContentType))
-            //     return BadRequest("Formato inválido.. Envie PDF, JPG ou PNG.");
-
             try
             {
-                var resultado = await _geminiCurriculo.ExtrairDadosAsync(file);
+            CurriculoDTO? response = await _geminiCurriculo.ExtrairDadosPorUrlAsync(url);
+            return Ok(response);
+            }
+            catch (DomainException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+        
+        [HttpPost("curriculo/file/")]
+        public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorArquivo(IFormFile file)
+        {
+            try
+            {
+                var resultado = await _geminiCurriculo.ExtrairCurriculoArquivoAsync(file);
                 return Ok(resultado);
             }
             catch (DomainException ex)
@@ -59,15 +71,11 @@ namespace NextHire_API.Controllers
             }
         }
         
+        
         [HttpPost("upload")]
         public async Task<ActionResult<string>> UploadCurriculo(IFormFile file)
         {
-            // if (file == null || file.Length == 0)
-            //     return BadRequest("Nenhum arquivo enviado.");
-            //
-            // var s3Key = await _curriculoService.UploadCurriculoAsync(file);
-            //
-            // return Ok(new { CaminhoS3 = s3Key });
+
             try
             {
                 var s3Key = await _curriculoService.UploadCurriculoAsync(file);

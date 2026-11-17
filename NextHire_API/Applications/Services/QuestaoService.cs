@@ -66,7 +66,7 @@ public class QuestaoService
 
         await _repository.AdicionarVarias(questoes);
 
-        return questoes.Select(QuestaoToDTO.QuestaoParaListarDto).ToList();
+        return MontarRetornoGeracao(questoes, vaga, geradas);
     }
 
     // ======================================================================
@@ -123,7 +123,7 @@ public class QuestaoService
 
         await _repository.AdicionarVarias(questoes);
 
-        return questoes.Select(QuestaoToDTO.QuestaoParaListarDto).ToList();
+        return MontarRetornoGeracao(questoes, vaga, novas);
     }
 
     // ======================================================================
@@ -374,6 +374,27 @@ public class QuestaoService
     // ======================================================================
     // Helpers
     // ======================================================================
+
+    /// <summary>
+    /// Monta o retorno das questões geradas pelo agente: usa o DTO de listagem
+    /// preenchendo o título da vaga (a entidade recém-criada não vem com Include)
+    /// e a dificuldade informada pelo agente (ainda não persistida no banco).
+    /// </summary>
+    private static List<ListarQuestaoDto> MontarRetornoGeracao(
+        List<Questao> questoes, Vaga vaga, List<QuestaoAgenteDto> geradas)
+    {
+        var lista = new List<ListarQuestaoDto>();
+
+        for (int i = 0; i < questoes.Count; i++)
+        {
+            var dto = QuestaoToDTO.QuestaoParaListarDto(questoes[i]);
+            dto.tituloVaga = vaga.Titulo;
+            dto.dificuldade = i < geradas.Count ? geradas[i].dificuldade?.Trim().ToLowerInvariant() : null;
+            lista.Add(dto);
+        }
+
+        return lista;
+    }
 
     /// <summary>Valida as alternativas conforme o tipo da questão (mesmas regras do agente).</summary>
     private static void ValidarAlternativas(TipoQuestaoEnum tipo, List<CriarAlternativaDto> alternativas)

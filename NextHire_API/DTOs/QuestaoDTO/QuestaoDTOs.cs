@@ -71,6 +71,13 @@ public class ListarQuestaoDto
 
     public string tipoQuestao { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Preenchida somente nas questões geradas pelo Next Agent
+    /// (tabela questao ainda não persiste dificuldade).
+    /// Valores: facil | media | dificil
+    /// </summary>
+    public string? dificuldade { get; set; }
+
     public List<ListarAlternativaDto> alternativas { get; set; } = new();
 }
 

@@ -20,7 +20,7 @@ namespace NextHire_API.Repository
                 .Include(q => q.Vaga)
                 .OrderBy(q => q.QuestaoId)
                 .Where(q => q.VagaId == vagaId)
-                .ToListAsync();
+                .ToListAsync() ?? throw new DomainException("Nenhuma questao ou encontrada!");
 
         public async Task<Questao> BuscarPorId(int questaoId)
             => await _context.Questao

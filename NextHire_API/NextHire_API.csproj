@@ -13,6 +13,11 @@
     <Compile Remove="Interfaces\IEntrevistadorRepository.cs" />
   </ItemGroup>
 
+  <!-- Arquivos de config do Next Agent (system prompts) vão para a saída do build -->
+  <ItemGroup>
+    <None Include="Config\NextAgent\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.2.0" />
     <PackageReference Include="EntityFrameworkRuler.Design" Version="10.0.2">

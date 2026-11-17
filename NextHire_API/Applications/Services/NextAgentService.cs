@@ -10,8 +10,11 @@ namespace NextHire_API.Applications.Services;
 /// Cliente do Next Agent: consome diretamente o LM Studio (API compatível OpenAI)
 /// para gerar questões da vaga. NÃO usar gateway do OpenClaw como intermediário
 /// (harness de tools induz o modelo de 7B a invocar a operação como ferramenta).
-/// A resposta do modelo é estocástica, portanto TODA resposta é validada
-/// (quantidade, enums, nº de alternativas e gabarito) com até 3 tentativas.
+/// Os system prompts vêm dos arquivos versionados em Config/NextAgent/ (pacote
+/// de integração do agente), com fallback embutido. A requisição usa response_format
+/// json_schema (grammar estruturada): garante JSON parseável e a quantidade exata
+/// de questões; a validação abaixo cobre alternativas, gabarito e duplicatas,
+/// repetindo a chamada até 3 vezes (modelo estocástico).
 /// </summary>
 public class NextAgentService
 {
@@ -19,6 +22,9 @@ public class NextAgentService
 
     private const string Modelo = "qwen2.5-7b-instruct";
     private const int MaxTentativas = 3;
+
+    /// <summary>Pasta (relativa à saída do build) com os arquivos de config do agente.</summary>
+    private const string PastaConfig = "Config/NextAgent";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -103,7 +109,9 @@ public class NextAgentService
             vaga = payloadVaga
         });
 
-        return await ChamarAgenteAsync(PromptGerarQuestao, payload, quantidadeEsperada: 10);
+        return await ChamarAgenteAsync(
+            CarregarPromptConfig("system-prompt-generate-question.md", PromptGerarQuestao),
+            payload, quantidadeEsperada: 10);
     }
 
     /// <summary>Operação generate_more_question: 5 questões novas sem repetir as existentes.</summary>
@@ -117,26 +125,107 @@ public class NextAgentService
             questoes_existentes = questoesExistentes
         });
 
-        return await ChamarAgenteAsync(PromptGerarMaisQuestoes, payload, quantidadeEsperada: 5);
+        return await ChamarAgenteAsync(
+            CarregarPromptConfig("system-prompt-generate-more-questions.md", PromptGerarMaisQuestoes),
+            payload, quantidadeEsperada: 5);
     }
 
     // ======================================================================
     // Chamada HTTP + validação obrigatória com retry
     // ======================================================================
 
+    /// <summary>
+    /// Carrega o system prompt da config versionada do Next Agent
+    /// (arquivos .md do pacote de integração, copiados para a saída do build).
+    /// Se o arquivo não existir, usa o prompt embutido como fallback.
+    /// </summary>
+    private static string CarregarPromptConfig(string nomeArquivo, string fallback)
+    {
+        try
+        {
+            var caminho = Path.Combine(AppContext.BaseDirectory, PastaConfig, nomeArquivo);
+
+            if (File.Exists(caminho))
+            {
+                var conteudo = File.ReadAllText(caminho).Trim();
+                if (!string.IsNullOrWhiteSpace(conteudo))
+                {
+                    Console.WriteLine($"[NextAgent] Config carregada do arquivo: {PastaConfig}/{nomeArquivo}");
+                    return conteudo;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[NextAgent] Falha ao carregar config '{nomeArquivo}': {ex.Message}. Usando prompt embutido.");
+        }
+
+        Console.WriteLine($"[NextAgent] Usando prompt embutido (fallback): {nomeArquivo}");
+        return fallback;
+    }
+
     private async Task<List<QuestaoAgenteDto>> ChamarAgenteAsync(string systemPrompt, string userPayload, int quantidadeEsperada)
     {
-        var corpo = new
+        var corpo = new Dictionary<string, object?>
         {
-            model = Modelo,
-            messages = new object[]
+            ["model"] = Modelo,
+            ["messages"] = new object[]
             {
                 new { role = "system", content = systemPrompt },
                 new { role = "user", content = userPayload }
             },
-            temperature = 0.2,
-            max_tokens = 8192,
-            stream = false
+            ["temperature"] = 0.2,
+            ["max_tokens"] = 8192,
+            ["stream"] = false,
+            // Grammar estruturada: garante JSON parseável e a quantidade exata de questões
+            // (minItems/maxItems). A validação abaixo cobre o restante (alternativas, gabarito).
+            ["response_format"] = new
+            {
+                type = "json_schema",
+                json_schema = new
+                {
+                    name = "questoes_vaga",
+                    strict = true,
+                    schema = new
+                    {
+                        type = "object",
+                        properties = new Dictionary<string, object>
+                        {
+                            ["questoes"] = new Dictionary<string, object>
+                            {
+                                ["type"] = "array",
+                                ["items"] = new Dictionary<string, object>
+                                {
+                                    ["type"] = "object",
+                                    ["properties"] = new Dictionary<string, object>
+                                    {
+                                        ["texto_questao"] = new Dictionary<string, object> { ["type"] = "string" },
+                                        ["classificacao_questao"] = new Dictionary<string, object> { ["type"] = "string" },
+                                        ["tipo_questao"] = new Dictionary<string, object> { ["type"] = "string" },
+                                        ["dificuldade"] = new Dictionary<string, object> { ["type"] = "string" },
+                                        ["alternativas"] = new Dictionary<string, object>
+                                        {
+                                            ["type"] = "array",
+                                            ["items"] = new Dictionary<string, object>
+                                            {
+                                                ["type"] = "object",
+                                                ["properties"] = new Dictionary<string, object>
+                                                {
+                                                    ["texto_alternativa"] = new Dictionary<string, object> { ["type"] = "string" },
+                                                    ["alternativa_correta"] = new Dictionary<string, object> { ["type"] = "boolean" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                ["minItems"] = quantidadeEsperada,
+                                ["maxItems"] = quantidadeEsperada
+                            }
+                        },
+                        required = new[] { "questoes" }
+                    }
+                }
+            }
         };
 
         Exception? ultimoErro = null;

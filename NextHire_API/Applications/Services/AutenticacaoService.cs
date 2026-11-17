@@ -19,6 +19,8 @@ namespace NextHireAPI.Applications.Services
             _jwt = jwt;
         }
 
+
+
         public async Task<TokenResponseDto> Login(string email, string senha)
         {
             Usuario usuario = await _repository.BuscarUsuarioPorEmail(email);

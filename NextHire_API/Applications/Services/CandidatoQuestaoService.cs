@@ -13,6 +13,7 @@ public class CandidatoQuestaoService
     private readonly ICandidato_QuestaoRepository _rep;
     public CandidatoQuestaoService(ICandidato_QuestaoRepository rep) => _rep = rep;
     
+    
     public async Task<bool> ExisteRespostaCandidato(int questaoId, int candidatoId)
     {
         //

@@ -15,6 +15,11 @@
     <Compile Remove="Interfaces\IEntrevistadorRepository.cs" />
   </ItemGroup>
 
+  <!-- Arquivos de config do Next Agent (system prompts) vão para a saída do build -->
+  <ItemGroup>
+    <None Include="Config\NextAgent\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="4.1.0" />
     <PackageReference Include="DotNetEnv" Version="3.2.0" />

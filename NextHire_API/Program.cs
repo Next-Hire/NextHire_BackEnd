@@ -227,6 +227,17 @@ builder.Services.AddScoped<InformacaoCandidatoService>();
 builder.Services.AddScoped<IAvaliacaoHabilidadeRepository, AvaliacaoHabilidadesRepository>();
 builder.Services.AddScoped<AvaliacaoHabilidadeService>();
 
+// Questao (Next Agent)
+builder.Services.AddScoped<IQuestaoRepository, QuestaoRepository>();
+builder.Services.AddScoped<QuestaoService>();
+builder.Services.AddHttpClient<NextAgentService>(client =>
+{
+    var url = Environment.GetEnvironmentVariable("LMSTUDIO_URL") ?? "http://localhost:1235";
+    client.BaseAddress = new Uri(url);
+    // Geração de 10 questões com grammar estruturada no LM Studio pode levar ~2 min
+    client.Timeout = TimeSpan.FromMinutes(5);
+});
+
 // cors btw
 
 builder.Services.AddCors(options =>

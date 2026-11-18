@@ -61,11 +61,35 @@ namespace NextHire_API.Applications.S3
                     {
                       "cargo": "string",
                       "empresa": "string",
+                      "descricao": "string",
                       "periodo": "string",
-                      "descricao": "string"
+                      "dataInicio": "string",
+                      "dataEncerramento" : "string"
                     }
+                    ],
+                  "escolaridade": [
+                  {
+                  "nomeDaEscolaridade": "string",
+                  "tipoDeEscolaridade": "string",
+                  "periodoAnos": int,
+                  "dataInicio": "string",
+                  "dataEncerramento" : "string",
+                  "instituicao": "string"
+                  }
+                  ],
+
+                  "cursosExtras": [
+                  {
+                  "nomeCurso" : "string",
+                  "descricaoCurso" : "string",
+                  "periodoEmHoras": "string",
+                  "instituicao" : "string"
+                  }
                   ]
+                  
                 }
+
+                E ainda faça com que experiencia se refira apenas às que o candidato deixe explicito, ou seja, projetos realizados não são experiências.
                 """;
 
             string modeloSelecionado;

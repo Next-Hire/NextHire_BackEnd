@@ -30,50 +30,50 @@ namespace NextHire_API.Controllers
                 return Ok(link);
             }
 
-            catch(DomainException ex)
+            catch (DomainException ex)
             {
                 return NotFound(ex.Message);
             }
         }
 
-        [HttpPost("curriculo/url/")]
-        public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorUrl(string url)
-        {
-            try
-            {
-            CurriculoDTO? response = await _geminiCurriculo.ExtrairDadosPorUrlAsync(url);
-            return Ok(response);
-            }
-            catch (DomainException e)
-            {
-                return BadRequest(e.Message);
-            }
+        //[HttpPost("curriculo/url/")]
+        //public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorUrl(string url)
+        //{
+        //    try
+        //    {
+        //    CurriculoDTO? response = await _geminiCurriculo.ExtrairDadosPorUrlAsync(url);
+        //    return Ok(response);
+        //    }
+        //    catch (DomainException e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
 
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-        
-        [HttpPost("curriculo/file/")]
-        public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorArquivo(IFormFile file)
-        {
-            try
-            {
-                var resultado = await _geminiCurriculo.ExtrairCurriculoArquivoAsync(file);
-                return Ok(resultado);
-            }
-            catch (DomainException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-        
-        
+        //    catch (Exception e)
+        //    {
+        //        return StatusCode(500, e.Message);
+        //    }
+        //}
+
+        //[HttpPost("curriculo/file/")]
+        //public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorArquivo(IFormFile file)
+        //{
+        //    try
+        //    {
+        //        var resultado = await _geminiCurriculo.ExtrairCurriculoArquivoAsync(file);
+        //        return Ok(resultado);
+        //    }
+        //    catch (DomainException ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ex.Message);
+        //    }
+        //}
+
+
         [HttpPost("curriculo/file/groq")]
         public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorArquivo2(IFormFile file)
         {
@@ -96,21 +96,21 @@ namespace NextHire_API.Controllers
         }
         
         
-        [HttpPost("upload")]
-        public async Task<ActionResult<string>> UploadCurriculo(IFormFile file)
-        {
+        //[HttpPost("upload")]
+        //public async Task<ActionResult<string>> UploadCurriculo(IFormFile file)
+        //{
 
-            try
-            {
-                var s3Key = await _curriculoService.UploadCurriculoAsync(file);
-                return Ok(s3Key);
-            }
-            catch (DomainException e)
-            {
-                return BadRequest(e.Message);
+        //    try
+        //    {
+        //        var s3Key = await _curriculoService.UploadCurriculoAsync(file);
+        //        return Ok(s3Key);
+        //    }
+        //    catch (DomainException e)
+        //    {
+        //        return BadRequest(e.Message);
 
-            }
-        }
+        //    }
+        //}
 
     }
 }

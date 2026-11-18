@@ -58,7 +58,7 @@ if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
 
 var rbosfBaseUrl = Environment.GetEnvironmentVariable("RBOSF_API_BASE_URL")
     ?? builder.Configuration["Rbosf:BaseUrl"]
-    ?? "http://localhost:5116/escoapi/v1/";
+    ?? "http://localhost:5116/rbosfapi/v1/";
 
 if (!Uri.TryCreate($"{rbosfBaseUrl.TrimEnd('/')}/", UriKind.Absolute, out Uri? rbosfUri))
     throw new Exception("RBOSF_API_BASE_URL inválida.");

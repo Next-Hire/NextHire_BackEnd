@@ -21,6 +21,7 @@ using Amazon.Runtime;
 using Amazon.S3;
 using NextHireAPI.Applications.Auth;
 using NextHire_API.Applications.S3;
+using NextHire_API.Applications.Integrations;
 using NextHire_API.Exceptions;
 
 Env.Load();
@@ -54,6 +55,13 @@ if (string.IsNullOrWhiteSpace(jwtKey))
 
 if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
     throw new Exception("JWT_KEY precisa ter no mínimo 32 bytes.");
+
+var rbosfBaseUrl = Environment.GetEnvironmentVariable("RBOSF_API_BASE_URL")
+    ?? builder.Configuration["Rbosf:BaseUrl"]
+    ?? "http://localhost:5116/escoapi/v1/";
+
+if (!Uri.TryCreate($"{rbosfBaseUrl.TrimEnd('/')}/", UriKind.Absolute, out Uri? rbosfUri))
+    throw new Exception("RBOSF_API_BASE_URL inválida.");
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
     ConnectionMultiplexer.Connect(redisConnection)
@@ -191,6 +199,11 @@ builder.Services.AddScoped<IEmpresaRepository, EmpresaRepository>();
 
 builder.Services.AddScoped<IHabilidadesRepository, HabilidadeRepositiory>();
 builder.Services.AddScoped<HabilidadesService>();
+builder.Services.AddHttpClient<IRbosfHabilidadeClient, RbosfHabilidadeClient>(client =>
+{
+    client.BaseAddress = rbosfUri;
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 // Experiencia profissional
 builder.Services.AddScoped<IExperienciaProfissionalRepository, ExperienciaProfissionalRepository>();

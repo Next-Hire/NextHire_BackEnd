@@ -105,12 +105,18 @@ CREATE TABLE IF NOT EXISTS gestor_vaga(
 
 CREATE TABLE IF NOT EXISTS habilidade (
     habilidade_id SERIAL PRIMARY KEY,
+    codigo TEXT NOT NULL,
     nome TEXT NOT NULL
 );
+
+-- Bancos criados antes da coluna de codigo: adiciona sem quebrar a carga existente.
+ALTER TABLE habilidade ADD COLUMN IF NOT EXISTS codigo TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_habilidade_codigo ON habilidade (codigo);
 
 CREATE TABLE IF NOT EXISTS habilidade_vaga (
     habilidade_id INTEGER NOT NULL REFERENCES habilidade(habilidade_id),
     vaga_id INTEGER NOT NULL REFERENCES vaga(vaga_id),
+    nivel_habilidade INTEGER NOT NULL,
     CONSTRAINT pk_habilidade_vaga PRIMARY KEY(habilidade_id, vaga_id)
 );
 

@@ -8,6 +8,8 @@ public partial class Habilidade
 {
     public int HabilidadeId { get; set; }
 
+    public string Codigo { get; set; } = null!;
+
     public string Nome { get; set; } = null!;
 
     public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();

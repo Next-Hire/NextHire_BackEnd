@@ -12,11 +12,13 @@ namespace NextHire_API.Controllers
     {
         private readonly CurriculoService _curriculoService;
         private readonly GeminiCurriculoService _geminiCurriculo;
+        private readonly GroqCurriculoService _groqService;
 
-        public CurriculoController(CurriculoService service, GeminiCurriculoService geminiCurriculo)
+        public CurriculoController(CurriculoService service, GeminiCurriculoService geminiCurriculo, GroqCurriculoService groqService)
         {
             _curriculoService = service;
             _geminiCurriculo = geminiCurriculo;
+            _groqService = groqService;
         }
 
         [HttpGet]
@@ -59,6 +61,28 @@ namespace NextHire_API.Controllers
             try
             {
                 var resultado = await _geminiCurriculo.ExtrairCurriculoArquivoAsync(file);
+                return Ok(resultado);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        
+        
+        [HttpPost("curriculo/file/groq")]
+        public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorArquivo2(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Nenhum arquivo foi enviado.");
+
+            try
+            {
+                CurriculoDTO? resultado = await _groqService.ExtrairCurriculoArquivoAsync(file);
                 return Ok(resultado);
             }
             catch (DomainException ex)

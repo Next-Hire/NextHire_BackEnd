@@ -56,9 +56,22 @@ namespace NextHireAPI.Controllers
             }
         }
 
-        /// <summary>Busca vagas pelo título (correspondência parcial, ignorando maiúsculas/minúsculas).</summary>
-        /// <param name="titulo">Texto a ser procurado no título da vaga.</param>
-        /// <returns>Vagas cujo título contém o texto informado.</returns>
+        /// <summary>Busca vagas pelo setor (correspondência parcial, ignorando maiúsculas/minúsculas).</summary>
+        /// <param name="setorId">ID do setor cujas vagas serão listadas.</param>
+        /// <returns>Vagas do setor informado.</returns>
+        [HttpGet("setor/{setorId}")]
+        public async Task<IActionResult> ListarPorSetorId(int setorId)
+        {
+            try
+            {
+                return Ok(await _service.ListarPorSetorId(setorId));
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
         [HttpGet("titulo")]
         [AllowAnonymous]
         [SwaggerOperation(Summary = "Busca vagas por título", Description = "Retorna as vagas cujo título contém o texto informado, ordenadas por importância.")]

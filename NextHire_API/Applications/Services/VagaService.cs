@@ -37,6 +37,18 @@ namespace NextHireAPI.Applications.Services
 
             return vagas.Select(v => VagaToDTO.VagaToDto(v)).ToList();
         }
+        public async Task<List<ListarVagaDto>> ListarPorSetorId(int setorId)
+        {
+            if (setorId <= 0)
+                throw new DomainException("Informe um ID de setor válido.");
+
+            List<Vaga> vagas = await _repository.ListarPorSetorId(setorId);
+
+            if (vagas.Count <= 0 || vagas == null)
+                throw new DomainException("Nenhuma vaga encontrada com este ID de setor.");
+
+            return vagas.Select(v => VagaToDTO.VagaToDto(v)).ToList();
+        }
 
         public async Task<List<ListarVagaDto>> ListarPorTitulo(string titulo)
         {

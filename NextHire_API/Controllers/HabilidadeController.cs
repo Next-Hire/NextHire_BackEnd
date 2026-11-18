@@ -18,6 +18,75 @@ namespace NextHire_API.Controllers
             _service = service;
         }
 
+        /// <summary>Busca habilidades na API do RBOSF pelo código.</summary>
+        /// <param name="codigo">Código da habilidade no RBOSF (ex.: PROG, DOCK).</param>
+        /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
+        /// <returns>Habilidades encontradas no RBOSF.</returns>
+        [HttpGet("rbosf/codigo/{codigo}")]
+        [AllowAnonymous]
+        [SwaggerOperation(Summary = "Busca habilidades no RBOSF pelo código", Description = "Consulta a API do RBOSF e retorna as habilidades correspondentes ao código informado, sem gravar no banco.")]
+        [SwaggerResponse(200, "Habilidades retornadas com sucesso.", typeof(List<RbosfHabilidadeDto>))]
+        [SwaggerResponse(400, "Código inválido ou erro ao consultar o RBOSF.")]
+        public async Task<ActionResult<List<RbosfHabilidadeDto>>> BuscarNoRbosfPorCodigo(string codigo, CancellationToken cancellationToken)
+        {
+            try
+            {
+                return Ok(await _service.BuscarNoRbosfPorCodigo(codigo, cancellationToken));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>Busca habilidades na API do RBOSF por termo/nome.</summary>
+        /// <param name="termo">Texto a pesquisar (ex.: docker, python).</param>
+        /// <param name="classificacao">Filtro opcional: hard ou soft.</param>
+        /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
+        /// <returns>Habilidades encontradas no RBOSF.</returns>
+        [HttpGet("rbosf/termo/{termo}")]
+        [AllowAnonymous]
+        [SwaggerOperation(Summary = "Busca habilidades no RBOSF por termo", Description = "Consulta a API do RBOSF por nome/termo livre, com filtro opcional de classificação, sem gravar no banco.")]
+        [SwaggerResponse(200, "Habilidades retornadas com sucesso.", typeof(List<RbosfHabilidadeDto>))]
+        [SwaggerResponse(400, "Termo inválido ou erro ao consultar o RBOSF.")]
+        public async Task<ActionResult<List<RbosfHabilidadeDto>>> BuscarNoRbosfPorTermo(
+            string termo,
+            [FromQuery] string? classificacao,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                return Ok(await _service.BuscarNoRbosfPorTermo(termo, classificacao, cancellationToken));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>Importa habilidades do RBOSF para o catálogo do NextHire.</summary>
+        /// <param name="dto">Códigos das habilidades selecionadas.</param>
+        /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
+        /// <returns>Resumo da importação, incluindo códigos não encontrados.</returns>
+        [HttpPost("rbosf/importar")]
+        [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Importa habilidades do RBOSF", Description = "Busca cada código no RBOSF e faz upsert no catálogo local pelo código. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerResponse(200, "Importação concluída.", typeof(ResultadoImportacaoRbosfDto))]
+        [SwaggerResponse(400, "Dados inválidos ou erro ao consultar o RBOSF.")]
+        public async Task<ActionResult<ResultadoImportacaoRbosfDto>> ImportarDoRbosf(
+            ImportarHabilidadesRbosfDto dto,
+            CancellationToken cancellationToken)
+        {
+            try
+            {
+                return Ok(await _service.ImportarDoRbosf(dto, cancellationToken));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         /// <summary>Lista todas as habilidades cadastradas.</summary>
         /// <returns>Lista completa de habilidades.</returns>
         [HttpGet]

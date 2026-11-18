@@ -46,6 +46,8 @@ public partial class NextHireContext : DbContext
 
     public virtual DbSet<HabilidadeCandidato> HabilidadeCandidato { get; set; }
 
+    public virtual DbSet<HabilidadeVaga> HabilidadeVaga { get; set; }
+
     public virtual DbSet<InformacaoCandidato> InformacaoCandidato { get; set; }
 
     public virtual DbSet<ProcessoSeletivo> ProcessoSeletivo { get; set; }
@@ -415,31 +417,33 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.HabilidadeId)
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasColumnName("habilidade_id");
+            entity.Property(e => e.Codigo)
+                .IsRequired()
+                .HasColumnName("codigo");
+            entity.HasIndex(e => e.Codigo)
+                .IsUnique()
+                .HasDatabaseName("uq_habilidade_codigo");
             entity.Property(e => e.Nome)
                 .IsRequired()
                 .HasColumnName("nome");
             entity.HasMany(d => d.Vaga)
                 .WithMany(p => p.Habilidade)
-                .UsingEntity<Dictionary<string, object>>(
-                    "HabilidadeVaga",
+                .UsingEntity<HabilidadeVaga>(
                     l => l.HasOne<Vaga>()
                         .WithMany()
-                        .HasForeignKey("VagaId")
+                        .HasForeignKey(hv => hv.VagaId)
                         .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("habilidade_vaga_vaga_id_fkey"),
                     r => r.HasOne<Habilidade>()
                         .WithMany()
-                        .HasForeignKey("HabilidadeId")
+                        .HasForeignKey(hv => hv.HabilidadeId)
                         .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("habilidade_vaga_habilidade_id_fkey"),
                     j =>
                     {
-                        j.HasKey("HabilidadeId", "VagaId").HasName("pk_habilidade_vaga");
+                        j.HasKey(hv => new { hv.HabilidadeId, hv.VagaId }).HasName("pk_habilidade_vaga");
                         j.ToTable("habilidade_vaga", "public");
-                        j.IndexerProperty<int>(
-                            "HabilidadeId")
-                            .HasColumnName("habilidade_id");
-                        j.IndexerProperty<int>(
-                            "VagaId")
-                            .HasColumnName("vaga_id");
+                        j.Property(hv => hv.HabilidadeId).HasColumnName("habilidade_id");
+                        j.Property(hv => hv.VagaId).HasColumnName("vaga_id");
+                        j.Property(hv => hv.NivelHabilidade).HasColumnName("nivel_habilidade");
                     });
 
         });

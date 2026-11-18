@@ -417,6 +417,12 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.HabilidadeId)
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasColumnName("habilidade_id");
+            entity.Property(e => e.Codigo)
+                .IsRequired()
+                .HasColumnName("codigo");
+            entity.HasIndex(e => e.Codigo)
+                .IsUnique()
+                .HasDatabaseName("uq_habilidade_codigo");
             entity.Property(e => e.Nome)
                 .IsRequired()
                 .HasColumnName("nome");

@@ -35,6 +35,11 @@ namespace NextHire_API.Repository
             return _context.Habilidade.Find(id);
         }
 
+        public Habilidade? BuscarPorCodigo(string codigo)
+        {
+            return _context.Habilidade.FirstOrDefault(h => h.Codigo == codigo);
+        }
+
         public void Deletar(int id)
         {
             Habilidade habilidadeExistente = _context.Habilidade.Find(id);

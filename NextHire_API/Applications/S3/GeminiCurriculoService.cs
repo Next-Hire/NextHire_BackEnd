@@ -1,5 +1,5 @@
 ﻿using NextHire_API.DTOs.CurriculoAWS;
-using NextHire_API.DTOs.CurriculoS3DTO;
+
 using NextHire_API.Exceptions;
 using System.Text;
 using System.Text.Json;

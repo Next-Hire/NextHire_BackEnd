@@ -6,6 +6,7 @@ namespace NextHireAPI.Interfaces
     public interface IUsuarioRepository
     {
         public Task<List<Usuario>> ListarUsuarios();
+
         public Task<List<Usuario>> ListarFuncionariosPorEmpresaId(int empresaId);
 
         public Task<List<Usuario>> ListarCandidatos();

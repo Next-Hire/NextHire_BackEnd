@@ -152,8 +152,8 @@ CREATE TABLE IF NOT EXISTS candidato_questao (
 CREATE TABLE IF NOT EXISTS processo_seletivo (
     processo_seletivo_id SERIAL PRIMARY KEY,
     titulo_processo TEXT NOT NULL,
-    data_abertura TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_fechamento TIMESTAMP NOT NULL,
+    data_abertura DATE DEFAULT CURRENT_DATE,
+    data_fechamento DATE NOT NULL,
     status_processo_seletivo BOOLEAN DEFAULT TRUE,
     vaga_id INTEGER NOT NULL REFERENCES vaga(vaga_id)
 );

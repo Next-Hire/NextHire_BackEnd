@@ -127,7 +127,7 @@ namespace NextHireAPI.Controllers
         /// <param name="funcionarios">Lista de dados dos funcionários a serem cadastrados.</param>
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost("funcionarios/{empresaId}")]
-        [Authorize(Roles = "AnalistaRh,Adm")]
+        [Authorize(Roles = "adm")]
         [SwaggerOperation(Summary = "Cadastra funcionários de uma empresa", Description = "Cria um lote de funcionários vinculados ao ID da empresa informado. Requer perfil de Analista de RH ou Administrador.")]
         [SwaggerResponse(200, "Funcionários cadastrados com sucesso.")]
         [SwaggerResponse(400, "Dados inválidos ou empresa inexistente.")]

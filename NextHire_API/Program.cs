@@ -32,13 +32,13 @@ var acessKeyAws = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
 var secretKeyAws = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
 var regionName = Environment.GetEnvironmentVariable("AWS_REGION");
 
-if (string.IsNullOrWhiteSpace(acessKeyAws) || string.IsNullOrWhiteSpace(secretKeyAws) || string.IsNullOrWhiteSpace(regionName))
-    throw new DomainException("Credenciais da AWS não configuradas.");
+// if (string.IsNullOrWhiteSpace(acessKeyAws) || string.IsNullOrWhiteSpace(secretKeyAws) || string.IsNullOrWhiteSpace(regionName))
+//     throw new DomainException("Credenciais da AWS não configuradas.");
 
-var credenciais = new BasicAWSCredentials(acessKeyAws, secretKeyAws);
-var regiao = RegionEndpoint.GetBySystemName(regionName);
+// var credenciais = new BasicAWSCredentials(acessKeyAws, secretKeyAws);
+// var regiao = RegionEndpoint.GetBySystemName(regionName);
 
-builder.Services.AddSingleton<IAmazonS3>(varAux => new AmazonS3Client(credenciais, regiao));
+// builder.Services.AddSingleton<IAmazonS3>(varAux => new AmazonS3Client(credenciais, regiao));
 
 var conexaoBanco = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 var redisConnection = Environment.GetEnvironmentVariable("REDIS_CONNECTION");
@@ -239,6 +239,10 @@ builder.Services.AddScoped<InformacaoCandidatoService>();
 
 builder.Services.AddScoped<IAvaliacaoHabilidadeRepository, AvaliacaoHabilidadesRepository>();
 builder.Services.AddScoped<AvaliacaoHabilidadeService>();
+
+// Processo seletivo
+builder.Services.AddScoped<IProcessoSeletivoRepository, ProcessoSeletivoRepository>();
+builder.Services.AddScoped<ProcessoSeletivoService>();
 
 // Questao (Next Agent)
 builder.Services.AddScoped<IQuestaoRepository, QuestaoRepository>();

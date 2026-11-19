@@ -11,8 +11,7 @@ services:
     image: eukauecmp/nexthire-db:latest
     container_name: nexthire_api
     restart: always
-    env_file:
-      - .env
+    env_file: .env
     ports:
       - "8080:8080"
       - "5432:5432"  # Porta exposta para a API usar

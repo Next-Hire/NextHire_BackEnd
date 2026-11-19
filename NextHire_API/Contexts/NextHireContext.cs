@@ -505,8 +505,7 @@ public partial class NextHireContext : DbContext
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasColumnName("processo_seletivo_id");
             entity.Property(e => e.DataAbertura)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-
+                .HasDefaultValueSql("CURRENT_DATE")
                 .HasColumnName("data_abertura");
             entity.Property(e => e.DataFechamento)
 

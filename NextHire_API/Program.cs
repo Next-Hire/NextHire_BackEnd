@@ -195,6 +195,7 @@ builder.Services.AddScoped<VagaService>();
 
 // Curriculo
 builder.Services.AddScoped<CurriculoService>();
+builder.Services.AddScoped<ICurriculoCandidatoRepository, CurriculoCandidatoRepository>();
 builder.Services.AddHttpClient<GeminiCurriculoService>();
 builder.Services.AddHttpClient<GroqCurriculoService>();
 

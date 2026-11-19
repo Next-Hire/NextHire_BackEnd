@@ -21,7 +21,7 @@ namespace NextHire_API.Controllers
             _groqService = groqService;
         }
 
-        [HttpGet]
+        [HttpGet("GerarLinkPelaAWS")]
         public async Task<ActionResult> ObterCurriculo(string nomeObjeto)
         {
             try
@@ -35,6 +35,38 @@ namespace NextHire_API.Controllers
                 return NotFound(ex.Message);
             }
         }
+
+        [HttpGet("Listagem")]
+        public async Task<ActionResult<List<LerCurriculoCandidatoDTO>>> Listagem()
+        {
+            try
+            {
+                List<LerCurriculoCandidatoDTO> listarDTO = await _curriculoService.Listar();
+                return Ok(listarDTO);
+            }
+
+            catch(DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+
+        [HttpPost("CriarCurriculoCandidato")]
+        public async Task<ActionResult<CriarCurriculoDTO>> Criar([FromBody] CriarCurriculoDTO criarDTO)
+        {
+            try
+            {
+                CriarCurriculoDTO criarQuery = await _curriculoService.AdicionarCurriculo(criarDTO);
+                return Created();
+            }
+
+            catch(DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         //[HttpPost("curriculo/url/")]
         //public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorUrl(string url)

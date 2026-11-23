@@ -18,7 +18,7 @@ public class QuestaoService
     private readonly IQuestaoRepository _repository;
     private readonly NextAgentService _agente;
     private readonly ICandidato_QuestaoRepository _candidatoQuestaoRepository;
-
+    private readonly IVagaRepository _vagaRepository;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -27,10 +27,12 @@ public class QuestaoService
     public QuestaoService(
         IQuestaoRepository repository,
         NextAgentService agente,
+        IVagaRepository vagaRepository,
         ICandidato_QuestaoRepository candidatoQuestaoRepository)
     {
         _repository = repository;
         _agente = agente;
+        _vagaRepository = vagaRepository;
         _candidatoQuestaoRepository = candidatoQuestaoRepository;
     }
 
@@ -43,7 +45,7 @@ public class QuestaoService
         if (vagaId <= 0)
             throw new DomainException("Informe um ID de vaga válido.");
 
-        var vaga = await _repository.BuscarVagaParaAgente(vagaId);
+        var vaga = await _vagaRepository.BuscarPorId(vagaId);
 
         var geradas = await _agente.GerarQuestoes(MontarPayloadVaga(vaga));
 

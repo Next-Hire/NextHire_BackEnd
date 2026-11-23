@@ -19,6 +19,12 @@
   <ItemGroup>
     <None Include="Config\NextAgent\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Applications\Authentication\**" />
+    <Content Remove="Applications\Authentication\**" />
+    <EmbeddedResource Remove="Applications\Authentication\**" />
+    <None Remove="Applications\Authentication\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="4.1.0" />
@@ -55,7 +61,6 @@
 
   <ItemGroup>
     <Folder Include="Applications\Convertions\DomainToDto\" />
-    <Folder Include="Applications\Authentication\" />
     <Folder Include="Applications\Validations\" />
   </ItemGroup>
 

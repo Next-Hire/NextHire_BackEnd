@@ -19,10 +19,10 @@ using System.Text;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
-using NextHireAPI.Applications.Auth;
 using NextHire_API.Applications.S3;
 using NextHire_API.Applications.Integrations;
 using NextHire_API.Exceptions;
+using NextHire_API.Applications.Auth;
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

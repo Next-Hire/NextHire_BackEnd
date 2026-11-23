@@ -2,9 +2,9 @@ using NextHireAPI.Domains;
 using NextHireAPI.DTOs.Autenticacao;
 using NextHireAPI.Interfaces;
 using NextHireAPI.Applications.Conversions;
-using NextHireAPI.Applications.Auth;
 using NextHire_API.Domains;
 using NextHire_API.Exceptions;
+using NextHire_API.Applications.Auth;
 
 namespace NextHireAPI.Applications.Services
 {

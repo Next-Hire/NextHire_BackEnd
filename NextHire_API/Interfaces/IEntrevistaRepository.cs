@@ -1,0 +1,17 @@
+﻿using NextHire_API.Domains;
+
+namespace NextHire_API.Interfaces
+{
+    public interface IEntrevistaRepository
+    {
+        public Task<List<Entrevista>> Listar();
+        public Task<List<Entrevista>> EntrevistasHoje(DateTime data);
+        public Task<List<Entrevista>> BuscarPorCandidato(int candidatoId);
+        public Task<Entrevista?> BuscarPorId(int id);
+
+        public Task<Entrevista> AtualizarCandidatoNaEntrevista(int entrevistaId, int candidatoId);
+        public Task<Entrevista> AtualizarDataDaEntrevista(int entrevistaId, DateTime dataInicio, DateTime dataFinal);
+        public Task<Entrevista> AdicionarEntrevista(Entrevista entr);
+        public Task<Entrevista> RemoverEntrevista(int id);
+    }
+}

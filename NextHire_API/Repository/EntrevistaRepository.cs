@@ -1,0 +1,118 @@
+﻿using Microsoft.EntityFrameworkCore;
+using NextHire_API.Contexts;
+using NextHire_API.Domains;
+
+namespace NextHire_API.Interfaces
+{
+    public class EntrevistaRepository : IEntrevistaRepository
+    {
+        private readonly NextHireContext _ctx;
+        public EntrevistaRepository(NextHireContext ctx) => _ctx = ctx;
+
+        public async Task<List<Entrevista>> Listar()
+            => await _ctx.Entrevista
+            .AsNoTracking()
+            .Include(varAux => varAux.Candidato)
+                .ThenInclude(varAux => varAux.Comentario)
+            .Where(varAux => varAux.HorarioInicio >= DateTime.UtcNow)
+            .OrderBy(varAux => varAux.HorarioInicio)
+            .ToListAsync();
+
+
+        public async Task<List<Entrevista>> EntrevistasHoje(DateTime data)
+            {
+            DateTime inicioDoDia = data.Date;
+            DateTime fimDoDia = inicioDoDia.AddDays(0);
+
+            List<Entrevista> entrevistasHoje = await _ctx.Entrevista
+            .AsNoTracking()
+            .Include(varAux => varAux.Candidato)
+                .ThenInclude(varAux => varAux.Comentario)
+            .Where(varAux => varAux.HorarioInicio >= inicioDoDia && varAux.HorarioInicio < fimDoDia)
+            .OrderBy(varAux => varAux.HorarioInicio)
+            .ToListAsync();
+
+            return entrevistasHoje;
+            
+            }
+
+
+        public async Task<List<Entrevista>> BuscarPorCandidato(int candidatoId)
+        {
+            List<Entrevista> entrevistaQuery = await _ctx.Entrevista
+             .AsNoTracking()
+             .Include(varAux => varAux.Candidato)
+                 .ThenInclude(varAux => varAux.Comentario)
+             .Where(varAux => varAux.HorarioInicio >= DateTime.UtcNow && varAux.Candidato.Any(varAux => varAux.UsuarioId == candidatoId))
+           .OrderBy(varAux => varAux.HorarioInicio)
+           .ToListAsync();
+
+            return entrevistaQuery;
+        }
+
+
+        public async Task<Entrevista?> BuscarPorId(int id)
+            => await _ctx.Entrevista.FindAsync(id);
+
+        public async Task<Entrevista> AdicionarEntrevista(Entrevista entr)
+        {
+            await _ctx.Entrevista.AddAsync(entr);
+            await _ctx.SaveChangesAsync();
+
+            return entr;
+        }
+
+
+        public async Task<Entrevista> AtualizarCandidatoNaEntrevista(int entrevistaId, int candidatoId)
+        {
+            Entrevista? entrQuery = await _ctx.Entrevista.FindAsync(entrevistaId);
+
+            Usuario? usuarioQuery = await _ctx.Usuario
+                                    .Where(varAux => varAux.TipoUsuario == TipoUsuarioEnum.Candidato)
+                                    .FirstOrDefaultAsync(varAux => varAux.UsuarioId == candidatoId);
+
+            if (entrQuery == null || usuarioQuery == null)
+                return null;
+
+            entrQuery.Candidato.Clear();
+            entrQuery.Candidato.Add(usuarioQuery);
+
+            await _ctx.SaveChangesAsync();
+
+            return entrQuery;
+
+            
+        }
+   
+        public async Task<Entrevista> AtualizarDataDaEntrevista(int entrevistaId, DateTime dataInicio, DateTime dataFinal)
+        {
+            Entrevista? entrQuery = await _ctx.Entrevista.FindAsync(entrevistaId);
+            if (entrQuery == null)
+                return null;
+
+            DateTime inicioDoDia = dataInicio;
+            DateTime finalDoDia = dataFinal.Date;
+            
+
+            entrQuery.HorarioInicio = inicioDoDia;
+            entrQuery.HorarioFim = finalDoDia;
+
+            await _ctx.SaveChangesAsync();
+
+            return entrQuery;
+        }
+
+        public async Task<Entrevista> RemoverEntrevista(int id)
+        {
+            Entrevista? entrQuery = await _ctx.Entrevista.FindAsync(id);
+            if (entrQuery == null)
+                return null;
+
+            _ctx.Entrevista.Remove(entrQuery);
+            await _ctx.SaveChangesAsync();
+
+            return entrQuery;
+
+        }
+    }
+}

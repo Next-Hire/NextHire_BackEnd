@@ -255,6 +255,10 @@ builder.Services.AddHttpClient<NextAgentService>(client =>
     client.Timeout = TimeSpan.FromMinutes(5);
 });
 
+// Avaliação de candidaturas pelo Next Agent (nota + comentários)
+builder.Services.AddScoped<IAvaliacaoAgenteRepository, AvaliacaoAgenteRepository>();
+builder.Services.AddScoped<AvaliacaoAgenteService>();
+
 // cors btw
 
 builder.Services.AddCors(options =>

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using NextHire_API.Applications.Services;
+using NextHire_API.DTOs.AvaliacaoAgenteDTO;
 using NextHire_API.DTOs.CandidatoVagaDTO;
 using NextHire_API.DTOs.VagaDTO;
 using NextHire_API.Exceptions;
@@ -14,8 +15,15 @@ namespace NextHire_API.Controllers
     public class CurriculoVagaController : ControllerBase
     {
         private readonly CurriculoVagaService _service;
+        private readonly AvaliacaoAgenteService _avaliacaoService;
 
-        public CurriculoVagaController(CurriculoVagaService service) => _service = service;
+        public CurriculoVagaController(
+            CurriculoVagaService service,
+            AvaliacaoAgenteService avaliacaoService)
+        {
+            _service = service;
+            _avaliacaoService = avaliacaoService;
+        }
 
         /// <summary>Lista os candidatos que se candidataram a uma vaga.</summary>
         /// <param name="vagaId">ID da vaga cujos candidatos serão listados.</param>
@@ -98,6 +106,68 @@ namespace NextHire_API.Controllers
             catch (DomainException ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>Gera (e persiste) a avaliação do agente para uma candidatura.</summary>
+        /// <param name="vagaId">ID da vaga da candidatura.</param>
+        /// <param name="candidatoId">ID do candidato que se candidatou à vaga.</param>
+        /// <returns>Nota geral e comentários do agente sobre as respostas e o currículo.</returns>
+        [HttpPost("AvaliarCandidatura/vaga/{vagaId}/candidato/{candidatoId}")]
+        [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Avalia uma candidatura com o Next Agent", Description = "Envia a vaga, as respostas do candidato e o currículo ao agente (LM Studio), valida a resposta e persiste nota geral + comentários. Se já existir avaliação para o par candidato/vaga, ela é atualizada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerResponse(200, "Avaliação gerada e persistida.", typeof(ListarAvaliacaoAgenteDto))]
+        [SwaggerResponse(400, "Dados inválidos, candidatura/respostas inexistentes ou resposta inválida do agente.")]
+        public async Task<ActionResult<ListarAvaliacaoAgenteDto>> AvaliarCandidatura(int vagaId, int candidatoId)
+        {
+            try
+            {
+                return Ok(await _avaliacaoService.AvaliarCandidatura(vagaId, candidatoId));
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>Busca a avaliação do agente para uma candidatura.</summary>
+        /// <param name="vagaId">ID da vaga da candidatura.</param>
+        /// <param name="candidatoId">ID do candidato avaliado.</param>
+        /// <returns>Avaliação persistida (nota geral e comentários).</returns>
+        [HttpGet("Avaliacao/vaga/{vagaId}/candidato/{candidatoId}")]
+        [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Busca a avaliação de uma candidatura", Description = "Retorna a avaliação do agente já persistida para a candidatura informada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerResponse(200, "Avaliação encontrada.", typeof(ListarAvaliacaoAgenteDto))]
+        [SwaggerResponse(404, "Nenhuma avaliação encontrada para o candidato e vaga informados.")]
+        public async Task<ActionResult<ListarAvaliacaoAgenteDto>> BuscarAvaliacao(int vagaId, int candidatoId)
+        {
+            try
+            {
+                return Ok(await _avaliacaoService.Buscar(vagaId, candidatoId));
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        /// <summary>Lista as avaliações do agente de uma vaga.</summary>
+        /// <param name="vagaId">ID da vaga cujas avaliações serão listadas.</param>
+        /// <returns>Avaliações persistidas para a vaga, da maior para a menor nota.</returns>
+        [HttpGet("AvaliacoesPorVagaId/{vagaId}")]
+        [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Lista as avaliações de uma vaga", Description = "Retorna as avaliações do agente já persistidas para a vaga informada, ordenadas por nota. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerResponse(200, "Avaliações listadas com sucesso.", typeof(List<ListarAvaliacaoAgenteDto>))]
+        [SwaggerResponse(404, "Nenhuma avaliação encontrada para a vaga informada.")]
+        public async Task<ActionResult<List<ListarAvaliacaoAgenteDto>>> ListarAvaliacoesPorVagaId(int vagaId)
+        {
+            try
+            {
+                return Ok(await _avaliacaoService.ListarPorVaga(vagaId));
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
     }

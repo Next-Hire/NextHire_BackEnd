@@ -225,3 +225,16 @@ CREATE TABLE IF NOT EXISTS curriculo_vaga (
     data_hora_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_curriculo_vaga PRIMARY KEY (curriculo_id, vaga_id)
 );
+
+-- Avaliação gerada pelo Next Agent (LM Studio) para uma candidatura
+-- (candidato x vaga): nota geral + comentários sobre respostas e currículo.
+CREATE TABLE IF NOT EXISTS avaliacao_agente (
+    avaliacao_id SERIAL PRIMARY KEY,
+    nota_geral INTEGER NOT NULL CHECK (nota_geral BETWEEN 0 AND 100),
+    comentario_respostas TEXT NOT NULL,
+    comentario_curriculo TEXT NOT NULL,
+    data_avaliacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    vaga_id INTEGER NOT NULL REFERENCES vaga(vaga_id),
+    candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
+    CONSTRAINT uq_avaliacao_agente_vaga_candidato UNIQUE (vaga_id, candidato_id)
+);

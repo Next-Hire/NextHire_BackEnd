@@ -26,6 +26,7 @@ public partial class NextHireContext : DbContext
 
     public virtual DbSet<AreaOcupacao> AreaOcupacao { get; set; }
 
+    public virtual DbSet<AvaliacaoAgente> AvaliacaoAgente { get; set; }
     public virtual DbSet<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; }
 
     public virtual DbSet<CandidatoQuestao> CandidatoQuestao { get; set; }
@@ -162,6 +163,33 @@ public partial class NextHireContext : DbContext
                             "AreaOcupacaoId")
                             .HasColumnName("area_ocupacao_id");
                     });
+
+        });
+
+        modelBuilder.Entity<AvaliacaoAgente>(entity =>
+        {
+            entity.HasKey(e => e.AvaliacaoId).HasName("avaliacao_agente_pkey");
+            entity.ToTable("avaliacao_agente", "public");
+            entity.HasIndex(e => e.AvaliacaoId, "avaliacao_agente_pkey").IsUnique();
+            entity.HasIndex(e => new { e.VagaId, e.CandidatoId }, "uq_avaliacao_agente_vaga_candidato").IsUnique();
+            entity.Property(e => e.AvaliacaoId).HasColumnName("avaliacao_id");
+            entity.Property(e => e.NotaGeral).HasColumnName("nota_geral");
+            entity.Property(e => e.ComentarioRespostas).HasColumnName("comentario_respostas");
+            entity.Property(e => e.ComentarioCurriculo).HasColumnName("comentario_curriculo");
+            entity.Property(e => e.DataAvaliacao)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("data_avaliacao");
+            entity.Property(e => e.VagaId).HasColumnName("vaga_id");
+            entity.Property(e => e.CandidatoId).HasColumnName("candidato_id");
+
+            entity.HasOne(d => d.Candidato).WithMany()
+                .HasForeignKey(d => d.CandidatoId)
+                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("avaliacao_agente_candidato_id_fkey");
+
+            entity.HasOne(d => d.Vaga).WithMany()
+                .HasForeignKey(d => d.VagaId)
+                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("avaliacao_agente_vaga_id_fkey");
 
         });
 

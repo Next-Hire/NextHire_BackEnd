@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using NextHire_API.Domains;
+using NextHire_API.DTOs.AvaliacaoAgenteDTO;
 using NextHire_API.DTOs.QuestaoDTO;
 using NextHire_API.Exceptions;
 
@@ -96,6 +97,23 @@ public class NextAgentService
         - No ids, no extra fields.
         """;
 
+    private const string PromptAvaliacaoUsuario =
+        """
+        You are the candidate-evaluation engine of Next Hire (a job-application platform).
+        You receive a JSON with the job (vaga), the candidate's answers (with status
+        acertou/errou for objective questions) and the candidate's resume (curriculo).
+
+        OUTPUT RULES (absolute):
+        - Reply with ONE JSON object and nothing else: {"nota_geral":0,"comentario_respostas":"...","comentario_curriculo":"..."}
+        - The first character of your reply must be "{" and the last "}". No prose, no markdown, no code fences.
+        - All text in the language of the job ("language" field).
+        - nota_geral: integer 0-100, weighting: objective-question status (from the backend) + quality of the dissertative answers + coherence with the resume.
+        - comentario_respostas: direct human tone, citing real evidence (e.g., "na dissertativa 4 ele descreveu..."), distinguishing missing evidence from negative evidence, flagging inconsistencies.
+        - comentario_curriculo: job x resume comparison (matches, gaps, points to verify in interview). Use only received data - never invent experiences, technologies or facts.
+        - No extra fields, no hiring decision, no ranking.
+        - If resume or answers are missing, narrow the scope and explain it in the comments.
+        """;
+
     public NextAgentService(HttpClient http)
         => _http = http;
 
@@ -128,6 +146,31 @@ public class NextAgentService
         return await ChamarAgenteAsync(
             CarregarPromptConfig("system-prompt-generate-more-questions.md", PromptGerarMaisQuestoes),
             payload, quantidadeEsperada: 5);
+    }
+
+    /// <summary>
+    /// Operação evaluation_user: avalia a candidatura de um candidato a uma vaga
+    /// (respostas + currículo) e retorna nota geral e comentários do agente.
+    /// </summary>
+    public async Task<AvaliacaoAgenteDto> AvaliarCandidatura(object payloadCandidatura)
+    {
+        var payload = JsonSerializer.Serialize(new
+        {
+            operacao = "evaluation_user",
+            candidatura = payloadCandidatura
+        });
+
+        return await ChamarComValidacaoAsync(
+            CarregarPromptConfig("system-prompt-evaluation-user.md", PromptAvaliacaoUsuario),
+            payload,
+            CriarResponseFormatAvaliacao(),
+            conteudo =>
+            {
+                var avaliacao = ExtrairAvaliacao(conteudo);
+                ValidarAvaliacao(avaliacao);
+                return avaliacao;
+            },
+            descricaoRetorno: "avaliação válida");
     }
 
     // ======================================================================
@@ -165,6 +208,111 @@ public class NextAgentService
     }
 
     private async Task<List<QuestaoAgenteDto>> ChamarAgenteAsync(string systemPrompt, string userPayload, int quantidadeEsperada)
+        => await ChamarComValidacaoAsync(
+            systemPrompt,
+            userPayload,
+            CriarResponseFormatQuestoes(quantidadeEsperada),
+            conteudo =>
+            {
+                var questoes = ExtrairQuestoes(conteudo);
+                ValidarQuestoes(questoes, quantidadeEsperada);
+                return questoes;
+            },
+            descricaoRetorno: "questões válidas");
+
+    /// <summary>
+    /// Grammar estruturada das operações de geração de questões:
+    /// garante JSON parseável e a quantidade exata de questões (minItems/maxItems).
+    /// A validação em código cobre o restante (alternativas, gabarito).
+    /// </summary>
+    private static object CriarResponseFormatQuestoes(int quantidadeEsperada)
+        => new
+        {
+            type = "json_schema",
+            json_schema = new
+            {
+                name = "questoes_vaga",
+                strict = true,
+                schema = new
+                {
+                    type = "object",
+                    properties = new Dictionary<string, object>
+                    {
+                        ["questoes"] = new Dictionary<string, object>
+                        {
+                            ["type"] = "array",
+                            ["items"] = new Dictionary<string, object>
+                            {
+                                ["type"] = "object",
+                                ["properties"] = new Dictionary<string, object>
+                                {
+                                    ["texto_questao"] = new Dictionary<string, object> { ["type"] = "string" },
+                                    ["classificacao_questao"] = new Dictionary<string, object> { ["type"] = "string" },
+                                    ["tipo_questao"] = new Dictionary<string, object> { ["type"] = "string" },
+                                    ["dificuldade"] = new Dictionary<string, object> { ["type"] = "string" },
+                                    ["alternativas"] = new Dictionary<string, object>
+                                    {
+                                        ["type"] = "array",
+                                        ["items"] = new Dictionary<string, object>
+                                        {
+                                            ["type"] = "object",
+                                            ["properties"] = new Dictionary<string, object>
+                                            {
+                                                ["texto_alternativa"] = new Dictionary<string, object> { ["type"] = "string" },
+                                                ["alternativa_correta"] = new Dictionary<string, object> { ["type"] = "boolean" }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            ["minItems"] = quantidadeEsperada,
+                            ["maxItems"] = quantidadeEsperada
+                        }
+                    },
+                    required = new[] { "questoes" }
+                }
+            }
+        };
+
+    /// <summary>Grammar estruturada da operação evaluation_user.</summary>
+    private static object CriarResponseFormatAvaliacao()
+        => new
+        {
+            type = "json_schema",
+            json_schema = new
+            {
+                name = "avaliacao_candidatura",
+                strict = true,
+                schema = new
+                {
+                    type = "object",
+                    properties = new Dictionary<string, object>
+                    {
+                        ["nota_geral"] = new Dictionary<string, object>
+                        {
+                            ["type"] = "integer",
+                            ["minimum"] = 0,
+                            ["maximum"] = 100
+                        },
+                        ["comentario_respostas"] = new Dictionary<string, object> { ["type"] = "string" },
+                        ["comentario_curriculo"] = new Dictionary<string, object> { ["type"] = "string" }
+                    },
+                    required = new[] { "nota_geral", "comentario_respostas", "comentario_curriculo" }
+                }
+            }
+        };
+
+    /// <summary>
+    /// Executa a operação no LM Studio com a grammar estruturada informada,
+    /// extrai o JSON da resposta e delega a interpretação/validação para quem chamou.
+    /// Repete até MaxTentativas (modelo estocástico).
+    /// </summary>
+    private async Task<T> ChamarComValidacaoAsync<T>(
+        string systemPrompt,
+        string userPayload,
+        object responseFormat,
+        Func<string?, T> interpretar,
+        string descricaoRetorno)
     {
         var corpo = new Dictionary<string, object?>
         {
@@ -177,55 +325,7 @@ public class NextAgentService
             ["temperature"] = 0.2,
             ["max_tokens"] = 8192,
             ["stream"] = false,
-            // Grammar estruturada: garante JSON parseável e a quantidade exata de questões
-            // (minItems/maxItems). A validação abaixo cobre o restante (alternativas, gabarito).
-            ["response_format"] = new
-            {
-                type = "json_schema",
-                json_schema = new
-                {
-                    name = "questoes_vaga",
-                    strict = true,
-                    schema = new
-                    {
-                        type = "object",
-                        properties = new Dictionary<string, object>
-                        {
-                            ["questoes"] = new Dictionary<string, object>
-                            {
-                                ["type"] = "array",
-                                ["items"] = new Dictionary<string, object>
-                                {
-                                    ["type"] = "object",
-                                    ["properties"] = new Dictionary<string, object>
-                                    {
-                                        ["texto_questao"] = new Dictionary<string, object> { ["type"] = "string" },
-                                        ["classificacao_questao"] = new Dictionary<string, object> { ["type"] = "string" },
-                                        ["tipo_questao"] = new Dictionary<string, object> { ["type"] = "string" },
-                                        ["dificuldade"] = new Dictionary<string, object> { ["type"] = "string" },
-                                        ["alternativas"] = new Dictionary<string, object>
-                                        {
-                                            ["type"] = "array",
-                                            ["items"] = new Dictionary<string, object>
-                                            {
-                                                ["type"] = "object",
-                                                ["properties"] = new Dictionary<string, object>
-                                                {
-                                                    ["texto_alternativa"] = new Dictionary<string, object> { ["type"] = "string" },
-                                                    ["alternativa_correta"] = new Dictionary<string, object> { ["type"] = "boolean" }
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                ["minItems"] = quantidadeEsperada,
-                                ["maxItems"] = quantidadeEsperada
-                            }
-                        },
-                        required = new[] { "questoes" }
-                    }
-                }
-            }
+            ["response_format"] = responseFormat
         };
 
         Exception? ultimoErro = null;
@@ -244,10 +344,7 @@ public class NextAgentService
                     .GetProperty("content")
                     .GetString();
 
-                var questoes = ExtrairQuestoes(conteudo);
-                ValidarQuestoes(questoes, quantidadeEsperada);
-
-                return questoes;
+                return interpretar(conteudo);
             }
             catch (Exception ex)
             {
@@ -257,7 +354,7 @@ public class NextAgentService
             }
         }
 
-        throw new DomainException($"O agente não retornou questões válidas após {MaxTentativas} tentativas: {ultimoErro?.Message}");
+        throw new DomainException($"O agente não retornou {descricaoRetorno} após {MaxTentativas} tentativas: {ultimoErro?.Message}");
     }
 
     /// <summary>Extrai o JSON da resposta (o modelo pode incluir prose ou code fences).</summary>
@@ -279,6 +376,43 @@ public class NextAgentService
             throw new Exception("Resposta do agente sem questões.");
 
         return resposta.questoes;
+    }
+
+    /// <summary>Extrai o JSON da avaliação (o modelo pode incluir prose ou code fences).</summary>
+    private static AvaliacaoAgenteDto ExtrairAvaliacao(string? conteudo)
+    {
+        if (string.IsNullOrWhiteSpace(conteudo))
+            throw new Exception("Resposta vazia do agente.");
+
+        var inicio = conteudo.IndexOf('{');
+        var fim = conteudo.LastIndexOf('}');
+
+        if (inicio < 0 || fim <= inicio)
+            throw new Exception("Resposta do agente não contém JSON.");
+
+        var avaliacao = JsonSerializer.Deserialize<AvaliacaoAgenteDto>(
+            conteudo.Substring(inicio, fim - inicio + 1), JsonOptions);
+
+        if (avaliacao == null)
+            throw new Exception("Resposta do agente sem avaliação.");
+
+        return avaliacao;
+    }
+
+    /// <summary>
+    /// Validação obrigatória da avaliação (modelo estocástico):
+    /// nota_geral inteiro entre 0 e 100 e os dois comentários preenchidos.
+    /// </summary>
+    private static void ValidarAvaliacao(AvaliacaoAgenteDto avaliacao)
+    {
+        if (avaliacao.nota_geral is < 0 or > 100)
+            throw new Exception($"nota_geral fora do intervalo 0-100: {avaliacao.nota_geral}.");
+
+        if (string.IsNullOrWhiteSpace(avaliacao.comentario_respostas))
+            throw new Exception("Avaliação sem comentário sobre as respostas.");
+
+        if (string.IsNullOrWhiteSpace(avaliacao.comentario_curriculo))
+            throw new Exception("Avaliação sem comentário sobre o currículo.");
     }
 
     /// <summary>
@@ -360,5 +494,15 @@ public class NextAgentService
             "tecnica" => ClassificacaoQuestaoEnum.Tecnica,
             "situacional" => ClassificacaoQuestaoEnum.Situacional,
             _ => throw new DomainException($"classificacao_questao inválida: {valor}. Valores aceitos: comportamental, tecnica, situacional.")
+        };
+
+    /// <summary>Converte o enum do banco para a string técnica do contrato do agente.</summary>
+    public static string ConverterTipoQuestaoParaString(TipoQuestaoEnum tipo)
+        => tipo switch
+        {
+            TipoQuestaoEnum.VerdadeiroFalso => "verdadeiro_falso",
+            TipoQuestaoEnum.UnicaEscolha => "unica_escolha",
+            TipoQuestaoEnum.MultiplaEscolha => "multipla_escolha",
+            _ => "dissertativa"
         };
 }

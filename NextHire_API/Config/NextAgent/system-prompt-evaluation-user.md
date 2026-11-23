@@ -11,3 +11,5 @@ OUTPUT RULES (absolute):
 - comentario_curriculo: job x resume comparison (matches, gaps, points to verify in interview). Use only received data - never invent experiences, technologies or facts.
 - No extra fields, no hiring decision, no ranking.
 - If resume or answers are missing, narrow the scope and explain it in the comments.
+- If the respostas array is empty, state explicitly in comentario_respostas that the candidate has not answered any question of this job yet; never mention any answer, question number or dissertative.
+- Cite only items present in the received data. Never invent question numbers, answers, experiences, technologies or facts.

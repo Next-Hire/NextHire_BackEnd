@@ -52,7 +52,7 @@ public class AvaliacaoAgenteService
         var candidatura = candidaturas.FirstOrDefault(c => c.Curriculo.CandidatoId == candidatoId)
             ?? throw new DomainException("O candidato informado não possui candidatura para esta vaga.");
 
-        var respostas = await _questaoService.VerificarRespostas(candidatoId, vagaId);
+        var respostas = await ObterRespostas(candidatoId, vagaId);
 
         var payload = new
         {
@@ -74,6 +74,12 @@ public class AvaliacaoAgenteService
 
         var avaliacao = await _agente.AvaliarCandidatura(payload);
 
+        // Sem respostas não há evidência para comentar: o modelo pequeno tende a
+        // "inventar" dissertativas. Nesse caso o comentário é factual e determinístico.
+        if (respostas.Count == 0)
+            avaliacao.comentario_respostas =
+                "O candidato ainda não respondeu nenhuma questão desta vaga; esta avaliação considera apenas o currículo.";
+
         var salva = await _repository.Salvar(new AvaliacaoAgente
         {
             VagaId = vagaId,
@@ -87,6 +93,25 @@ public class AvaliacaoAgenteService
         dto.nomeCandidato ??= candidatura.Curriculo.Candidato.Nome;
 
         return dto;
+    }
+
+    /// <summary>
+    /// Gera a avaliação a partir da candidatura recém-registrada (currículo x vaga),
+    /// resolvendo o candidato dono do currículo.
+    /// </summary>
+    public async Task<ListarAvaliacaoAgenteDto> AvaliarCandidaturaPorCurriculo(int curriculoId, int vagaId)
+    {
+        if (curriculoId <= 0)
+            throw new DomainException("Selecione um currículo para prosseguir.");
+
+        if (vagaId <= 0)
+            throw new DomainException("Informe um ID de vaga válido.");
+
+        var candidaturas = await _curriculoVagaRepository.ListarCandidatosPorVagaId(vagaId);
+        var candidatura = candidaturas?.FirstOrDefault(c => c.CurriculoId == curriculoId)
+            ?? throw new DomainException("Candidatura não encontrada para o currículo e vaga informados.");
+
+        return await AvaliarCandidatura(vagaId, candidatura.Curriculo.CandidatoId);
     }
 
     public async Task<ListarAvaliacaoAgenteDto> Buscar(int vagaId, int candidatoId)
@@ -116,6 +141,23 @@ public class AvaliacaoAgenteService
     // ======================================================================
     // Helpers
     // ======================================================================
+
+    /// <summary>
+    /// Obtém as respostas com gabarito. Se o candidato ainda não respondeu nenhuma
+    /// questão da vaga (caso normal logo após se candidatar), retorna lista vazia:
+    /// o agente avalia só o currículo e relata a ausência de evidências.
+    /// </summary>
+    private async Task<List<VerificarQuestaoDto>> ObterRespostas(int candidatoId, int vagaId)
+    {
+        try
+        {
+            return await _questaoService.VerificarRespostas(candidatoId, vagaId);
+        }
+        catch (DomainException)
+        {
+            return new List<VerificarQuestaoDto>();
+        }
+    }
 
     private static Dictionary<string, object?> MontarRespostaPayload(VerificarQuestaoDto resposta)
     {

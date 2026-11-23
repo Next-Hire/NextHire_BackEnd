@@ -16,13 +16,16 @@ namespace NextHire_API.Controllers
     {
         private readonly CurriculoVagaService _service;
         private readonly AvaliacaoAgenteService _avaliacaoService;
+        private readonly ILogger<CurriculoVagaController> _logger;
 
         public CurriculoVagaController(
             CurriculoVagaService service,
-            AvaliacaoAgenteService avaliacaoService)
+            AvaliacaoAgenteService avaliacaoService,
+            ILogger<CurriculoVagaController> logger)
         {
             _service = service;
             _avaliacaoService = avaliacaoService;
+            _logger = logger;
         }
 
         /// <summary>Lista os candidatos que se candidataram a uma vaga.</summary>
@@ -65,13 +68,13 @@ namespace NextHire_API.Controllers
             }
         }
 
-        /// <summary>Efetua a candidatura de um currículo a uma vaga.</summary>
+        /// <summary>Efetua a candidatura de um currículo a uma vaga e gera a avaliação do agente.</summary>
         /// <param name="curriculoId">ID do currículo que será vinculado à vaga.</param>
         /// <param name="vagaId">ID da vaga alvo da candidatura.</param>
         /// <returns>Mensagem de confirmação do envio da candidatura.</returns>
         [HttpPost("EfetuarCandidatura/curriculo/{curriculoId}/vaga/{vagaId}")]
         [Authorize(Roles = "Candidato")]
-        [SwaggerOperation(Summary = "Efetua uma candidatura", Description = "Registra a candidatura do currículo informado à vaga informada. Requer perfil de Candidato.")]
+        [SwaggerOperation(Summary = "Efetua uma candidatura", Description = "Registra a candidatura do currículo informado à vaga informada e, em seguida, gera e persiste a avaliação do Next Agent (nota + comentários). A candidatura é mantida mesmo se a avaliação falhar. Requer perfil de Candidato.")]
         [SwaggerResponse(201, "Candidatura enviada.")]
         [SwaggerResponse(400, "Falha ao efetuar a candidatura (dados inválidos ou candidatura já existente).")]
         public async Task<ActionResult> EfetuarCandidatura(int curriculoId, int vagaId)
@@ -79,12 +82,28 @@ namespace NextHire_API.Controllers
             try
             {
                 await _service.EfetuarCandidatura(curriculoId, vagaId);
-                return StatusCode(201, "Candidatura enviada.");
             }
             catch (DomainException ex)
             {
                 return BadRequest(ex.Message);
             }
+
+            // A candidatura já está persistida: uma falha do agente (LM Studio fora,
+            // timeout ou resposta inválida) não deve desfazer nem invalidar a candidatura.
+            try
+            {
+                await _avaliacaoService.AvaliarCandidaturaPorCurriculo(curriculoId, vagaId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Falha ao gerar a avaliação automática da candidatura (currículo {CurriculoId}, vaga {VagaId}).",
+                    curriculoId,
+                    vagaId);
+            }
+
+            return StatusCode(201, "Candidatura enviada.");
         }
 
         /// <summary>Cancela a candidatura de um currículo a uma vaga.</summary>

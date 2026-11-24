@@ -160,6 +160,12 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<IComentarioRepository, ComentarioRepository>();
 builder.Services.AddScoped<ComentarioService>();
 
+// Entrevistas
+
+
+builder.Services.AddScoped<IEntrevistaRepository, EntrevistaRepository>();
+builder.Services.AddScoped<EntrevistaService>();
+
 // Vaga
 builder.Services.AddScoped<IVagaRepository, VagaRepository>();
 builder.Services.AddScoped<VagaService>();

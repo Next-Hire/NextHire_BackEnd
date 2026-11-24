@@ -24,6 +24,8 @@ System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeM
 var builder = WebApplication.CreateBuilder(args);
 
 var conexaoBanco = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+
 var redisConnection = Environment.GetEnvironmentVariable("REDIS_CONNECTION");
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
 
@@ -182,6 +184,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<NextHireContext>();
+    db.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 
 if (app.Environment.IsDevelopment())

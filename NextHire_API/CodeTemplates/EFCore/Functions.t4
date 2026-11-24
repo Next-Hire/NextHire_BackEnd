@@ -1,0 +1,392 @@
+﻿<#@ template hostSpecific="true" debug="false" #>
+<#@ assembly name="EntityFrameworkRuler.Design" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Design" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Relational" #>
+<#@ assembly name="Microsoft.Extensions.DependencyInjection.Abstractions" #>
+<#@ parameter name="Model" type="EntityFrameworkRuler.Design.Metadata.ModelEx" #>
+<#@ parameter name="Options" type="Microsoft.EntityFrameworkCore.Scaffolding.ModelCodeGenerationOptions" #>
+<#@ parameter name="NamespaceHint" type="System.String" #>
+<#@ parameter name="ProjectDefaultNamespace" type="System.String" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Infrastructure" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
+<#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Metadata.Builders" #>
+<#@ import namespace="EntityFrameworkRuler.Design.Metadata" #>
+<#@ import namespace="System.Data" #>
+<#
+    if (!Int32.TryParse(ProductInfo.GetVersion()?.Split('.').FirstOrDefault()??"0", out var version) || version > 8) {
+        Warning(
+            "Your templates were created using an older version of Entity Framework. Additional features and bug fixes may be available. See https://aka.ms/efcore-docs-updating-templates for more information.");
+    }
+
+    var services = (IServiceProvider)Host;
+    var providerCode = services.GetRequiredService<IProviderConfigurationCodeGenerator>();
+    var annotationCodeGenerator = services.GetRequiredService<IAnnotationCodeGenerator>();
+    var code = services.GetRequiredService<ICSharpHelper>();
+
+    var usings = new List<string> {
+        "Microsoft.Data.SqlClient",
+        "Microsoft.EntityFrameworkCore",
+        "System",
+        "System.Collections.Generic",
+        "System.Data",
+        "System.Threading",
+        "System.Threading.Tasks",
+    };
+
+    if (NamespaceHint != Options.ModelNamespace
+        && !string.IsNullOrEmpty(Options.ModelNamespace)) {
+        usings.Add(Options.ModelNamespace);
+    }
+    var useDapper = Model.GetFunctions().Any(f => f.SupportsMultipleResultSet);
+    if (useDapper) {
+        usings.Add("Dapper");
+        usings.Add("Microsoft.EntityFrameworkCore.Storage");
+        usings.Add("System.Linq");
+    }
+    usings.Add(typeof(EntityTypeBuilder<>).Namespace);
+
+    ISet<SqlDbType> scaleTypes = new HashSet<SqlDbType> {
+        SqlDbType.Decimal,
+        SqlDbType.Money,
+        SqlDbType.SmallMoney,
+    };
+    ISet<SqlDbType> varTimeTypes = new HashSet<SqlDbType> {
+        SqlDbType.DateTimeOffset,
+        SqlDbType.DateTime2,
+        SqlDbType.Time,
+    };
+    ISet<SqlDbType> lengthRequiredTypes = new HashSet<SqlDbType> {
+        SqlDbType.Binary,
+        SqlDbType.VarBinary,
+        SqlDbType.Char,
+        SqlDbType.VarChar,
+        SqlDbType.NChar,
+        SqlDbType.NVarChar,
+    };
+
+    if (!string.IsNullOrEmpty(NamespaceHint)) {
+#>
+namespace <#= NamespaceHint #>;
+
+<#
+    }
+#>
+public partial class <#= Options.ContextName #>Functions : I<#= Options.ContextName #>Functions
+{
+    private readonly <#= Options.ContextName #> _context; 
+   
+    public <#= Options.ContextName #>Functions(<#= Options.ContextName #> context)
+    {
+        _context = context;
+    }   
+<#
+    var anyConfiguration = false;
+    StringBuilder mainEnvironment;
+    foreach (var function in Model.GetFunctions()) {
+        if (function?.Name != null && function.CommandText != null) {
+            anyConfiguration = true;
+            // Save all previously generated code, and start generating into a new temporary environment
+            mainEnvironment = GenerationEnvironment;
+            GenerationEnvironment = new StringBuilder();
+
+            bool anyFunctionConfiguration = false;
+
+            var paramStrings = function.GetParameters().Where(p => !p.IsOutput)
+                .Select(
+                    p => $"{code.Reference(p.ClrType ?? typeof(object))} {code.Identifier(p.Name, capitalize: false)}")
+                .ToList();
+            var paramStringFull = string.Join(", ", paramStrings);
+            var allOutParams =
+                function.GetParameters().Where(p => p.IsOutput && !string.IsNullOrWhiteSpace(p.Name)).ToList();
+            var outParams = allOutParams.SkipLast(1).ToList();
+            var retValueParam = allOutParams.LastOrDefault();
+            var retValueName = retValueParam?.Name;
+            if (retValueName != null)
+                retValueName = code.Identifier(allOutParams.LastOrDefault()?.Name, capitalize: false);
+            var outParamStrings = outParams.Select(p => $"OutputParameter<{code.Reference(p.ClrType ?? typeof(object))}> {code.Identifier(p.Name, capitalize: false)}").ToList();
+
+            var multiResultSyntax = function.MultiResultTupleSyntax;
+
+            if (outParams.Any()) {
+                if (!string.IsNullOrWhiteSpace(paramStringFull)) paramStringFull += ", ";
+                paramStringFull += string.Join(", ", outParamStrings);
+            }
+
+            if (!string.IsNullOrWhiteSpace(retValueName)) {
+                if (!string.IsNullOrWhiteSpace(paramStringFull)) paramStringFull += ", ";
+                paramStringFull += $"OutputParameter<int> {retValueName} = null";
+            }
+            if (!string.IsNullOrWhiteSpace(paramStringFull)) paramStringFull += ", ";
+#>
+
+    public virtual async Task<<#= function.ReturnType ?? "int" #>> <#= function.Name #>(<#= paramStringFull #>CancellationToken cancellationToken = default)
+    {
+<#
+            foreach (var parameter in allOutParams) {
+#>
+        SqlParameter p<#= parameter.Name #>;
+<#
+            }
+#>
+        var sqlParameters = new object[]
+        {
+<#
+            foreach (var parameter in function.GetParameters()) {
+                // Start SQL param
+                anyFunctionConfiguration = true;
+#>
+            <#=
+                    parameter.IsOutput ? "p" + parameter.Name + " = " : string.Empty #>new SqlParameter
+            {
+                ParameterName = <#= code.Literal(parameter.Name) #>,
+<#
+                if (IsScaleType(parameter.SqlDbType)) {
+                    if (parameter.Precision > 0) {
+#>
+                Precision = <#= parameter.Precision #>,
+<#
+                    }
+
+                    if (parameter.Scale > 0) {
+#>
+                Scale = <#= parameter.Scale #>,
+<#
+                    }
+                }
+
+                if (IsVarTimeType(parameter.SqlDbType) && parameter.Scale > 0) {
+#>
+                Scale = <#= parameter.Scale #>,
+<#
+                }
+
+                if (IsLengthRequiredType(parameter.SqlDbType)) {
+#>
+                Size = <#= parameter.Length #>,
+<#
+                }
+
+                if (!parameter.IsReturnValue) {
+                    if (parameter.IsOutput) {
+#>
+                Direction = System.Data.ParameterDirection.InputOutput,<#=
+                            AppendValue(parameter) #>
+<#
+                    }
+                    else {
+#>
+                <#=
+                            AppendValue(parameter) #>
+<#
+                    }
+                }
+                else {
+                    if (function.SupportsMultipleResultSet) {
+#>
+                Direction = System.Data.ParameterDirection.ReturnValue,
+<#
+                    }
+                    else {
+#>
+                Direction = System.Data.ParameterDirection.Output,
+<#
+                    }
+                }
+#>
+                SqlDbType = System.Data.SqlDbType.<#= parameter.SqlDbType #>,
+<#
+                if (parameter.SqlDbType == SqlDbType.Structured) {
+#>
+                TypeName = <#=
+                        code.Literal(parameter.TypeName) #>,
+<#
+                }
+
+                if (parameter.SqlDbType == SqlDbType.Udt) {
+#>
+                UdtTypeName = <#=
+                        code.Literal(parameter.TypeName) #>,
+<#
+                }
+#>
+            }, 
+
+<#
+                // End of parameter output
+            }
+#>
+        }; 
+
+<#
+            // End of parameter list output
+
+            if (function.HasAcquiredResultSchema && function.ResultEntities.Count == 0 && string.IsNullOrEmpty(function.ReturnType)) {
+#>
+        var response = await _context.Database.ExecuteSqlRawAsync(<#= code.Literal(function.CommandText) #>, sqlParameters, cancellationToken);
+<#
+            }
+            else {
+                if (function.SupportsMultipleResultSet) {
+#>
+        var dynamic = CreateDynamic(sqlParameters);
+        <#= multiResultSyntax #> _;
+        using var reader = await GetMultiReaderAsync(_context, dynamic, <#=
+                            code.Literal($"[{function.Schema}].[{function.Name}]") #>);
+        var response = <#=
+                        GenerateMultiResultStatement(function) #>;        
+<#
+                }
+                else {
+                    var genericArg = function.IsTableValuedFunction ? "" : (function.ReturnType ?? "int");
+                    if (genericArg?.StartsWith("List<") == true) {
+                        genericArg = genericArg.Substring(5, genericArg.Length - 6);
+                    }
+                    if (genericArg?.Length > 0) genericArg = $"<{genericArg}>";
+                    string method;
+                    if (function.ResultEntities.Count > 0)
+                        method = "SqlQueryAsync";
+                    else if (function.IsScalar)
+                        method = "SqlQueryRawScalarAsync";
+                    else if (function.IsTableValuedFunction)
+                        method = "SqlQueryRawTableAsync";
+                    else
+                        method = "SqlQueryRawAsync";
+
+                    if (genericArg?.Length>0)
+                    {
+#>
+        var response = await _context.<#= method #><#= genericArg #>(<#=code.Literal(function.CommandText) #>, sqlParameters, cancellationToken);
+<#
+                    } else
+                    {
+#>
+        var response = await _context.<#= method #>(<#=code.Literal(function.CommandText) #>, sqlParameters, cancellationToken);
+<#
+                    }
+                }
+            }
+
+            foreach (var parameter in outParams) {
+#>
+        <#=
+                    code.Identifier(parameter.Name, capitalize: false) #>?.SetValue(p<#= parameter.Name #>.Value);//a
+<#
+            }
+            if (function.SupportsMultipleResultSet && retValueParam != null && retValueName != null) {
+#>
+        <#= retValueName #>?.SetValue(dynamic.Get<int>(p<#= retValueParam.Name #>.ParameterName));//b
+<#
+            }
+            else if (retValueParam != null && retValueName != null) {
+#>
+        <#= retValueName #>?.SetValue(p<#= retValueParam.Name #>.Value);
+<#
+            }
+#>
+        return response;
+<#
+#>
+    } 
+<#
+            // End of function output
+            // If any significant code was generated, append it to the main environment
+            if (anyFunctionConfiguration) {
+                mainEnvironment.Append(GenerationEnvironment);
+                anyConfiguration = true;
+            }
+
+            // Resume generating code into the main environment
+            GenerationEnvironment = mainEnvironment;
+        }
+    }
+
+    if (useDapper) {
+#>
+
+    private static DynamicParameters CreateDynamic(object[] sqlParameters)
+    {
+        var dynamic = new DynamicParameters();
+        foreach (var sqlParameter in sqlParameters.Cast<SqlParameter>())
+        {
+            dynamic.Add(sqlParameter.ParameterName, sqlParameter.Value, sqlParameter.DbType, sqlParameter.Direction, sqlParameter.Size, sqlParameter.Precision, sqlParameter.Scale);
+        }
+
+        return dynamic;
+    }
+
+    private async Task<SqlMapper.GridReader> GetMultiReaderAsync(DbContext db, DynamicParameters dynamic, string sql)
+    {
+        IDbTransaction tran = null;
+        if (db.Database.CurrentTransaction is IDbContextTransaction ctxTran)
+        {
+            tran = ctxTran.GetDbTransaction();
+        }
+
+        return await ((IDbConnection)db.Database.GetDbConnection())
+            .QueryMultipleAsync(sql, dynamic, tran, db.Database.GetCommandTimeout(), CommandType.StoredProcedure);
+    }
+<#
+    }
+
+    if (anyConfiguration) {
+        WriteLine("");
+    }
+#>
+    
+}
+<#
+    mainEnvironment = GenerationEnvironment;
+    GenerationEnvironment = new StringBuilder();
+
+    foreach (var ns in usings.Distinct().OrderBy(x => x, new NamespaceComparer())) {
+#>
+using <#= ns #>;
+<#
+    }
+
+    WriteLine("");
+
+    GenerationEnvironment.Append(mainEnvironment);
+
+    string AppendValue(Parameter parameter) {
+        var value = parameter.IsNullable
+            ? $"{code.Identifier(parameter.Name, capitalize: false)} ?? Convert.DBNull"
+            : $"{code.Identifier(parameter.Name, capitalize: false)}";
+        if (parameter.IsOutput) {
+            value = parameter.IsNullable
+                ? $"{code.Identifier(parameter.Name, capitalize: false)}?._value ?? Convert.DBNull"
+                : $"{code.Identifier(parameter.Name, capitalize: false)}?._value";
+        }
+
+        return ($"Value = {value},");
+    }
+
+    string GenerateMultiResultStatement(EntityFrameworkRuler.Design.Metadata.Function function) {
+        if (function.ResultEntities.Count == 0) return null;
+
+        var ids = new List<string>();
+        foreach (var entity in function.ResultEntities)
+            ids.Add($"(await reader.ReadAsync<{entity.Name}>()).ToList()");
+
+        return $"({string.Join(", ", ids)})";
+    }
+
+    bool IsScaleType(SqlDbType sqlDbType) {
+        return scaleTypes.Contains(sqlDbType);
+    }
+
+    bool IsVarTimeType(SqlDbType sqlDbType) {
+        return varTimeTypes.Contains(sqlDbType);
+    }
+
+    bool IsLengthRequiredType(SqlDbType sqlDbType) {
+        return lengthRequiredTypes.Contains(sqlDbType);
+    }
+#>

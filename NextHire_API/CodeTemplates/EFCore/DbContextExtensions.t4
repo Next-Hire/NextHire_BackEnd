@@ -1,0 +1,226 @@
+﻿<#@ template hostSpecific="true" debug="false" #>
+<#@ assembly name="EntityFrameworkRuler.Design" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Design" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Relational" #>
+<#@ assembly name="Microsoft.Extensions.DependencyInjection.Abstractions" #>
+<#@ parameter name="Model" type="EntityFrameworkRuler.Design.Metadata.ModelEx" #>
+<#@ parameter name="Options" type="Microsoft.EntityFrameworkCore.Scaffolding.ModelCodeGenerationOptions" #>
+<#@ parameter name="NamespaceHint" type="System.String" #>
+<#@ parameter name="ProjectDefaultNamespace" type="System.String" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Infrastructure" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
+<#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Metadata.Builders" #>
+<#@ import namespace="EntityFrameworkRuler.Design.Metadata" #>
+<#@ import namespace="System.Data" #>
+<# 
+
+            if (!Int32.TryParse(ProductInfo.GetVersion()?.Split('.').FirstOrDefault()??"0", out var version) || version > 8) {
+                Warning(
+                    "Your templates were created using an older version of Entity Framework. Additional features and bug fixes may be available. See https://aka.ms/efcore-docs-updating-templates for more information.");
+            }
+
+            var services = (IServiceProvider)Host;
+            var providerCode = services.GetRequiredService<IProviderConfigurationCodeGenerator>();
+            var annotationCodeGenerator = services.GetRequiredService<IAnnotationCodeGenerator>();
+            var code = services.GetRequiredService<ICSharpHelper>();
+
+            var usings = new List<string> {
+                "System",
+                "System.Collections.Generic",
+                "System.Data",
+                "System.Data.Common",
+                "System.Linq",
+                "Microsoft.Data.SqlClient",
+                "Microsoft.EntityFrameworkCore",
+                "System.Threading",
+                "System.Threading.Tasks",
+            };
+
+            if (NamespaceHint != Options.ModelNamespace
+                && !string.IsNullOrEmpty(Options.ModelNamespace)) {
+                usings.Add(Options.ModelNamespace);
+            }
+            usings.Add(typeof(EntityTypeBuilder<>).Namespace); 
+
+            if (!string.IsNullOrEmpty(NamespaceHint)) {
+#>
+namespace <#= NamespaceHint #>;
+
+<#
+            }
+#>
+public static class DbContextExtensions
+{
+    public static bool AllowStringGuidConversion { get; set; } = true;
+
+    public static async Task<List<T>> SqlQueryAsync<T>(this DbContext db, string sql, object[] parameters = null, CancellationToken cancellationToken = default) where T : class
+    {
+        if (parameters is null) 
+            parameters = Array.Empty<object>();
+
+        if (typeof(T).GetProperties().Any())
+            return await db.Set<T>().FromSqlRaw(sql, parameters).ToListAsync(cancellationToken);
+        else
+        {
+            await db.Database.ExecuteSqlRawAsync(sql, parameters, cancellationToken);
+            return default;
+        }
+    }
+
+    /// <summary>
+    ///     Creates a LINQ query based on a raw SQL query, which returns a result set of a scalar type natively supported by the database
+    ///     provider.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         To use this method with a return type that isn't natively supported by the database provider, use the
+    ///         <see cref="ModelConfigurationBuilder.DefaultTypeMapping{TScalar}(Action{TypeMappingConfigurationBuilder{TScalar}})" />
+    ///         method.
+    ///     </para>
+    ///     <para>
+    ///         The returned <see cref="IQueryable{TResult}" /> can be composed over using LINQ to build more complex queries.
+    ///     </para>
+    ///     <para>
+    ///         Note that this method does not start a transaction. To use this method with a transaction, first call
+    ///         <see cref="BeginTransaction" /> or <see cref="O:UseTransaction" />.
+    ///     </para>
+    ///     <para>
+    ///         As with any API that accepts SQL it is important to parameterize any user input to protect against a SQL injection
+    ///         attack. You can include parameter place holders in the SQL query string and then supply parameter values as additional
+    ///         arguments. Any parameter values you supply will automatically be converted to a DbParameter.
+    ///     </para>
+    ///     <para>
+    ///         However, <b>never</b> pass a concatenated or interpolated string (<c>$""</c>) with non-validated user-provided values
+    ///         into this method. Doing so may expose your application to SQL injection attacks. To use the interpolated string syntax,
+    ///         consider using <see cref="SqlQuery{TResult}(DatabaseFacade, FormattableString)" /> to create parameters.
+    ///     </para>
+    ///     <para>
+    ///         See <see href="https://aka.ms/efcore-docs-raw-sql">Executing raw SQL commands with EF Core</see>
+    ///         for more information and examples.
+    ///     </para>
+    /// </remarks>
+    /// <param name="db">The <see cref="DbContext" /> for the context.</param>
+    /// <param name="sql">The raw SQL query.</param>
+    /// <param name="parameters">The values to be assigned to parameters.</param>
+    /// <returns>An <see cref="IQueryable{T}" /> representing the raw SQL query.</returns>
+    public static async Task<List<T>> SqlQueryRawAsync<T>(this DbContext db, string sql, object[] parameters = null, CancellationToken cancellationToken = default) 
+    {
+        if (parameters is null)
+            parameters = Array.Empty<object>();
+
+        return await db.Database.SqlQueryRaw<T>(sql, parameters, cancellationToken).ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Executes a raw SQL query and returns the first result.
+    /// </summary>
+    public static async Task<T> SqlQueryRawScalarAsync<T>(this DbContext db, string sql, object[] parameters = null, CancellationToken cancellationToken = default) {
+        var databaseFacade = db.Database;
+        var conn = databaseFacade.GetDbConnection(); // not in using clause
+        if (conn.State == ConnectionState.Closed) await conn.OpenAsync(cancellationToken);
+        await using var command = conn.CreateCommand();
+        command.CommandText = sql;
+
+        if (parameters != null)
+            foreach (SqlParameter param in parameters)
+                command.Parameters.Add(param);
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken); 
+        if (reader.HasRows)
+            while (await reader.ReadAsync(cancellationToken)) {
+                var dbValue = reader.GetValue(0);
+                if (AllowStringGuidConversion && typeof(T) == typeof(Guid) && dbValue is string dbStringValue) 
+                    dbValue = new Guid(dbStringValue);                 
+                return (T)dbValue;
+            }
+
+        var result = default(T);
+        return result;
+    }
+
+
+    /// <summary>
+    /// Executes a raw SQL query and returns the first result.
+    /// </summary>
+    public static async Task<DataTable> SqlQueryRawTableAsync(this DbContext db, string sql, object[] parameters = null, CancellationToken cancellationToken = default) 
+    {
+        var databaseFacade = db.Database;
+        var conn = databaseFacade.GetDbConnection(); // not in using clause
+        if (conn.State == ConnectionState.Closed) await conn.OpenAsync(cancellationToken);
+        await using var command = conn.CreateCommand();
+        command.CommandText = sql;
+
+        if (parameters != null)
+            foreach (SqlParameter param in parameters) 
+                command.Parameters.Add(param);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        return await ToDataTableAsync(reader);
+    }
+    
+    /// <summary> Read data table from DbDataReader </summary>
+    public static async Task<DataTable> ToDataTableAsync(this DbDataReader dr)
+    {
+        var dataTable = new DataTable();
+        for (var i = 0; i < dr.FieldCount; ++i)
+        {
+            dataTable.Columns.Add(dr.GetName(i), dr.GetFieldType(i));
+        }
+        if (dr.HasRows)
+        {
+            dataTable.BeginLoadData();
+            var values = new object[dr.FieldCount];
+            while (await dr.ReadAsync())
+            {
+                dr.GetValues(values);
+                dataTable.LoadDataRow(values, true);
+            }
+            dataTable.EndLoadData();
+        }
+        return dataTable;
+    }
+}
+
+public class OutputParameter<TValue>
+{
+    private bool _valueSet = false;
+
+    public TValue _value;
+
+    public TValue Value
+    {
+        get
+        {
+            if (!_valueSet)
+                throw new InvalidOperationException("Value not set.");
+
+            return _value;
+        }
+    }
+
+    internal void SetValue(object value)
+    {
+        _valueSet = true;
+        _value = null == value || Convert.IsDBNull(value) ? default(TValue) : (TValue)value;
+    }
+}
+<#
+            var mainEnvironment = GenerationEnvironment;
+            GenerationEnvironment = new StringBuilder();
+
+            foreach (var ns in usings.Distinct().OrderBy(x => x, new NamespaceComparer())) {
+#>
+using <#= ns #>;
+<#
+            }
+            
+            WriteLine("");
+
+            GenerationEnvironment.Append(mainEnvironment);
+#>

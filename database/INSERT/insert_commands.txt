@@ -1,0 +1,5 @@
+ON CMD OR BASH?
+docker exec -i <<nome imagem>> psql -U nexthire -d nexthire_db < <<caminho_do_arquivo>>
+
+USING POWERSHELL?
+Get-Content <<caminho arquivo>> | docker exec -i <<nome_imagem>> psql -U nexthire -d nexthire

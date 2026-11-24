@@ -1,0 +1,173 @@
+﻿<#@ template hostSpecific="true" debug="false" #>
+<#@ assembly name="EntityFrameworkRuler.Design" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Design" #>
+<#@ assembly name="Microsoft.EntityFrameworkCore.Relational" #>
+<#@ assembly name="Microsoft.Extensions.DependencyInjection.Abstractions" #>
+<#@ parameter name="Model" type="EntityFrameworkRuler.Design.Metadata.ModelEx" #>
+<#@ parameter name="Options" type="Microsoft.EntityFrameworkCore.Scaffolding.ModelCodeGenerationOptions" #>
+<#@ parameter name="NamespaceHint" type="System.String" #>
+<#@ parameter name="ProjectDefaultNamespace" type="System.String" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Design" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Infrastructure" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Scaffolding" #>
+<#@ import namespace="Microsoft.Extensions.DependencyInjection" #>
+<#@ import namespace="Microsoft.EntityFrameworkCore.Metadata.Builders" #>
+<#@ import namespace="EntityFrameworkRuler.Design.Metadata" #>
+<#@ import namespace="System.Data" #>
+<#
+    if (!Int32.TryParse(ProductInfo.GetVersion()?.Split('.').FirstOrDefault()??"0", out var version) || version > 8) {
+        Warning(
+            "Your templates were created using an older version of Entity Framework. Additional features and bug fixes may be available. See https://aka.ms/efcore-docs-updating-templates for more information.");
+    }
+
+    var services = (IServiceProvider)Host;
+    var providerCode = services.GetRequiredService<IProviderConfigurationCodeGenerator>();
+    var annotationCodeGenerator = services.GetRequiredService<IAnnotationCodeGenerator>();
+    var code = services.GetRequiredService<ICSharpHelper>();
+
+    var usings = new List<string> {
+        "System",
+        "System.Linq",
+        "System.Collections.Generic",
+        "Microsoft.EntityFrameworkCore",
+        "System.Threading",
+        "System.Threading.Tasks",
+    };
+
+    if (NamespaceHint != Options.ModelNamespace
+        && !string.IsNullOrEmpty(Options.ModelNamespace)) {
+        usings.Add(Options.ModelNamespace);
+    }
+    usings.Add(typeof(EntityTypeBuilder<>).Namespace);
+
+
+    if (!string.IsNullOrEmpty(NamespaceHint)) {
+#>
+namespace <#= NamespaceHint #>;
+
+<#
+    }
+#>
+public partial class <#= Options.ContextName #> : DbContext
+{    
+<#
+    var anyConfiguration = false;
+    StringBuilder mainEnvironment;
+    foreach (var function in Model.GetFunctions()) {
+        if (function?.Name == null || function.CommandText == null || function.ReturnType == null ||
+            function.IsTableValuedFunction)
+            continue;
+
+        anyConfiguration = true;
+        // Save all previously generated code, and start generating into a new temporary environment
+        mainEnvironment = GenerationEnvironment;
+        GenerationEnvironment = new StringBuilder();
+
+        bool anyFunctionConfiguration = false;
+
+        var paramStrings = function.GetParameters()
+            .Where(p => !p.IsReturnValue)
+            .Select(
+                p => $"{code.Reference(p.ClrType ?? typeof(object))} {code.Identifier(p.Name, capitalize: false)}")
+            .ToList();
+#>
+
+    [DbFunction(<#= code.Literal(function.DatabaseName) #>, <#= code.Literal(function.Schema) #>)]
+<#
+        if (function.IsScalar) {
+            var parameters = string.Empty;
+
+            if (function.GetParameters().Count() > 0) {
+                parameters = string.Join(", ", paramStrings);
+            }
+#>
+    public static <#= function.ReturnType #> <#= function.Name #>(<#= parameters #>)
+    {
+        throw new NotSupportedException("Function <#= function.Name #> can only be called from Entity Framework Core queries");
+    }
+<#
+        }
+        else {
+            var typeName = function.ResultEntities.FirstOrDefault()?.Name ?? function.ReturnType;
+            var returnType = $"IQueryable<{typeName}>";
+
+            var parameters = string.Empty;
+
+            if (function.GetParameters().Any()) {
+                parameters = string.Join(", ", paramStrings);
+            }
+            var argumentStrings = function.GetParameters()
+                .Where(p => !p.IsReturnValue)
+                .Select(p => code.Identifier(p.Name, capitalize: false));
+            var arguments = string.Join(", ", argumentStrings);
+#>
+    public <#= returnType #> <#= function.Name #>(<#= parameters #>)
+    {
+        return FromExpression(() => <#= function.Name #>(<#= arguments #>));
+    }
+<#
+        }
+        anyFunctionConfiguration = true;
+#>      
+<#
+        // End of function output
+#>
+<#
+        // If any significant code was generated, append it to the main environment
+        if (anyFunctionConfiguration) {
+            mainEnvironment.Append(GenerationEnvironment);
+            anyConfiguration = true;
+        }
+
+        // Resume generating code into the main environment
+        GenerationEnvironment = mainEnvironment;
+    }
+
+    if (anyConfiguration) {
+#>
+    partial void OnModelCreatingGeneratedFunctions(ModelBuilder modelBuilder)
+    {
+<#
+        foreach (var f in Model.GetFunctions()) {
+            if (f.FunctionType == FunctionType.Function) {
+                if (f.IsScalar) continue;
+                var result = f.ResultEntities.FirstOrDefault();
+                if (result is null) continue;
+#>
+        modelBuilder.Entity<<#= result.Name #>>().HasNoKey();
+<#
+            }
+            else {
+                foreach (var result in f.ResultEntities) {
+#>
+        modelBuilder.Entity<<#= result.Name #>>().HasNoKey().ToView(null);
+<#
+                }
+            }
+        }
+#>               
+    }
+<#
+        WriteLine("");
+    }
+#>    
+}
+<#
+    mainEnvironment = GenerationEnvironment;
+    GenerationEnvironment = new StringBuilder();
+
+    foreach (var ns in usings.Distinct().OrderBy(x => x, new NamespaceComparer())) {
+#>
+using <#= ns #>;
+<#
+    }
+
+    WriteLine("");
+
+    GenerationEnvironment.Append(mainEnvironment);
+#>

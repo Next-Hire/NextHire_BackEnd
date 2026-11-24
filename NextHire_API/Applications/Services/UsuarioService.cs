@@ -82,8 +82,8 @@ namespace NextHireAPI.Applications.Services
 
         public async Task CadastroCandidato(CadastrarCandidatoDto candidato)
         {
-            if (EmailService.ValidarNome(candidato.Nome))
-                throw new DomainException("O nome é um campo obrigatório!");
+            //if (EmailService.ValidarNome(candidato.Nome))
+            //    throw new DomainException("O nome é um campo obrigatório!");
 
             if (String.IsNullOrEmpty(candidato.Email) || !EmailService.ValidarEmail(candidato.Email))
                 throw new DomainException("Digite um email valido.");

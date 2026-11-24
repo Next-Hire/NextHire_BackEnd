@@ -1,5 +1,5 @@
 ﻿using NextHire_API.DTOs.CurriculoAWS;
-using NextHire_API.DTOs.CurriculoS3DTO;
+
 using NextHire_API.Exceptions;
 using System.Text;
 using System.Text.Json;
@@ -14,8 +14,8 @@ namespace NextHire_API.Applications.S3
 
         public GeminiCurriculoService(HttpClient httpClient)
         {
-            _apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY")
-            ?? throw new DomainException("GEMINI_API_KEY não configurada."); ;
+            //_apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY")
+            //?? throw new DomainException("GEMINI_API_KEY não configurada."); ;
             _httpClient = httpClient;
         }
         

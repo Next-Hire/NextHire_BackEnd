@@ -15,6 +15,7 @@ namespace NextHire_API.Repository
 
         public async Task<CandidatoQuestao?> BuscarPorId(int questaoId, int candidatoId)
             => await _ctx.CandidatoQuestao
+                .Include(varAux => varAux.Candidato)
                 .Include(varAux => varAux.Questao)
                     .ThenInclude(varAux => varAux.Alternativa)
                 .FirstOrDefaultAsync(varAux => varAux.QuestaoId == questaoId
@@ -113,7 +114,10 @@ namespace NextHire_API.Repository
                     }
                     return candidatoQuestao;
                 }
-                
+
+        public async Task<bool> candidatoPossuiCurriculo(int usuarioId)
+            => await _ctx.CurriculoCandidato.AnyAsync(varAux => varAux.CandidatoId == usuarioId);
+
                 
                 
     }

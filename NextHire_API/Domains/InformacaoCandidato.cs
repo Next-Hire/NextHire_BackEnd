@@ -13,7 +13,10 @@ public partial class InformacaoCandidato
     public DateOnly DataNascimento { get; set; }
 
     public string FormacaoAcademica { get; set; } = null!;
-
+    
+    // adicionando as novas entidades: endereco e contato
+    public string Endereco { get; set; }
+    public string Contato { get; set; }
     public string Idioma { get; set; } = null!;
 
     public string Resumo { get; set; } = null!;

@@ -210,7 +210,9 @@ CREATE TABLE IF NOT EXISTS informacao_candidato(
     candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
     situacao_profissional situacao_profissional_enum NOT NULL,
     formacao_academica JSONB NOT NULL,
-    idioma JSONB NOT NULL
+    idioma JSONB NOT NULL,
+    contato JSONB,
+    endereco TEXT
 );
 
 CREATE TABLE IF NOT EXISTS curriculo_candidato (

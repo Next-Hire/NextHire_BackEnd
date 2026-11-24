@@ -525,9 +525,7 @@ public partial class NextHireContext : DbContext
                 .HasColumnName("endereco");
 
             entity.Property(e => e.Contato)
-                .IsRequired()
                 .HasColumnType("jsonb")
-                .HasDefaultValueSql("'{}'::jsonb") // Evita erro caso já existam registros na tabela
                 .HasColumnName("contato");
             entity.Property(e => e.Idioma)
                 .IsRequired()

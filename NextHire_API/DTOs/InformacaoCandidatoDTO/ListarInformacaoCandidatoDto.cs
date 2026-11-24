@@ -12,6 +12,8 @@ namespace NextHire_API.DTOs.InformacaoCandidatoDTO
         public JsonElement Idioma { get; set; }
         public string Resumo { get; set; } = null!;
         public string Telefone { get; set; } = null!;
+        public JsonElement? Contato { get; set; }
+        public string? Endereco { get; set; }
         public SituacaoProfissionalEnum SituacaoProfissional { get; set; }
     }
 }

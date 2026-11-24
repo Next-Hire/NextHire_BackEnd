@@ -26,6 +26,8 @@ namespace NextHire_API.Applications.Services
                 Idioma = ConverterParaJson(informacao.Idioma),
                 Resumo = informacao.Resumo,
                 Telefone = informacao.Telefone,
+                Contato = ConverterParaJsonOpcional(informacao.Contato),
+                Endereco = informacao.Endereco,
                 SituacaoProfissional = informacao.SituacaoProfissional
             };
         }
@@ -34,6 +36,23 @@ namespace NextHire_API.Applications.Services
         {
             using JsonDocument documento = JsonDocument.Parse(valor);
             return documento.RootElement.Clone();
+        }
+
+        private static JsonElement? ConverterParaJsonOpcional(string? valor)
+        {
+            if (string.IsNullOrWhiteSpace(valor))
+                return null;
+
+            using JsonDocument documento = JsonDocument.Parse(valor);
+            return documento.RootElement.Clone();
+        }
+
+        private static string? ConverterJsonParaTextoOpcional(JsonElement? valor)
+        {
+            if (valor == null || valor.Value.ValueKind == JsonValueKind.Undefined || valor.Value.ValueKind == JsonValueKind.Null)
+                return null;
+
+            return valor.Value.GetRawText();
         }
 
         private static string ConverterJsonParaTexto(JsonElement valor, string nomeCampo)
@@ -121,6 +140,8 @@ namespace NextHire_API.Applications.Services
                 Idioma = ConverterJsonParaTexto(dto.Idioma, "Idioma"),
                 Resumo = dto.Resumo.Trim(),
                 Telefone = dto.Telefone.Trim(),
+                Contato = ConverterJsonParaTextoOpcional(dto.Contato),
+                Endereco = string.IsNullOrWhiteSpace(dto.Endereco) ? null : dto.Endereco.Trim(),
                 SituacaoProfissional = dto.SituacaoProfissional
             };
 
@@ -153,6 +174,8 @@ namespace NextHire_API.Applications.Services
             informacao.Idioma = ConverterJsonParaTexto(dto.Idioma, "Idioma");
             informacao.Resumo = dto.Resumo.Trim();
             informacao.Telefone = dto.Telefone.Trim();
+            informacao.Contato = ConverterJsonParaTextoOpcional(dto.Contato);
+            informacao.Endereco = string.IsNullOrWhiteSpace(dto.Endereco) ? null : dto.Endereco.Trim();
             informacao.SituacaoProfissional = dto.SituacaoProfissional;
 
             _repository.Atualizar(id, informacao);

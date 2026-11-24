@@ -16,7 +16,6 @@ using NextHireAPI.Repository;
 using NextHireAPI.Applications.Services;
 using StackExchange.Redis;
 using System.Text;
-using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using NextHire_API.Applications.S3;
@@ -41,6 +40,8 @@ var regionName = Environment.GetEnvironmentVariable("AWS_REGION");
 // builder.Services.AddSingleton<IAmazonS3>(varAux => new AmazonS3Client(credenciais, regiao));
 
 var conexaoBanco = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+
 var redisConnection = Environment.GetEnvironmentVariable("REDIS_CONNECTION");
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
 
@@ -226,6 +227,13 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<IComentarioRepository, ComentarioRepository>();
 builder.Services.AddScoped<ComentarioService>();
 
+// Entrevistas
+builder.Services.AddScoped<IEntrevistaRepository, EntrevistaRepository>();
+builder.Services.AddScoped<EntrevistaService>();
+
+builder.Services.AddScoped<IProcessoSeletivoRepository, ProcessoSeletivoRepository>();
+builder.Services.AddScoped<ProcessoSeletivoService>();
+
 // Vaga
 builder.Services.AddScoped<IVagaRepository, VagaRepository>();
 builder.Services.AddScoped<VagaService>();
@@ -277,6 +285,11 @@ var app = builder.Build();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<NextHireContext>();
+    db.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 
 if (app.Environment.IsDevelopment())

@@ -6,6 +6,8 @@
         public string Empresa { get; set; } = string.Empty;
         public string Periodo { get; set; } = string.Empty;
         public string Descricao { get; set; } = string.Empty;
+        public string DataInicio { get; set; } = string.Empty;
+        public string DataEncerramento { get; set; } = string.Empty;
     }
 
 }

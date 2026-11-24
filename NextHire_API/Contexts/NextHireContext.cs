@@ -50,11 +50,13 @@ public partial class NextHireContext : DbContext
     public virtual DbSet<HabilidadeVaga> HabilidadeVaga { get; set; }
 
     public virtual DbSet<InformacaoCandidato> InformacaoCandidato { get; set; }
+    
 
     public virtual DbSet<ProcessoSeletivo> ProcessoSeletivo { get; set; }
     
     public virtual DbSet<CandidatoProcessoSeletivo> CandidatoProcessoSeletivo { get; set; } // adicionado
 
+    
     public virtual DbSet<Questao> Questao { get; set; }
 
     public virtual DbSet<SetorOcupacao> SetorOcupacao { get; set; }
@@ -203,18 +205,6 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.CandidatoId).HasColumnName("candidato_id");
             entity.Property(e => e.EntrevistaId).HasColumnName("entrevista_id");
             entity.Property(e => e.NivelAvaliado).HasColumnName("nivel_avaliado");
-            entity.HasOne(d => d.Candidato).WithMany(p => p.AvaliacaoHabilidade)
-                .HasForeignKey(d => d.CandidatoId)
-                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("avaliacao_habilidade_candidato_id_fkey");
-
-            entity.HasOne(d => d.Entrevista).WithMany(p => p.AvaliacaoHabilidade)
-                .HasForeignKey(d => d.EntrevistaId)
-                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("avaliacao_habilidade_entrevista_id_fkey");
-
-            entity.HasOne(d => d.Habilidade).WithMany(p => p.AvaliacaoHabilidade)
-                .HasForeignKey(d => d.HabilidadeId)
-                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("avaliacao_habilidade_habilidade_id_fkey");
-
         });
         
         modelBuilder.Entity<CandidatoProcessoSeletivo>(entity =>
@@ -530,6 +520,15 @@ public partial class NextHireContext : DbContext
                 .IsRequired()
                 .HasColumnType("jsonb")
                 .HasColumnName("formacao_academica");
+            entity.Property(e => e.Endereco)
+                .HasColumnType("text")
+                .HasColumnName("endereco");
+
+            entity.Property(e => e.Contato)
+                .IsRequired()
+                .HasColumnType("jsonb")
+                .HasDefaultValueSql("'{}'::jsonb") // Evita erro caso já existam registros na tabela
+                .HasColumnName("contato");
             entity.Property(e => e.Idioma)
                 .IsRequired()
                 .HasColumnType("jsonb")

@@ -47,7 +47,7 @@ public partial class Usuario
     public virtual ICollection<Entrevista> Entrevista { get; set; } = new List<Entrevista>();
 
     public virtual ICollection<Entrevista> EntrevistaNavigation { get; set; } = new List<Entrevista>();
-
+ 
     // public virtual ICollection<ProcessoSeletivo> ProcessoSeletivo { get; set; } = new List<ProcessoSeletivo>(); 
     // relação n:n não veio do banco
     public virtual ICollection<CandidatoProcessoSeletivo> CandidatoProcessoSeletivo { get; set; } = new List<CandidatoProcessoSeletivo>();

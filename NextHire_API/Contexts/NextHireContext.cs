@@ -52,6 +52,8 @@ public partial class NextHireContext : DbContext
     public virtual DbSet<InformacaoCandidato> InformacaoCandidato { get; set; }
 
     public virtual DbSet<ProcessoSeletivo> ProcessoSeletivo { get; set; }
+    
+    public virtual DbSet<CandidatoProcessoSeletivo> CandidatoProcessoSeletivo { get; set; } // adicionado
 
     public virtual DbSet<Questao> Questao { get; set; }
 
@@ -214,6 +216,28 @@ public partial class NextHireContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("avaliacao_habilidade_habilidade_id_fkey");
 
         });
+        
+        modelBuilder.Entity<CandidatoProcessoSeletivo>(entity =>
+        {
+            entity.HasKey(e => new { e.ProcessoSeletivoId, e.CandidatoId })
+                .HasName("pk_candidato_processo_seletivo");
+
+            entity.ToTable("candidato_processo_seletivo", "public");
+
+            entity.Property(e => e.ProcessoSeletivoId).HasColumnName("processo_seletivo_id");
+            entity.Property(e => e.CandidatoId).HasColumnName("candidato_id");
+            entity.Property(e => e.StatusRelacao).HasColumnName("status_relacao");
+
+            entity.HasOne(d => d.Candidato).WithMany(p => p.CandidatoProcessoSeletivo)
+                .HasForeignKey(d => d.CandidatoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("candidato_processo_seletivo_candidato_id_fkey");
+
+            entity.HasOne(d => d.ProcessoSeletivo).WithMany(p => p.CandidatoProcessoSeletivo)
+                .HasForeignKey(d => d.ProcessoSeletivoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("candidato_processo_seletivo_processo_seletivo_id_fkey");
+        }); // adicionado
 
         modelBuilder.Entity<CandidatoQuestao>(entity =>
         {
@@ -536,7 +560,6 @@ public partial class NextHireContext : DbContext
                 .HasDefaultValueSql("CURRENT_DATE")
                 .HasColumnName("data_abertura");
             entity.Property(e => e.DataFechamento)
-
                 .HasColumnName("data_fechamento");
             entity.Property(e => e.StatusProcessoSeletivo)
                 .HasDefaultValue(true)
@@ -548,32 +571,7 @@ public partial class NextHireContext : DbContext
             entity.HasOne(d => d.Vaga).WithMany(p => p.ProcessoSeletivo)
                 .HasForeignKey(d => d.VagaId)
                 .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("processo_seletivo_vaga_id_fkey");
-
-            entity.HasMany(d => d.Candidato)
-                .WithMany(p => p.ProcessoSeletivo)
-                .UsingEntity<Dictionary<string, object>>(
-                    "CandidatoProcessoSeletivo",
-                    l => l.HasOne<Usuario>()
-                        .WithMany()
-                        .HasForeignKey("CandidatoId")
-                        .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("candidato_processo_seletivo_candidato_id_fkey"),
-                    r => r.HasOne<ProcessoSeletivo>()
-                        .WithMany()
-                        .HasForeignKey("ProcessoSeletivoId")
-                        .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("candidato_processo_seletivo_processo_seletivo_id_fkey"),
-                    j =>
-                    {
-                        j.HasKey("ProcessoSeletivoId", "CandidatoId").HasName("pk_candidato_processo_seletivo");
-                        j.ToTable("candidato_processo_seletivo", "public");
-                        j.IndexerProperty<int>(
-                            "ProcessoSeletivoId")
-                            .HasColumnName("processo_seletivo_id");
-                        j.IndexerProperty<int>(
-                            "CandidatoId")
-                            .HasColumnName("candidato_id");
-                    });
-
-        });
+        }); // alterado
 
         modelBuilder.Entity<Questao>(entity =>
         {

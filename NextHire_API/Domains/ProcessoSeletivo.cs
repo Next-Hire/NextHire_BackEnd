@@ -22,6 +22,9 @@ public partial class ProcessoSeletivo
 
     public virtual Vaga Vaga { get; set; } = null!;
 
-    public virtual ICollection<Usuario> Candidato { get; set; } = new List<Usuario>();
+    // public virtual ICollection<Usuario> Candidato { get; set; } = new List<Usuario>();
+    
+    // relação n:n não veio do banco.
+    public virtual ICollection<CandidatoProcessoSeletivo> CandidatoProcessoSeletivo { get; set; } = new List<CandidatoProcessoSeletivo>();
 
 }

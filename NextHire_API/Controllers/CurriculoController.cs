@@ -52,12 +52,27 @@ namespace NextHire_API.Controllers
         }
 
 
-        [HttpPost("CriarCurriculoCandidato")]
-        public async Task<ActionResult<CriarCurriculoDTO>> Criar([FromBody] CriarCurriculoDTO criarDTO)
+        [HttpPost("CriarCurriculoCandidato/candidato/{candidatoId}/json")]
+        public async Task<ActionResult<LerCurriculoCandidatoDTO>> Criar(int candidatoId, [FromBody] CriarCurriculoDTO criarDTO)
         {
             try
             {
-                CriarCurriculoDTO criarQuery = await _curriculoService.AdicionarCurriculo(criarDTO);
+                LerCurriculoCandidatoDTO criarQuery = await _curriculoService.AdicionarCurriculoJSON(candidatoId, criarDTO);
+                return Created();
+            }
+
+            catch(DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+        [HttpPost("CriarCurriculoCandidato/candidato/{candidatoId}/arquivo")]
+        public async Task<ActionResult<LerCurriculoCandidatoDTO>> Criar(int candidatoId, IFormFile criarDTO)
+        {
+            try
+            {
+                LerCurriculoCandidatoDTO criarQuery = await _curriculoService.AdicionarCurriculoArquivo(candidatoId, criarDTO);
                 return Created();
             }
 
@@ -106,7 +121,7 @@ namespace NextHire_API.Controllers
         //}
 
 
-        [HttpPost("curriculo/file/groq")]
+        [HttpPost("curriculo/gerarJSON")]
         public async Task<ActionResult<CurriculoDTO?>> ConverterCurriculoPorArquivo2(IFormFile file)
         {
             if (file == null || file.Length == 0)

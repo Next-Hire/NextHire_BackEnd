@@ -31,6 +31,7 @@ namespace NextHire_API.Applications.S3
         private readonly string regionName = Environment.GetEnvironmentVariable("AWS_REGION");
         private readonly ICurriculoCandidatoRepository _rep;
         private readonly IUsuarioRepository _usuarioRep;
+        private readonly GroqCurriculoService _groqService;
 
         // Lista de regras dos tipos permitidos
         private static readonly HashSet<string> tiposPermitidos = new(StringComparer.OrdinalIgnoreCase)
@@ -48,7 +49,7 @@ namespace NextHire_API.Applications.S3
             ".jpg"
         };
 
-        public CurriculoService(ICurriculoCandidatoRepository rep, IUsuarioRepository usuarioRep)
+        public CurriculoService(ICurriculoCandidatoRepository rep, IUsuarioRepository usuarioRep, GroqCurriculoService groqService)
         {
             var regiao = RegionEndpoint.GetBySystemName(regionName);
             var credenciais = new SessionAWSCredentials(access_key_id, secret_Key, session_token);
@@ -56,6 +57,7 @@ namespace NextHire_API.Applications.S3
 
             _rep = rep;
             _usuarioRep = usuarioRep;
+            _groqService = groqService;
         }
         //
 
@@ -135,11 +137,11 @@ namespace NextHire_API.Applications.S3
 
         }
 
-        public async Task<CriarCurriculoDTO> AdicionarCurriculo(CriarCurriculoDTO curriculoDTO)
+        public async Task<LerCurriculoCandidatoDTO> AdicionarCurriculoJSON(int candidatoId, CriarCurriculoDTO curriculoDTO)
         {
             if (curriculoDTO == null)
                 throw new DomainException("Curriculo é obrigatorio");
-            Usuario? usuarioQuery = await _rep.buscarCandidatoId(curriculoDTO.candidatoId);
+            Usuario? usuarioQuery = await _rep.buscarCandidatoId(candidatoId);
 
             if (usuarioQuery.TipoUsuario != TipoUsuarioEnum.Candidato)
                 throw new DomainException("O usuário encontrado não é um candidato");
@@ -148,11 +150,11 @@ namespace NextHire_API.Applications.S3
              
             if (curriculoQuery != null)
                 throw new DomainException("Usuário já possui curriculo. ");
-
+            
 
             CurriculoCandidato curriculoPOST = new CurriculoCandidato
             {
-                CandidatoId = curriculoDTO.candidatoId,
+                CandidatoId = usuarioQuery.UsuarioId,
                 CurriculoConvertido = JsonSerializer.Serialize(curriculoDTO.curriculoConvertido)
             };
 
@@ -160,7 +162,41 @@ namespace NextHire_API.Applications.S3
 
             await _rep.AdicionarCurriculo(curriculoPOST);
 
-            return CurriculoCandidatoToDto.criarCurriculo(curriculoPOST);
+            return CurriculoCandidatoToDto.LerCurriculoToDTO(curriculoPOST);
+        }
+
+        public async Task<LerCurriculoCandidatoDTO> AdicionarCurriculoArquivo(int candidatoId, IFormFile arquivo)
+        {
+            if (arquivo == null || arquivo.Length == 0)
+                throw new DomainException("O arquivo do currículo é obrigatório.");
+ 
+            Usuario? usuarioQuery = await _rep.buscarCandidatoId(candidatoId);
+            if (usuarioQuery == null)
+                throw new DomainException("Candidato não encontrado.");
+            
+            if (usuarioQuery.TipoUsuario != TipoUsuarioEnum.Candidato)
+                throw new DomainException("O usuário encontrado não é um candidato.");
+
+            CurriculoCandidato? curriculoQuery = await _rep.BuscarCurriculoPorCandidatoId(usuarioQuery.UsuarioId);
+            if (curriculoQuery != null)
+                throw new DomainException("Usuário já possui currículo.");
+ 
+            CurriculoDTO? extraido = await _groqService.ExtrairCurriculoArquivoAsync(arquivo);
+            if (extraido == null)
+                throw new DomainException("Não foi possível extrair os dados do currículo enviado.");
+
+            // Monta o DTO padrão e salva
+
+            CurriculoCandidato curriculoPOST = new CurriculoCandidato
+            {
+                CandidatoId = usuarioQuery.UsuarioId,
+                CurriculoConvertido = JsonSerializer.Serialize(extraido)
+            };
+            
+            curriculoPOST.Candidato = usuarioQuery;
+            
+            await _rep.AdicionarCurriculo(curriculoPOST);
+            return CurriculoCandidatoToDto.LerCurriculoToDTO(curriculoPOST);
         }
 
 

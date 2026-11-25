@@ -134,5 +134,17 @@ namespace NextHire_API.Interfaces
             return entrQuery;
 
         }
+
+        public async Task<List<Entrevista>> ListarPorStatus(bool status)
+        {
+            List<Entrevista> entrevistasAtivas = await _ctx.Entrevista
+                .AsNoTracking()
+                .Include(varAux => varAux.Comentario)
+            .Where(varAux => varAux.StatusEntrevista == status)
+            .OrderBy(varAux => varAux.HorarioInicio)
+            .ToListAsync();
+
+            return entrevistasAtivas;
+        }
     }
 }

@@ -14,3 +14,11 @@ public class CriarCandidatoProcessoDTO
     [Required(ErrorMessage = "O status da relação é obrigatório.")]
     public StatusRelacaoEnum StatusRelacao { get; set; } = StatusRelacaoEnum.Considera;
 }
+
+
+public class CriarCandidatosNoProcessoSeletivoDTO
+{
+    public int ProcessoSeletivoId { get; set; }
+    public List<int> CandidatosIds { get; set; } = new();
+    public StatusRelacaoEnum StatusRelacao { get; set; } = StatusRelacaoEnum.Considera;
+}

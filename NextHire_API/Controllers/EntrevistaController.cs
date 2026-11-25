@@ -33,6 +33,22 @@ namespace NextHire_API.Controllers
             }
         }
 
+        // GET: api/Entrevista/status?status=true
+        [HttpGet("status")]
+        public async Task<ActionResult<List<LerEntrevistaDTO>>> ListarPorStatus(bool status)
+        {
+            try
+            {
+                List<LerEntrevistaDTO> entrevistas =
+                    await _service.ListarPorStatus(status);
+                return Ok(entrevistas);
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(new { mensagem = ex.Message });
+            }
+        }
+
         // GET: api/Entrevista/hoje
         [HttpGet("hoje")]
         public async Task<ActionResult<List<LerEntrevistaDTO>>> EntrevistasHoje()

@@ -161,6 +161,14 @@ public async Task<LerEntrevistaDTO> RemoverEntrevista(int id)
 
     return EntrevistaToDTO.LerDTO(entrevistaRemovida);
 }
-    
-    
+
+    public async Task<List<LerEntrevistaDTO>> ListarPorStatus(bool status)
+    {
+        List<Entrevista> entrevistas = await _rep.ListarPorStatus(status);
+
+        return entrevistas
+            .Select(e => EntrevistaToDTO.LerDTO(e))
+            .ToList();
+    }
+
 }

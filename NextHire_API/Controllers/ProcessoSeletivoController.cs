@@ -5,6 +5,7 @@ using NextHire_API.DTOs.ProcessoSeletivoDTO;
 using NextHire_API.Exceptions;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Runtime.InteropServices;
 
 namespace NextHire_API.Controllers
 {
@@ -33,6 +34,7 @@ namespace NextHire_API.Controllers
                 return NotFound(ex.Message);
             }
         }
+
 
         [HttpGet("Empresa/{empresaId}")]
         [Authorize(Roles="AnalistaRh,Gestor")]
@@ -153,6 +155,22 @@ namespace NextHire_API.Controllers
             catch (DomainException ex)
             {
                 return StatusCode(404, $"Erro ao atualizar o processos seletivo.\nERRO: {ex.Message}" );
+            }
+        }
+
+        [HttpGet("ProcessoSeletivo/status/{status}")]
+        [SwaggerOperation(Summary = "Listar todos os processos seletivos por status", Description = "Retorna todos os processos seletivos por status cadastradas no sistema. Requer perfil de Gestor/AnalistaRH.")]
+        [SwaggerResponse(200, "Processos seletivos listados com sucesso.", typeof(List<ListarProcessoSeletivoDto>))]
+        [SwaggerResponse(400, "Erro ao listar os processos seletivos.")]
+        public async Task<ActionResult> ListarPorStatus(bool status)
+        {
+            try
+            {
+                return Ok(await _service.ListarProcessosSeletivosPorStatus(status));
+            } 
+            catch (DomainException ex)
+            {
+                return StatusCode(404, $"Erro ao buscar o processos seletivo.\nERRO: {ex.Message}");
             }
         }
     }

@@ -10,8 +10,10 @@ public interface IProcessoSeletivoCandidatoRepository
     public Task<CandidatoProcessoSeletivo> BuscarPorId(int id, int processoSeletivoId);
     public Task<CandidatoProcessoSeletivo> BuscarPorCandidatoId(int id);
     public Task<CandidatoProcessoSeletivo> BuscarPorProcessoSeletivoId(int id);
+    public Task<List<CandidatoProcessoSeletivo>> ListarCandidatosDoProcesso(int processoId);
     
     public Task<CandidatoProcessoSeletivo> AdicionarCandidatoProcesso(CandidatoProcessoSeletivo candProcesso);
+    Task<List<CandidatoProcessoSeletivo>> AdicionarCandidatosNoProcesso(List<CandidatoProcessoSeletivo> entidades);
     public Task<CandidatoProcessoSeletivo> AtualizarCandidatoProcesso(int candidatoId, int processoSeletivoId, CandidatoProcessoSeletivo candProcesso);
     public Task<CandidatoProcessoSeletivo> RemoverCandidatoProcesso(int id, int processoSeletivoId);
 

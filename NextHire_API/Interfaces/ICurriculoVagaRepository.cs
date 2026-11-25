@@ -5,6 +5,7 @@ namespace NextHire_API.Interfaces
 {
     public interface ICurriculoVagaRepository
     {
+        public Task<List<CurriculoVaga>> ListarTodasAsCandidaturasPorEmpresaId(int empresaId);
         public Task<List<CurriculoVaga>> ListarCandidatosPorVagaId(int vagaId);
 
         public Task<List<Vaga>> ListarVagasPorCandidatoId(int curriculoId);

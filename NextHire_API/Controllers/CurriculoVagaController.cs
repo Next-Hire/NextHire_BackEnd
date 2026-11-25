@@ -31,6 +31,26 @@ namespace NextHire_API.Controllers
         /// <summary>Lista os candidatos que se candidataram a uma vaga.</summary>
         /// <param name="vagaId">ID da vaga cujos candidatos serão listados.</param>
         /// <returns>Lista de currículos (candidaturas) vinculados à vaga informada.</returns>
+        [HttpGet("Candidaturas/empresa/{empresaId}")]
+        //[Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Lista os candidaturas em vagas de uma empresa", Description = "Retorna os currículos inscritos nas vagas da empresa informada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerResponse(200, "Candidatos listados com sucesso.", typeof(List<ListarCurriculoVagaDto>))]
+        [SwaggerResponse(404, "Vaga não encontrada ou nenhuma candidatura registrada.")]
+        public async Task<ActionResult<List<ListarCurriculoVagaDto>>> ListarTodasAsCandidaturasPorEmpresaId(int empresaId)
+        {
+            try
+            {
+                return Ok(await _service.ListarTodasAsCandidaturasPorEmpresaId(empresaId));
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        /// <summary>Lista os candidatos que se candidataram a uma vaga.</summary>
+        /// <param name="vagaId">ID da vaga cujos candidatos serão listados.</param>
+        /// <returns>Lista de currículos (candidaturas) vinculados à vaga informada.</returns>
         [HttpGet("CandidatosPorVagaId/{vagaId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
         [SwaggerOperation(Summary = "Lista os candidatos de uma vaga", Description = "Retorna os currículos inscritos na vaga informada. Requer perfil de Analista de RH ou Administrador.")]

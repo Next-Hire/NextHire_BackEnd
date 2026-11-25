@@ -18,6 +18,8 @@ namespace NextHire_API.Applications.Convertions
                 Descricao = vaga.Descricao,
                 NomeEmpresa = vaga.Empresa?.Nome ?? "Empresa não encontrada",
                 EmpresaId = vaga.EmpresaId,
+                NomeSetor = vaga.Setor.Nome.ToUpper(),
+                SetorId = vaga.SetorId,
                 //? Para trabalhar com jsonb com o linq do EF Core
                 IdiomasDesejados = LerIdiomas(vaga.IdiomasDesejados),
                 StatusVaga = vaga.StatusVaga,

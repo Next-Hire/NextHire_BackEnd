@@ -16,6 +16,15 @@ namespace NextHire_API.Applications.Services
 
         public CurriculoVagaService(ICurriculoVagaRepository repository) => _repository = repository;
 
+        public async Task<List<ListarCurriculoVagaDto>> ListarTodasAsCandidaturasPorEmpresaId(int empresaId)
+        {
+            List<CurriculoVaga> candidaturas = await _repository.ListarTodasAsCandidaturasPorEmpresaId(empresaId);
+            if(candidaturas == null || candidaturas.Count == 0)
+                throw new DomainException("Nenhum candidato encontrado para a vaga informada.");
+
+            return candidaturas.Select(c => CurriculoVagaToDTO.CurriculoVagaToDto(c)).ToList();
+        }
+
         public async Task<List<ListarCurriculoVagaDto>> ListarCandidatosPorVagaId(int vagaId)
         {
             List<CurriculoVaga> candidaturas = await _repository.ListarCandidatosPorVagaId(vagaId);

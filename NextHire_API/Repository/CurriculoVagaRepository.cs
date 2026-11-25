@@ -14,6 +14,21 @@ namespace NextHire_API.Repository
         {
             _context = context;
         }
+        public async Task<List<CurriculoVaga>> ListarTodasAsCandidaturasPorEmpresaId(int empresaId)
+        {
+            var candidaturas = await _context.CurriculoVaga
+                .Include(c => c.Curriculo)
+                    .ThenInclude(c => c.Candidato)
+                .Include(c => c.Vaga)
+                .Where(c => c.Vaga.Empresa.EmpresaId == empresaId)
+                .ToListAsync();
+
+            if (candidaturas == null || candidaturas.Count <= 0)
+                throw new DomainException("Nenhuma candidatura encontrada");
+
+            return candidaturas;
+        }
+
         public async Task<List<CurriculoVaga>> ListarCandidatosPorVagaId(int vagaId)
         {
             var candidaturas = await _context.CurriculoVaga
@@ -28,6 +43,7 @@ namespace NextHire_API.Repository
 
             return candidaturas;
         }
+
         public async Task<List<Vaga>> ListarVagasPorCandidatoId(int candidatoId)
         {
             var vagas = await _context.Vaga

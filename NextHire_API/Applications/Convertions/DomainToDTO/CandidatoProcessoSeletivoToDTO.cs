@@ -9,9 +9,9 @@ public class CandidatoProcessoSeletivoToDTO
         => new LerCandidatoProcessoDTO
         {
             processoSeletivoId = candProcesso.ProcessoSeletivoId,
-            nomeProcesso = candProcesso.ProcessoSeletivo.TituloProcesso,
+            nomeProcesso = candProcesso.ProcessoSeletivo?.TituloProcesso ??  string.Empty,
             candidatoId = candProcesso.CandidatoId,
-            nomeCandidato = candProcesso.Candidato.Nome,
+            nomeCandidato = candProcesso.Candidato?.Nome ?? string.Empty,
             StatusRelacao =  candProcesso.StatusRelacao,
         };
 }

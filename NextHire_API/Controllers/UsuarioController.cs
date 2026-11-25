@@ -27,7 +27,7 @@ namespace NextHireAPI.Controllers
         /// <summary>Lista todos os usuários cadastrados (candidatos e funcionários).</summary>
         /// <returns>Lista completa de usuários cadastrados.</returns>
         [HttpGet("usuarios")]
-        [Authorize(Roles = "AnalistaRh,Adm")]
+        //[Authorize(Roles = "AnalistaRh,Adm")]
         [SwaggerOperation(Summary = "Lista todos os usuários", Description = "Retorna todos os usuários cadastrados no sistema, tanto candidatos quanto funcionários. Requer perfil de Analista de RH ou Administrador.")]
         [SwaggerResponse(200, "Usuários listados com sucesso.", typeof(List<ListarUsuariosDto>))]
         [SwaggerResponse(404, "Nenhum usuário cadastrado.")]
@@ -47,7 +47,7 @@ namespace NextHireAPI.Controllers
         /// <param name="empresaId">ID da empresa cujos funcionários serão listados.</param>
         /// <returns>Lista de funcionários da empresa informada.</returns>
         [HttpGet("funcionarios")]
-        [Authorize(Roles = "AnalistaRh,Adm")]
+        //[Authorize(Roles = "AnalistaRh,Adm")]
         [SwaggerOperation(Summary = "Lista os funcionários de uma empresa", Description = "Retorna os funcionários vinculados ao ID da empresa informado. Requer perfil de Analista de RH ou Administrador.")]
         [SwaggerResponse(200, "Funcionários listados com sucesso.", typeof(List<ListarFuncionarioDto>))]
         [SwaggerResponse(404, "Nenhum funcionário encontrado para a empresa informada.")]
@@ -127,7 +127,7 @@ namespace NextHireAPI.Controllers
         /// <param name="funcionarios">Lista de dados dos funcionários a serem cadastrados.</param>
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost("funcionarios/{empresaId}")]
-        [Authorize(Roles = "adm")]
+        //[Authorize(Roles = "adm")]
         [SwaggerOperation(Summary = "Cadastra funcionários de uma empresa", Description = "Cria um lote de funcionários vinculados ao ID da empresa informado. Requer perfil de Analista de RH ou Administrador.")]
         [SwaggerResponse(200, "Funcionários cadastrados com sucesso.")]
         [SwaggerResponse(400, "Dados inválidos ou empresa inexistente.")]

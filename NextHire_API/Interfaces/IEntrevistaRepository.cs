@@ -5,6 +5,7 @@ namespace NextHire_API.Interfaces
     public interface IEntrevistaRepository
     {
         public Task<List<Entrevista>> Listar();
+        public Task<List<Entrevista>> ListarPorStatus(bool status);
         public Task<List<Entrevista>> EntrevistasHoje(DateTime data);
         public Task<List<Entrevista>> BuscarPorCandidato(int candidatoId);
         public Task<Entrevista?> BuscarPorId(int id);

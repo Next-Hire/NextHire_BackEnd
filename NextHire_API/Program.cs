@@ -22,6 +22,7 @@ using NextHire_API.Applications.S3;
 using NextHire_API.Applications.Integrations;
 using NextHire_API.Exceptions;
 using NextHire_API.Applications.Auth;
+using Microsoft.EntityFrameworkCore.Diagnostics; // adicione no topo do Program.cs, se necessário
 
 Env.Load();
 System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -231,8 +232,12 @@ builder.Services.AddScoped<ComentarioService>();
 builder.Services.AddScoped<IEntrevistaRepository, EntrevistaRepository>();
 builder.Services.AddScoped<EntrevistaService>();
 
+//Procesos Seletivos
 builder.Services.AddScoped<IProcessoSeletivoRepository, ProcessoSeletivoRepository>();
 builder.Services.AddScoped<ProcessoSeletivoService>();
+
+builder.Services.AddScoped<IProcessoSeletivoCandidatoRepository, ProcessoSeletivoCandidatoRepository>();
+builder.Services.AddScoped<CandidatoProcessoSeletivoService>();
 
 // Vaga
 builder.Services.AddScoped<IVagaRepository, VagaRepository>();
@@ -284,12 +289,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<NextHireContext>();
-    db.Database.Migrate();
-}
+ 
 // Configure the HTTP request pipeline.
 
 if (app.Environment.IsDevelopment())
@@ -330,3 +330,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+// dotnet ef migrations add SyncMergeModel --ignore-changes

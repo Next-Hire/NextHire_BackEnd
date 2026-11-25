@@ -3,228 +3,245 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using NextHire_API.Applications.Services;
-using NextHire_API.DTOs.Setor_OcupacaoDTOs;
+using NextHire_API.DTOs.CandidatoProcessoSeletivoDTO;
 using NextHire_API.Exceptions;
 
 namespace NextHire_API.Controllers
 {
-    /// <summary>Endpoints de gerenciamento de setores de ocupação dentro das áreas de uma empresa.</summary>
+    /// <summary>Endpoints de gerenciamento do vínculo e avanço de candidatos nos processos seletivos.</summary>
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class Setor_OcupacaoController : ControllerBase
+    public class CandidatoProcessoSeletivoController : ControllerBase
     {
-        private readonly Setor_OcupacaoService _service;
-        public Setor_OcupacaoController(Setor_OcupacaoService service) => _service = service;
+        private readonly CandidatoProcessoSeletivoService _service;
+        public CandidatoProcessoSeletivoController(CandidatoProcessoSeletivoService service) => _service = service;
 
-        /// <summary>Lista todos os setores de ocupação cadastrados.</summary>
-        /// <returns>Lista completa de setores de ocupação.</returns>
+        /// <summary>Lista todos os vínculos entre candidatos e processos seletivos cadastrados.</summary>
+        /// <returns>Lista completa de candidatos vinculados a processos seletivos.</returns>
         [HttpGet]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Lista todos os setores de ocupação", Description = "Retorna todos os setores de ocupação cadastrados no sistema.")]
-        [SwaggerResponse(200, "Setores listados com sucesso.", typeof(List<LerSetor_OcupacaoDTO2>))]
-        [SwaggerResponse(404, "Nenhum setor de ocupação cadastrado.")]
-        public async Task<ActionResult<IEnumerable<LerSetor_OcupacaoDTO2?>>> Listar()
+        [SwaggerOperation(Summary = "Lista todos os candidatos e processos relacionados", Description = "Retorna todos os processos seletivos e seus respectivos candidatos vinculados no sistema.")]
+        [SwaggerResponse(200, "Vínculos listados com sucesso.", typeof(List<LerCandidatoProcessoDTO>))]
+        [SwaggerResponse(404, "Nenhum vínculo entre candidato e processo seletivo encontrado.")]
+        public async Task<ActionResult<List<LerCandidatoProcessoDTO>>> Listar()
         {
             try
             {
-                IEnumerable<LerSetor_OcupacaoDTO2> listaSetores = await _service.Listar();
-                if (listaSetores == null || !listaSetores.Any())
-                    return NotFound(listaSetores);
-
-                return Ok(listaSetores);
+                List<LerCandidatoProcessoDTO> lista = await _service.Listar();
+                if (lista == null || lista.Count == 0)
+                    return NotFound(lista);
+                
+                return Ok(lista);
             }
             catch (DomainException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(new { mensagem = ex.Message });
             }
         }
 
-        /// <summary>Busca um setor de ocupação específico pelo ID.</summary>
-        /// <param name="setorId">ID do setor de ocupação desejado.</param>
-        /// <returns>Dados do setor de ocupação encontrado.</returns>
-        [HttpGet("BuscarPorId/{setorId}")]
+        /// <summary>Lista todos os candidatos aprovados (com status Avança) em um processo seletivo.</summary>
+        /// <param name="processoId">ID do processo seletivo desejado.</param>
+        /// <returns>Lista de candidatos aprovados no processo seletivo informado.</returns>
+        [HttpGet("aprovados/{processoId:int}")]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Busca um setor de ocupação pelo ID", Description = "Retorna os dados do setor de ocupação correspondente ao ID informado.")]
-        [SwaggerResponse(200, "Setor de ocupação encontrado.", typeof(LerSetor_OcupacaoDTO2))]
-        [SwaggerResponse(404, "Setor de ocupação não encontrado.")]
-        public async Task<ActionResult<LerSetor_OcupacaoDTO2?>> ObterSetorPorId(int setorId)
+        [SwaggerOperation(Summary = "Lista os candidatos aprovados de um processo seletivo", Description = "Retorna todos os candidatos com status 'Avança' vinculados ao ID do processo seletivo informado.")]
+        [SwaggerResponse(200, "Candidatos aprovados listados com sucesso.", typeof(List<LerCandidatoProcessoDTO>))]
+        [SwaggerResponse(400, "ID inválido ou processo seletivo não encontrado.")]
+        public async Task<ActionResult<List<LerCandidatoProcessoDTO>>> ListarAprovados(int processoId)
         {
             try
             {
-                LerSetor_OcupacaoDTO2 setor = await _service.ObterSetorPorId(setorId);
-                return Ok(setor);
+                List<LerCandidatoProcessoDTO> aprovados = await _service.ListarAprovados(processoId);
+                return Ok(aprovados);
             }
             catch (DomainException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
 
-        /// <summary>Busca um setor de ocupação pelo nome.</summary>
-        /// <param name="setorNome">Nome do setor de ocupação desejado.</param>
-        /// <returns>Dados do setor de ocupação encontrado.</returns>
-        [HttpGet("BuscarPorNome/{setorNome}")]
+        /// <summary>Busca um vínculo específico entre candidato e processo seletivo pelos seus IDs.</summary>
+        /// <param name="candidatoId">ID do candidato desejado.</param>
+        /// <param name="processoSeletivoId">ID do processo seletivo desejado.</param>
+        /// <returns>Dados do vínculo entre o candidato e o processo seletivo informados.</returns>
+        [HttpGet("candidato/{candidatoId:int}/processo/{processoSeletivoId:int}")]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Busca um setor de ocupação pelo nome", Description = "Retorna os dados do setor de ocupação correspondente ao nome informado.")]
-        [SwaggerResponse(200, "Setor de ocupação encontrado.", typeof(LerSetor_OcupacaoDTO2))]
-        [SwaggerResponse(404, "Setor de ocupação não encontrado.")]
-        public async Task<ActionResult<LerSetor_OcupacaoDTO2?>> ObterSetorNome(string setorNome)
+        [SwaggerOperation(Summary = "Busca um vínculo pelo ID do candidato e do processo seletivo", Description = "Retorna os dados da relação correspondente à chave composta formada pelo ID do candidato e pelo ID do processo seletivo.")]
+        [SwaggerResponse(200, "Vínculo encontrado com sucesso.", typeof(LerCandidatoProcessoDTO))]
+        [SwaggerResponse(400, "IDs inválidos ou vínculo não encontrado.")]
+        public async Task<ActionResult<LerCandidatoProcessoDTO>> BuscarPorId(int candidatoId, int processoSeletivoId)
         {
             try
             {
-                LerSetor_OcupacaoDTO2 setor = await _service.ObterSetorNome(setorNome);
-                return Ok(setor);
+                LerCandidatoProcessoDTO relacao = await _service.BuscarPorId(candidatoId, processoSeletivoId);
+                return Ok(relacao);
             }
             catch (DomainException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
 
-        /// <summary>Busca o setor de ocupação de uma área, com filtro opcional pelo nome da área.</summary>
-        /// <param name="areaId">ID da área de ocupação.</param>
-        /// <param name="nomeArea">Nome opcional da área para refinar a busca.</param>
-        /// <returns>Dados do setor de ocupação vinculado à área informada.</returns>
-        [HttpGet("BuscarPorArea/{areaId}")]
+        /// <summary>Busca o vínculo correspondente ao ID de um processo seletivo.</summary>
+        /// <param name="processoSeletivoId">ID do processo seletivo desejado.</param>
+        /// <returns>Dados do vínculo encontrado para o processo seletivo informado.</returns>
+        [HttpGet("processo/{processoSeletivoId:int}")]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Busca o setor de ocupação de uma área", Description = "Retorna o setor de ocupação vinculado à área informada, com filtro opcional pelo nome da área.")]
-        [SwaggerResponse(200, "Setor de ocupação encontrado.", typeof(LerSetor_OcupacaoDTO2))]
-        [SwaggerResponse(404, "Setor de ocupação não encontrado para a área informada.")]
-        public async Task<ActionResult<LerSetor_OcupacaoDTO2?>> ObterSetorPorArea(int areaId, [FromQuery] string? nomeArea)
+        [SwaggerOperation(Summary = "Busca vínculo pelo ID do processo seletivo", Description = "Retorna os dados da relação vinculada ao ID do processo seletivo informado.")]
+        [SwaggerResponse(200, "Vínculo encontrado com sucesso.", typeof(LerCandidatoProcessoDTO))]
+        [SwaggerResponse(400, "ID inválido ou nenhum candidato vinculado ao processo seletivo.")]
+        public async Task<ActionResult<LerCandidatoProcessoDTO>> BuscarPorProcessoSeletivoId(int processoSeletivoId)
         {
             try
             {
-                LerSetor_OcupacaoDTO2 setor = await _service.ObterSetorPorArea(areaId, nomeArea);
-                return Ok(setor);
+                LerCandidatoProcessoDTO relacao = await _service.BuscarPorProcessoSeletivoId(processoSeletivoId);
+                return Ok(relacao);
             }
             catch (DomainException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
 
-        /// <summary>Lista os setores de ocupação de uma empresa filtrados por área.</summary>
-        /// <param name="empresaId">ID da empresa.</param>
-        /// <param name="empresaNome">Nome opcional da empresa para refinar a busca.</param>
-        /// <param name="nomeArea">Nome opcional da área para refinar a busca.</param>
-        /// <param name="areaId">ID da área de ocupação.</param>
-        /// <returns>Setores de ocupação da empresa na área informada.</returns>
-        [HttpGet("ListarPorEmpresaEArea")]
+        /// <summary>Busca o vínculo correspondente ao ID de um candidato.</summary>
+        /// <param name="candidatoId">ID do candidato desejado.</param>
+        /// <returns>Dados do vínculo encontrado para o candidato informado.</returns>
+        [HttpGet("candidato/{candidatoId:int}")]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Lista setores por empresa e área", Description = "Retorna os setores de ocupação da empresa informada, filtrados pelos dados de área recebidos por query.")]
-        [SwaggerResponse(200, "Setores listados com sucesso.", typeof(List<LerSetor_OcupacaoDTO2>))]
-        [SwaggerResponse(404, "Nenhum setor de ocupação encontrado para a empresa e área informadas.")]
-        public async Task<ActionResult<IEnumerable<LerSetor_OcupacaoDTO2?>>> ObterListagemSetoresPorEmpresaEPorArea(
-            [FromQuery] int empresaId, 
-            [FromQuery] string? empresaNome, 
-            [FromQuery] string? nomeArea, 
-            [FromQuery] int areaId)
+        [SwaggerOperation(Summary = "Busca vínculo pelo ID do candidato", Description = "Retorna os dados da relação vinculada ao ID do candidato informado.")]
+        [SwaggerResponse(200, "Vínculo encontrado com sucesso.", typeof(LerCandidatoProcessoDTO))]
+        [SwaggerResponse(400, "ID inválido ou nenhum processo seletivo vinculado ao candidato.")]
+        public async Task<ActionResult<LerCandidatoProcessoDTO>> BuscarPorCandidatoId(int candidatoId)
         {
             try
             {
-                IEnumerable<LerSetor_OcupacaoDTO2?> listaSetores = await _service.ObterListagemSetoresPorEmpresaEPorArea(empresaId, empresaNome, nomeArea, areaId);
-                return Ok(listaSetores);
+                LerCandidatoProcessoDTO relacao = await _service.BuscarPorCandidatoId(candidatoId);
+                return Ok(relacao);
             }
             catch (DomainException ex)
             {
-                return NotFound(ex.Message);
-            }
-        }
-
-        /// <summary>Lista todos os setores de ocupação de uma empresa.</summary>
-        /// <param name="empresaId">ID da empresa.</param>
-        /// <param name="nomeEmpresa">Nome opcional da empresa para refinar a busca.</param>
-        /// <returns>Setores de ocupação da empresa informada.</returns>
-        [HttpGet("BuscarPorEmpresa")]
-        [AllowAnonymous]
-        [SwaggerOperation(Summary = "Lista os setores de ocupação de uma empresa", Description = "Retorna todos os setores de ocupação vinculados à empresa informada, com filtro opcional pelo nome da empresa.")]
-        [SwaggerResponse(200, "Setores listados com sucesso.", typeof(List<LerSetor_OcupacaoDTO2>))]
-        [SwaggerResponse(404, "Nenhum setor de ocupação encontrado para a empresa informada.")]
-        public async Task<ActionResult<IEnumerable<LerSetor_OcupacaoDTO2?>>> ObterSetoresPorEmpresa(
-            [FromQuery] int empresaId, 
-            [FromQuery] string? nomeEmpresa)
-        {
-            try
-            {
-                IEnumerable<LerSetor_OcupacaoDTO2> listaSetores = await _service.ObterSetoresPorEmpresa(empresaId, nomeEmpresa);
-                return Ok(listaSetores);
-            }
-            catch (DomainException ex)
-            {
-                return NotFound(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
         
-        /// <summary>Cadastra um novo setor de ocupação.</summary>
-        /// <param name="criarDTO">Dados do setor de ocupação a ser criado.</param>
-        /// <returns>Dados do setor de ocupação criado.</returns>
+        /// <summary>Busca todos os vínculos correspondentes ao ID de um processo seletivo.</summary>
+        /// <param name="processoSeletivoId">ID do processo seletivo desejado.</param>
+        /// <returns>Lista de vínculos encontrados para o processo seletivo informado.</returns>
+        [HttpGet("processo/candidatos/{processoSeletivoId:int}")]
+        [AllowAnonymous]
+        [SwaggerOperation(Summary = "Lista vínculos pelo ID do processo seletivo", Description = "Retorna todos os candidatos vinculados ao ID do processo seletivo informado.")]
+        [SwaggerResponse(200, "Vínculos encontrados com sucesso.", typeof(List<LerCandidatoProcessoDTO>))]
+        [SwaggerResponse(400, "ID inválido ou nenhum candidato vinculado ao processo seletivo.")]
+        public async Task<ActionResult<List<LerCandidatoProcessoDTO>>> BuscarCandidatosPorProcessoSeletivo(int processoSeletivoId)
+        {
+            try
+            {
+                List<LerCandidatoProcessoDTO> relacoes = await _service.BuscarCandidatosPorProcessoSeletivoId(processoSeletivoId);
+                return Ok(relacoes);
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
+            }
+        }
+
+        /// <summary>Vincula um candidato a um processo seletivo.</summary>
+        /// <param name="dto">Dados do vínculo entre candidato e processo seletivo a ser criado.</param>
+        /// <returns>Dados do vínculo criado.</returns>
         [HttpPost]
-        [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Cadastra um novo setor de ocupação", Description = "Cria um setor de ocupação e retorna os dados do setor criado. Requer perfil de Analista de RH ou Administrador.")]
-        [SwaggerResponse(200, "Setor de ocupação cadastrado com sucesso.", typeof(CriarSetor_OcupacaoDTO))]
-        [SwaggerResponse(400, "Dados inválidos ou erro ao cadastrar o setor de ocupação.")]
-        public async Task<ActionResult<CriarSetor_OcupacaoDTO>> Adicionar([FromBody] CriarSetor_OcupacaoDTO criarDTO)
+        [Authorize(Roles = "Administrador,AnalistaRh,Gestor")]
+        [SwaggerOperation(Summary = "Vincula um candidato a um processo seletivo", Description = "Cria a relação entre candidato e processo seletivo com o status inicial informado e retorna os dados criados. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [SwaggerResponse(201, "Candidato vinculado ao processo seletivo com sucesso.", typeof(LerCandidatoProcessoDTO))]
+        [SwaggerResponse(400, "Dados inválidos, processo encerrado, vínculo duplicado ou erro ao cadastrar.")]
+        public async Task<ActionResult<LerCandidatoProcessoDTO>> AdicionarCandidatoProcesso(
+            [FromBody] CriarCandidatoProcessoDTO dto)
         {
             try
             {
-                CriarSetor_OcupacaoDTO setorCriado = await _service.Adicionar(criarDTO);
-                return Ok(setorCriado);
+                LerCandidatoProcessoDTO criado = await _service.AdicionarCandidatoProcesso(dto);
+                return CreatedAtAction(
+                    nameof(BuscarPorId),
+                    new { candidatoId = criado.candidatoId, processoSeletivoId = criado.processoSeletivoId },
+                    criado);
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
+            }
+        }
+        
+        /// <summary>Vincula um ou mais candidatos a um processo seletivo em uma única requisição.</summary>
+        /// <param name="dto">ID do processo seletivo, lista de IDs dos candidatos e status inicial.</param>
+        /// <returns>Lista dos vínculos criados.</returns>
+        [HttpPost("candidatos")]
+        [Authorize(Roles = "Adm,AnalistaRh,Gestor")]
+        [SwaggerOperation(Summary = "Vincula vários candidatos a um processo seletivo", Description = "Cria em lote a relação entre múltiplos candidatos e um processo seletivo com o status inicial informado. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [SwaggerResponse(200, "Candidatos vinculados ao processo seletivo com sucesso.", typeof(List<LerCandidatoProcessoDTO>))]
+        [SwaggerResponse(400, "Dados inválidos, candidatos já vinculados ou erro ao cadastrar.")]
+        public async Task<ActionResult<List<LerCandidatoProcessoDTO>>> AdicionarCandidatosProcessoEmLote(
+            [FromBody] CriarCandidatosNoProcessoSeletivoDTO dto)
+        {
+            try
+            {
+                List<LerCandidatoProcessoDTO> criados = await _service.AdicionarCandidatosNoProcessoSeletivo(dto);
+                return Created();
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
 
-        /// <summary>Atualiza os dados de um setor de ocupação existente.</summary>
-        /// <param name="setorId">ID do setor de ocupação a ser atualizado.</param>
-        /// <param name="atualizarDTO">Novos dados do setor de ocupação.</param>
-        /// <returns>Dados do setor de ocupação atualizado.</returns>
-        [HttpPut("Atualizar/{setorId}")]
-        [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Atualiza um setor de ocupação", Description = "Substitui os dados do setor de ocupação informado e retorna o setor atualizado. Requer perfil de Analista de RH ou Administrador.")]
-        [SwaggerResponse(200, "Setor de ocupação atualizado com sucesso.", typeof(AtualizarSetor_OcupacaoDTO))]
-        [SwaggerResponse(400, "Dados inválidos, setor inexistente ou erro ao atualizar.")]
-        public async Task<ActionResult<AtualizarSetor_OcupacaoDTO>> Atualizar(int setorId, [FromBody] AtualizarSetor_OcupacaoDTO atualizarDTO)
+        /// <summary>Atualiza o status da relação de um candidato em um processo seletivo.</summary>
+        /// <param name="candidatoId">ID do candidato.</param>
+        /// <param name="processoSeletivoId">ID do processo seletivo.</param>
+        /// <param name="dto">Novo status da relação do candidato no processo seletivo.</param>
+        /// <returns>Dados do vínculo atualizado.</returns>
+        [HttpPut("candidato/{candidatoId}/processo/{processoSeletivoId}")]
+        [Authorize(Roles = "Administrador,AnalistaRh,Gestor")]
+        [SwaggerOperation(Summary = "Atualiza o status de um candidato no processo seletivo", Description = "Altera o status da relação (Considera, Avança ou Não Avança) entre o candidato e o processo seletivo informados. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [SwaggerResponse(200, "Status atualizado com sucesso.", typeof(LerCandidatoProcessoDTO))]
+        [SwaggerResponse(400, "Dados inválidos, vínculo inexistente ou erro ao atualizar.")]
+        public async Task<ActionResult<LerCandidatoProcessoDTO>> AtualizarCandidatoProcesso(
+            int candidatoId,
+            int processoSeletivoId,
+            [FromBody] AtualizarCandidatoProcessoDTO dto)
         {
             try
             {
-                var setorAtualizado = await _service.Atualizar(setorId, atualizarDTO);
-                return Ok(setorAtualizado);
+                LerCandidatoProcessoDTO atualizado = await _service.AtualizarCandidatoProcesso(
+                    candidatoId,
+                    processoSeletivoId,
+                    dto);
+                return Ok(atualizado);
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
 
-        /// <summary>Remove um setor de ocupação de uma área de uma empresa.</summary>
-        /// <param name="setorId">ID do setor de ocupação a ser removido.</param>
-        /// <param name="areaId">ID da área à qual o setor pertence.</param>
-        /// <param name="empresaId">ID da empresa à qual o setor pertence.</param>
-        /// <param name="nomeEmpresa">Nome opcional da empresa para refinar a busca.</param>
-        /// <param name="nomeArea">Nome opcional da área para refinar a busca.</param>
-        /// <returns>Dados do setor de ocupação removido.</returns>
-        [HttpDelete]
-        [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Remove um setor de ocupação", Description = "Exclui o setor de ocupação informado, identificado pelos dados de setor, área e empresa recebidos por query, e retorna o setor removido. Requer perfil de Analista de RH ou Administrador.")]
-        [SwaggerResponse(200, "Setor de ocupação removido com sucesso.", typeof(LerSetor_OcupacaoDTO2))]
-        [SwaggerResponse(400, "Setor de ocupação não encontrado ou erro ao remover.")]
-        public async Task<ActionResult<LerSetor_OcupacaoDTO2>> RemoverSetor(
-            int setorId, 
-            [FromQuery] int areaId, 
-            [FromQuery] int empresaId, 
-            [FromQuery] string? nomeEmpresa, 
-            [FromQuery] string? nomeArea)
+        /// <summary>Remove o vínculo de um candidato com um processo seletivo.</summary>
+        /// <param name="candidatoId">ID do candidato.</param>
+        /// <param name="processoSeletivoId">ID do processo seletivo.</param>
+        /// <returns>Dados do vínculo removido.</returns>
+        [HttpDelete("candidato/{candidatoId:int}/processo/{processoSeletivoId:int}")]
+        // [Authorize(Roles = "Administrador,AnalistaRh,Gestor")]
+        [SwaggerOperation(Summary = "Remove um candidato de um processo seletivo", Description = "Exclui a relação entre o candidato e o processo seletivo informados e retorna os dados do vínculo removido. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [SwaggerResponse(200, "Vínculo removido com sucesso.", typeof(LerCandidatoProcessoDTO))]
+        [SwaggerResponse(400, "Vínculo não encontrado ou erro ao remover.")]
+        public async Task<ActionResult<LerCandidatoProcessoDTO>> RemoverCandidatoProcesso(
+            int candidatoId,
+            int processoSeletivoId)
         {
             try
             {
-                LerSetor_OcupacaoDTO2? setorRemovido = await _service.RemoverSetor(setorId, areaId, empresaId, nomeEmpresa, nomeArea);
-                return Ok(setorRemovido);
+                LerCandidatoProcessoDTO removido = await _service.RemoverCandidatoProcesso(candidatoId, processoSeletivoId);
+                return Ok(removido);
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
     }

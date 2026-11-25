@@ -240,3 +240,18 @@ CREATE TABLE IF NOT EXISTS avaliacao_agente (
     candidato_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
     CONSTRAINT uq_avaliacao_agente_vaga_candidato UNIQUE (vaga_id, candidato_id)
 );
+
+-- ─── ÍNDICES E UNICIDADE ───────────────────────────────────────────────────
+-- Evitam áreas duplicadas e setores repetidos dentro da mesma empresa/área.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_area_ocupacao_nome
+    ON area_ocupacao (lower(nome));
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_setor_ocupacao_empresa_area_nome
+    ON setor_ocupacao (empresa_id, area_ocupacao_id, lower(nome));
+
+-- Apoiam filtros por perfil e por área nos selects/listagens.
+CREATE INDEX IF NOT EXISTS ix_usuario_tipo_usuario
+    ON usuario (tipo_usuario);
+
+CREATE INDEX IF NOT EXISTS ix_setor_ocupacao_area_ocupacao_id
+    ON setor_ocupacao (area_ocupacao_id);

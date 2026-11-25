@@ -42,8 +42,7 @@ namespace NextHire_API.Applications.Convertions.DomainToDto
         public static CriarCurriculoDTO criarCurriculo(CurriculoCandidato curriculoCandidato)
             => new CriarCurriculoDTO
             {
-                candidatoId = curriculoCandidato.CandidatoId,
-                nomeCandidato = curriculoCandidato.Candidato?.Nome ?? string.Empty,
+                // candidatoId =  curriculoCandidato.CandidatoId,
                 curriculoConvertido = desserializarResposta(curriculoCandidato.CurriculoConvertido)
             };
 

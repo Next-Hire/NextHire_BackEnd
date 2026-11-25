@@ -49,6 +49,15 @@ public class ProcessoSeletivoCandidatoRepository : IProcessoSeletivoCandidatoRep
             .Include(varAux => varAux.Candidato)
             .Include(varAux => varAux.ProcessoSeletivo)
             .FirstOrDefaultAsync(varAux => varAux.ProcessoSeletivoId == processoSeletivoId);
+
+
+    public async Task<List<CandidatoProcessoSeletivo>> ListarCandidatosDoProcesso(int processoId)
+        => await _ctx.CandidatoProcessoSeletivo
+            .AsNoTracking()
+            .Include(varAux => varAux.Candidato)
+            .Include(varAux => varAux.ProcessoSeletivo)
+            .Where(varAux => varAux.ProcessoSeletivoId == processoId)
+            .ToListAsync();
     
     public async Task<CandidatoProcessoSeletivo> BuscarPorCandidatoId(int candidatoId)
         => await _ctx.CandidatoProcessoSeletivo
@@ -64,6 +73,26 @@ public class ProcessoSeletivoCandidatoRepository : IProcessoSeletivoCandidatoRep
         await _ctx.SaveChangesAsync();
         return candProcesso;
 
+    }
+    
+    
+    public async Task<List<CandidatoProcessoSeletivo>> AdicionarCandidatosNoProcesso(List<CandidatoProcessoSeletivo> entidades)
+    {
+        await _ctx.CandidatoProcessoSeletivo.AddRangeAsync(entidades);
+        await _ctx.SaveChangesAsync();
+
+        int processoId = entidades.First().ProcessoSeletivoId;
+        if (processoId == null)
+            return null;
+        List<int> candidatosIds = entidades.Select(e => e.CandidatoId).ToList();
+        if (candidatosIds == null || candidatosIds.Count == 0)
+            return null;
+
+        return await _ctx.CandidatoProcessoSeletivo
+            .Include(x => x.Candidato)
+            .Include(x => x.ProcessoSeletivo)
+            .Where(x => x.ProcessoSeletivoId == processoId && candidatosIds.Contains(x.CandidatoId))
+            .ToListAsync();
     }
 
 

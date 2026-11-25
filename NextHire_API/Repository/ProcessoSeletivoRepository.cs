@@ -82,6 +82,17 @@ namespace NextHire_API.Repository
                 await _context.SaveChangesAsync();
                 return true;
             }
+
+        public async Task<List<ProcessoSeletivo>> ListarProcessosSeletivosPorStatus(bool status)
+        {
+            return await _context.ProcessoSeletivo
+                    .Include(p => p.Vaga)
+                    .ThenInclude(p => p.Empresa)
+                    .ThenInclude(p => p.SetorOcupacao)
+                    .ThenInclude(p => p.AreaOcupacao)
+                    .Where(p => p.StatusProcessoSeletivo == status)
+                    .ToListAsync();
         }
+    }
     }
         

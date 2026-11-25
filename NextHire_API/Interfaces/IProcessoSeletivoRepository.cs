@@ -5,6 +5,7 @@ namespace NextHire_API.Interfaces
     public interface IProcessoSeletivoRepository
     {
         Task<List<ProcessoSeletivo>> ListarProcessosSeletivos();
+        Task<List<ProcessoSeletivo>> ListarProcessosSeletivosPorStatus(bool status);
         Task<List<ProcessoSeletivo>> ListarProcessosSeletivosPorEmpresaId(int empresaId);
         Task<List<ProcessoSeletivo>> ListarProcessosSeletivosPorSetorId(int setorId);
         Task<List<ProcessoSeletivo>> ListarProcessosSeletivosPorAreaId(int areaId);

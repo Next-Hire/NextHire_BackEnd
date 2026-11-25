@@ -96,5 +96,13 @@ namespace NextHire_API.Applications.Services
 
         public async Task<bool> RemoverProcessoSeletivo(int processoId)
             => await _repository.RemoverProcessoSeletivo(processoId);
+
+        public async Task<List<ListarProcessoSeletivoDto>> ListarProcessosSeletivosPorStatus(bool status)
+        {
+            List<ProcessoSeletivo> processos = await _repository.ListarProcessosSeletivosPorStatus(status);
+            return processos
+                .Select(p => ProcessoSeletivoToDto.ConvertProcessoSeletivoToDto(p))
+                .ToList();
+        }
     }
 }

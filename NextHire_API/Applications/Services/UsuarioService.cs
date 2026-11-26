@@ -62,6 +62,10 @@ namespace NextHireAPI.Applications.Services
             return funcionario;
         }
 
+        public async Task<ListarUsuariosDto> BuscarUsuarioPorEmail(string email) =>
+            UsuarioToDto.UsuariosToDto(await _repository.BuscarUsuarioPorEmail(email)) 
+            ?? throw new DomainException("Usuário não encontrado");
+
         public async Task<ListarCandidatoDto> BuscarCandidatoPorId(int candidatoId)
             => UsuarioToDto.CandidatoToDto
             (

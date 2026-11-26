@@ -14,9 +14,10 @@ public partial class Usuario
 
     public bool? PrimeiroAcesso { get; set; }
 
-    public string Senha { get; set; } = null!;
+    public string? Senha { get; set; }
 
     public bool? StatusUsuario { get; set; }
+    public bool? is_OAuth { get; set; }
 
     public TipoUsuarioEnum TipoUsuario { get; set; }
 

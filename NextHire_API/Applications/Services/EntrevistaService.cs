@@ -84,7 +84,8 @@ public async Task<LerEntrevistaDTO> AdicionarEntrevista(CriarEntrevistaDTO dto)
         HorarioInicio = inicio,
         HorarioFim = fim,
         ProcessoSeletivoId = dto.ProcessoSeletivoId,
-        StatusEntrevista = true
+        StatusEntrevista = true,
+        Link = ResolverLink(dto.link)
     };
     List<Usuario> candidatosQuery = await _usuarioRep.ListarCandidatos();
     List<int> candidatosQueryIds = candidatosQuery.Select(c => c.UsuarioId).ToList();
@@ -114,14 +115,14 @@ public async Task<LerEntrevistaDTO> AtualizarCandidatoNaEntrevista(int entrevist
     return EntrevistaToDTO.LerDTO(entrevistaAtualizada);
 }
 
-public async Task<LerEntrevistaDTO> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal)
+public async Task<LerEntrevistaDTO> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal, string? link = null)
 {
     if (entrevistaId <= 0)
         throw new DomainException("ID da entrevista inválido.");
 
-    if (!dataInicio.HasValue && !dataFinal.HasValue)
-        throw new DomainException("Informe ao menos a data de início ou a data final.");
- 
+    if (!dataInicio.HasValue && !dataFinal.HasValue && string.IsNullOrWhiteSpace(link))
+        throw new DomainException("Informe ao menos a data de início, a data final ou o link.");
+
     Entrevista entrevistaExistente = await _rep.BuscarPorId(entrevistaId)
                                      ?? throw new DomainException("Entrevista não encontrada.");
 
@@ -143,7 +144,7 @@ public async Task<LerEntrevistaDTO> AtualizarDataDaEntrevista(int entrevistaId, 
         throw new DomainException("A data/hora final deve ser maior que a data/hora inicial.");
 
     
-    Entrevista? entrevistaAtualizada = await _rep.AtualizarDataDaEntrevista(entrevistaId, inicio, fim);
+    Entrevista? entrevistaAtualizada = await _rep.AtualizarDataDaEntrevista(entrevistaId, inicio, fim, link);
     if (entrevistaAtualizada == null)
         throw new DomainException("Não foi possível atualizar as datas da entrevista.");
 
@@ -169,6 +170,18 @@ public async Task<LerEntrevistaDTO> RemoverEntrevista(int id)
         return entrevistas
             .Select(e => EntrevistaToDTO.LerDTO(e))
             .ToList();
+    }
+
+    /// <summary>
+    /// Usa o link enviado no DTO; se vazio, cai para INTERVIEW_LINK do .env.
+    /// </summary>
+    private static string? ResolverLink(string? link)
+    {
+        if (!string.IsNullOrWhiteSpace(link))
+            return link.Trim();
+
+        string? padrao = Environment.GetEnvironmentVariable("INTERVIEW_LINK");
+        return string.IsNullOrWhiteSpace(padrao) ? null : padrao.Trim();
     }
 
 }

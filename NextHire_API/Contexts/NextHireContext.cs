@@ -373,6 +373,8 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.StatusEntrevista)
                 .HasDefaultValue(true)
                 .HasColumnName("status_entrevista");
+            entity.Property(e => e.Link)
+                .HasColumnName("link");
             entity.HasOne(d => d.ProcessoSeletivo).WithMany(p => p.Entrevista)
                 .HasForeignKey(d => d.ProcessoSeletivoId)
                 .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("entrevista_processo_seletivo_id_fkey");

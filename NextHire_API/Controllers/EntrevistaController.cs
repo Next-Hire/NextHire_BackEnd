@@ -135,7 +135,8 @@ namespace NextHire_API.Controllers
                 LerEntrevistaDTO atualizada = await _service.AtualizarDataDaEntrevista(
                     entrevistaId,
                     dto.dataInicio,
-                    dto.dataEncerra);
+                    dto.dataEncerra,
+                    dto.link);
 
                 return Ok(atualizada);
             }

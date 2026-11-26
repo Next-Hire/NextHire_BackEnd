@@ -17,6 +17,7 @@ namespace NextHire_API.Applications.Convertions.DomainToDto
                 dataInicio = entrevista.HorarioInicio,
                 dataEncerra = entrevista.HorarioFim,
                 statusEntrevista = entrevista.StatusEntrevista,
+                link = entrevista.Link,
                 ProcessoSeletivoId = entrevista.ProcessoSeletivoId,
                 ListaCandidatos = entrevista.Candidato?.Select(varAux =>
                 {

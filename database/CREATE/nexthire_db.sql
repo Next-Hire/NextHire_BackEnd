@@ -171,6 +171,7 @@ CREATE TABLE IF NOT EXISTS entrevista (
     horario_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     horario_fim TIMESTAMP NOT NULL,
     status_entrevista BOOLEAN DEFAULT true,
+    link TEXT,
     processo_seletivo_id INTEGER NOT NULL REFERENCES processo_seletivo(processo_seletivo_id)
 );
 

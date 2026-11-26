@@ -96,7 +96,7 @@ namespace NextHire_API.Interfaces
             
         }
    
-        public async Task<Entrevista?> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal)
+        public async Task<Entrevista?> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal, string? link = null)
         {
             Entrevista? entrQuery = await _ctx.Entrevista
                 .Include(e => e.Candidato)
@@ -111,6 +111,9 @@ namespace NextHire_API.Interfaces
 
             if (dataFinal.HasValue)
                 entrQuery.HorarioFim = dataFinal.Value;
+
+            if (link != null)
+                entrQuery.Link = string.IsNullOrWhiteSpace(link) ? null : link.Trim();
 
             // Se HorarioInicio for DateTime? (nullable), use .GetValueOrDefault() ou .Value:
             DateTime inicioEfetivo = entrQuery.HorarioInicio;

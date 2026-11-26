@@ -765,6 +765,11 @@ VALUES
 (3, 'Entrevista Técnica - Sistemas Hospitalares', '2026-11-12 09:00:00', '2026-11-12 10:00:00', TRUE, 3);
 
 -- ─── ENTREVISTADORES ───────────────────────────────────────────────────────
+-- Links ficticios das entrevistas do seed (placeholder ate a integracao real)
+UPDATE entrevista SET link = 'https://meet.nexthire.com/ficticio/entrevista-1' WHERE entrevista_id = 1;
+UPDATE entrevista SET link = 'https://meet.nexthire.com/ficticio/entrevista-2' WHERE entrevista_id = 2;
+UPDATE entrevista SET link = 'https://meet.nexthire.com/ficticio/entrevista-3' WHERE entrevista_id = 3;
+
 INSERT INTO entrevistador_entrevista (gestor_id, entrevista_id) VALUES
 (3, 1),
 (3, 2),

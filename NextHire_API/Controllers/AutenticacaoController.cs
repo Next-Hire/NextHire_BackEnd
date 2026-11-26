@@ -63,6 +63,20 @@ namespace NextHire.Controllers
             return Redirect(authUrl);
         }
 
+        [HttpGet("google")]
+        public ActionResult GoogleInAuth()
+        {
+            var clientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            var redirectUri = Uri.EscapeDataString(Environment.GetEnvironmentVariable("GOOGLE_URL_BACK")!);
+            var state = Guid.NewGuid().ToString("N");
+            var scope = Uri.EscapeDataString("openid profile email");
+
+            var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth" +
+                          $"?response_type=code&client_id={clientId}&redirect_uri={redirectUri}&state={state}&scope={scope}";
+
+            return Redirect(authUrl);
+        }
+
         // 2. Recebe o retorno do LinkedIn, valida/cria o usuário e gera o SEU TokenJWT
         [HttpGet("linkedin/callback")]
         [AllowAnonymous]
@@ -72,6 +86,23 @@ namespace NextHire.Controllers
             {
                 var e = await _service.LinkedInLogin(code, error);
                 return Redirect(e);
+            }
+
+            catch(DomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpGet("google/callback")]
+        [AllowAnonymous]
+        public async Task<ActionResult> GoogleInCallback([FromQuery] string code, [FromQuery] string? error)
+        {
+            try
+            {
+                string urlGoogle = await _service.GoogleLinkLogin(code, error);
+                return Redirect(urlGoogle);
             }
 
             catch(DomainException ex)

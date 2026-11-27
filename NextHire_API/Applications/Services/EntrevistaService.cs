@@ -1,4 +1,5 @@
 using NextHire_API.Applications.Convertions.DomainToDto;
+using NextHire_API.Applications.S3;
 using NextHire_API.Domains;
 using NextHire_API.DTOs.EntrevistaDTO;
 using NextHire_API.Exceptions;
@@ -12,12 +13,14 @@ public class EntrevistaService
     private readonly IEntrevistaRepository _rep;
     // private readonly IProcessoSeletivoRepository _ProcessoRep;
     private readonly IUsuarioRepository _usuarioRep;
+    private readonly IGoogleCalendarRepository _googleRep;
 
-    public EntrevistaService(IEntrevistaRepository rep,  IUsuarioRepository usuarioRep)
+    public EntrevistaService(IEntrevistaRepository rep,  IUsuarioRepository usuarioRep, IGoogleCalendarRepository googleRep)
     {
         _rep = rep;
         // _ProcessoRep = ProcessoRep;
         _usuarioRep = usuarioRep;
+        _googleRep = googleRep;
     }
 
 
@@ -31,10 +34,13 @@ public class EntrevistaService
 
     }
 
-    public async Task<string> GerarLink()
+    public async Task<string> GerarLink(string titulo, DateTime inicio, DateTime fim)
     {
+        if (fim <= inicio)
+            throw new DomainException("A data/hora de encerramento deve ser posterior à de início.");
 
-        return string;
+        return await _googleRep.gerarURL(titulo, inicio, fim);
+
     }
 
     public async Task<List<LerEntrevistaDTO>> EntrevistasHoje()

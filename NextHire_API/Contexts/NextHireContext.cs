@@ -370,6 +370,9 @@ public partial class NextHireContext : DbContext
                 .IsRequired()
                 .HasColumnName("nome_entrevista");
             entity.Property(e => e.ProcessoSeletivoId).HasColumnName("processo_seletivo_id");
+            entity.Property(e => e.Link)
+            .HasColumnType("character varying")
+            .HasColumnName("link");
             entity.Property(e => e.StatusEntrevista)
                 .HasDefaultValue(true)
                 .HasColumnName("status_entrevista");
@@ -658,12 +661,15 @@ public partial class NextHireContext : DbContext
                 .HasDefaultValue(true)
                 .HasColumnName("primeiro_acesso");
             entity.Property(e => e.Senha)
-                .IsRequired()
+                //.IsRequired()
                 .HasColumnType("character varying")
                 .HasColumnName("senha");
             entity.Property(e => e.StatusUsuario)
                 .HasDefaultValue(true)
                 .HasColumnName("status_usuario");
+            entity.Property(e => e.is_OAuth)
+                .HasDefaultValue(false)
+                .HasColumnName("is_oauth");
             entity.Property(e => e.TipoUsuario)
                 .HasColumnName("tipo_usuario");
             entity.HasMany(d => d.Vaga)

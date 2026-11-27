@@ -18,6 +18,9 @@ public partial class Entrevista
 
     public bool? StatusEntrevista { get; set; }
 
+    /// <summary>Link da videochamada/entrevista online (opcional).</summary>
+    public string? Link { get; set; }
+
     public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();
 
     public virtual ICollection<Comentario> Comentario { get; set; } = new List<Comentario>();

@@ -166,8 +166,12 @@ builder.Services.AddDbContext<NextHireContext>(options =>
 
 //? JWT CONFIG
 
-var issuer = builder.Configuration["Jwt:Issuer"];
-var audience = builder.Configuration["Jwt:Audience"];
+//var googleAPI = builder.Configuration.GetSection("");
+
+var issuer = Environment.GetEnvironmentVariable("Jwt__Issuer");
+var audience = Environment.GetEnvironmentVariable("Jwt__Audience");
+
+
 
 if (string.IsNullOrWhiteSpace(issuer))
     throw new Exception("Jwt:Issuer não configurado.");
@@ -216,6 +220,7 @@ builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationH
 builder.Services.AddScoped<RedisService>();
 
 // Auth
+builder.Services.AddHttpClient<AutenticacaoService>();
 builder.Services.AddScoped<AutenticacaoService>();
 builder.Services.AddScoped<TokenJWT>();
 

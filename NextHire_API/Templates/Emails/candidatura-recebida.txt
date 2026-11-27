@@ -1,0 +1,8 @@
+Olá, {{nome}}!
+
+Recebemos sua candidatura para a vaga {{vaga}} na empresa {{empresa}}.
+Data do envio: {{data}}
+
+Nossa equipe vai avaliar seu perfil e entrará em contato com as próximas etapas. Boa sorte!
+
+NextHire

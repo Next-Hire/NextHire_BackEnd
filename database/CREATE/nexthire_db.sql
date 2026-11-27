@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS informacao_candidato(
     situacao_profissional situacao_profissional_enum NOT NULL,
     formacao_academica JSONB NOT NULL,
     idioma JSONB NOT NULL,
-    contato JSONB,
+    contato TEXT,
     endereco TEXT
 );
 
@@ -255,3 +255,32 @@ CREATE INDEX IF NOT EXISTS ix_usuario_tipo_usuario
 
 CREATE INDEX IF NOT EXISTS ix_setor_ocupacao_area_ocupacao_id
     ON setor_ocupacao (area_ocupacao_id);
+
+-- ─── INFRAESTRUTURA DE E-MAIL (FASE 2) ────────────────────────────────────
+CREATE TABLE IF NOT EXISTS email_outbox (
+    email_outbox_id SERIAL PRIMARY KEY,
+    destinatario TEXT NOT NULL,
+    nome_destinatario TEXT,
+    assunto TEXT NOT NULL,
+    template TEXT NOT NULL,
+    dados_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    dedupe_key TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pendente',
+    tentativas INTEGER NOT NULL DEFAULT 0,
+    erro TEXT,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    enviado_em TIMESTAMP,
+    proxima_tentativa_em TIMESTAMP,
+    CONSTRAINT uq_email_outbox_dedupe UNIQUE (dedupe_key)
+);
+
+CREATE INDEX IF NOT EXISTS ix_email_outbox_pendentes
+    ON email_outbox (status, proxima_tentativa_em);
+
+CREATE TABLE IF NOT EXISTS preferencia_notificacao (
+    preferencia_notificacao_id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL REFERENCES usuario(usuario_id),
+    tipo TEXT NOT NULL,
+    habilitado BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT uq_preferencia_notificacao UNIQUE (usuario_id, tipo)
+);

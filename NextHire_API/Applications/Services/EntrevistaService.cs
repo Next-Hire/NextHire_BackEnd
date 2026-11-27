@@ -4,6 +4,7 @@ using NextHire_API.DTOs.EntrevistaDTO;
 using NextHire_API.Exceptions;
 using NextHire_API.Interfaces;
 using NextHireAPI.Interfaces;
+using NextHire_API.Applications.Email;
 
 namespace NextHire_API.Applications.Services;
 
@@ -12,12 +13,14 @@ public class EntrevistaService
     private readonly IEntrevistaRepository _rep;
     // private readonly IProcessoSeletivoRepository _ProcessoRep;
     private readonly IUsuarioRepository _usuarioRep;
+    private readonly NotificationService _notifications;
 
-    public EntrevistaService(IEntrevistaRepository rep,  IUsuarioRepository usuarioRep)
+    public EntrevistaService(IEntrevistaRepository rep,  IUsuarioRepository usuarioRep, NotificationService notifications)
     {
         _rep = rep;
         // _ProcessoRep = ProcessoRep;
         _usuarioRep = usuarioRep;
+        _notifications = notifications;
     }
 
 
@@ -97,7 +100,9 @@ public async Task<LerEntrevistaDTO> AdicionarEntrevista(CriarEntrevistaDTO dto)
         throw new DomainException("Um ou mais candidatos informados não foram encontrados.");
 
     Entrevista entrevistaSalva = await _rep.AdicionarEntrevista(novaEntrevista, idsUnicos);
- 
+
+    try { await _notifications.EntrevistaConfirmada(entrevistaSalva.EntrevistaId); }
+    catch (Exception) { }
 
     return EntrevistaToDTO.LerDTO(entrevistaSalva);
 }
@@ -146,6 +151,9 @@ public async Task<LerEntrevistaDTO> AtualizarDataDaEntrevista(int entrevistaId, 
     Entrevista? entrevistaAtualizada = await _rep.AtualizarDataDaEntrevista(entrevistaId, inicio, fim);
     if (entrevistaAtualizada == null)
         throw new DomainException("Não foi possível atualizar as datas da entrevista.");
+
+    try { await _notifications.EntrevistaConfirmada(entrevistaId); }
+    catch (Exception) { }
 
     return EntrevistaToDTO.LerDTO(entrevistaAtualizada);
 }

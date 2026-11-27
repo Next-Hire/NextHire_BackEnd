@@ -1,0 +1,11 @@
+Entrevista confirmada
+
+Olá, {{nome}}!
+Sua entrevista para a vaga {{vaga}} ({{empresa}}) está agendada.
+Início: {{dataHora}}
+Término previsto: {{horarioFim}}
+Link da videochamada: {{link}}
+
+Preparação: teste microfone, câmera e conexão. Entre com 5 minutos de antecedência, em local silencioso.
+
+NextHire

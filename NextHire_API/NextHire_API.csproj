@@ -68,4 +68,7 @@
     <Folder Include="Applications\Validations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Templates\Emails\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

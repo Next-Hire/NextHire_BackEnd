@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Mail;
 using Microsoft.EntityFrameworkCore.Storage;
 using NextHire_API.Exceptions;
+using NextHire_API.Applications.Email;
 
 namespace NextHireAPI.Applications.Services
 {
@@ -80,27 +81,49 @@ namespace NextHireAPI.Applications.Services
 
         public static async Task EnviarCodigoVerificacao(MailAddress emailDestinatario, string codigo)
         {
-            var smtp = new SmtpClient("smtp.gmail.com")
+            string host = Ambiente("SMTP_HOST", "smtp.gmail.com");
+            int porta = int.TryParse(Ambiente("SMTP_PORT", "587"), out int valor) ? valor : 587;
+            bool ssl = !string.Equals(Ambiente("SMTP_SSL", "true"), "false", StringComparison.OrdinalIgnoreCase);
+            string usuario = Ambiente("SMTP_USER", emailEmp.ToString());
+            string senha = Ambiente("SMTP_PASS", senhaAplicativo);
+            string remetente = Ambiente("SMTP_FROM", usuario);
+            string nomeRemetente = Ambiente("SMTP_FROM_NAME", "NextHire");
+
+            var dados = new Dictionary<string, string> { ["codigo"] = codigo };
+            (string html, string texto) = EmailTemplateRenderer.Render(RaizTemplates(), "codigo-verificacao", dados);
+
+            var mail = new MailMessage
             {
-                Port = 587,
-                EnableSsl = true,
-                Credentials = new NetworkCredential(
-                    emailEmp.ToString(),
-                    senhaAplicativo
-                ),
-                Timeout = 15000
+                From = new MailAddress(remetente, nomeRemetente),
+                Subject = "Seu código de verificação - NextHire",
+                Body = html,
+                IsBodyHtml = true
             };
-
-            var mail = new MailMessage(emailEmp, emailDestinatario)
-            {
-                Subject = "Código para alterar senha",
-                Body = $"Seu código para redefinir a senha é: {codigo}",
-                IsBodyHtml = false
-            };
-
-
             mail.To.Add(emailDestinatario);
+            mail.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(texto, null, "text/plain"));
+
+            using var smtp = new SmtpClient(host, porta)
+            {
+                EnableSsl = ssl,
+                Timeout = 15000,
+                Credentials = new NetworkCredential(usuario, senha)
+            };
+
             await smtp.SendMailAsync(mail);
+        }
+
+        private static string Ambiente(string chave, string padrao)
+        {
+            string? valor = Environment.GetEnvironmentVariable(chave);
+            return string.IsNullOrWhiteSpace(valor) ? padrao : valor;
+        }
+
+        private static string RaizTemplates()
+        {
+            string baseDir = Path.Combine(AppContext.BaseDirectory, "Templates", "Emails");
+            return Directory.Exists(baseDir)
+                ? baseDir
+                : Path.Combine(Directory.GetCurrentDirectory(), "Templates", "Emails");
         }
     }
 }

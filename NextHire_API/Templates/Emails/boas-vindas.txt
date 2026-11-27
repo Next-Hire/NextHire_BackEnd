@@ -1,0 +1,6 @@
+Bem-vindo(a), {{nome}}!
+
+Sua conta na NextHire foi criada com sucesso.
+Complete seu perfil e currículo para aumentar suas chances nas vagas disponíveis.
+
+NextHire

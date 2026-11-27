@@ -21,6 +21,7 @@ using Amazon.S3;
 using NextHire_API.Applications.S3;
 using NextHire_API.Applications.Integrations;
 using NextHire_API.Exceptions;
+using NextHire_API.Applications.Email;
 using NextHire_API.Applications.Auth;
 using Microsoft.EntityFrameworkCore.Diagnostics; // adicione no topo do Program.cs, se necessário
 
@@ -273,6 +274,12 @@ builder.Services.AddHttpClient<NextAgentService>(client =>
 // Avaliação de candidaturas pelo Next Agent (nota + comentários)
 builder.Services.AddScoped<IAvaliacaoAgenteRepository, AvaliacaoAgenteRepository>();
 builder.Services.AddScoped<AvaliacaoAgenteService>();
+
+// E-mail (Fase 2)
+builder.Services.AddSingleton<EmailOutboxStore>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddHostedService<EmailOutboxWorker>();
 
 // cors btw
 

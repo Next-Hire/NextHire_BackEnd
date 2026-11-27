@@ -1,0 +1,8 @@
+{{status}}
+
+Olá, {{nome}}!
+Vaga: {{vaga}} · Empresa: {{empresa}}
+
+{{descricao}}
+
+NextHire

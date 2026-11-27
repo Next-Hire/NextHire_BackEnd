@@ -1,0 +1,7 @@
+Candidato liberado
+
+Olá, {{nome}}!
+{{candidato}} avançou no processo da vaga {{vaga}} ({{empresa}}) e está disponível para sua avaliação.
+Acesse o painel para registrar seu feedback.
+
+NextHire

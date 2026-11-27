@@ -5,6 +5,7 @@ using NextHire_API.Exceptions;
 using NextHire_API.Interfaces;
 using NextHireAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using NextHire_API.Applications.Email;
 
 namespace NextHire_API.Applications.Services;
 
@@ -13,13 +14,16 @@ public class CandidatoProcessoSeletivoService
     private readonly IUsuarioRepository _usuarioRep;
     private readonly IProcessoSeletivoRepository _processoSeletivoRepository;
     private readonly IProcessoSeletivoCandidatoRepository _rep;
+    private readonly NotificationService _notifications;
 
     public CandidatoProcessoSeletivoService(IUsuarioRepository usuarioRep,
-        IProcessoSeletivoRepository processoSeletivoRepository, IProcessoSeletivoCandidatoRepository rep)
+        IProcessoSeletivoRepository processoSeletivoRepository, IProcessoSeletivoCandidatoRepository rep,
+        NotificationService notifications)
     {
         _usuarioRep = usuarioRep;
         _processoSeletivoRepository = processoSeletivoRepository;
         _rep = rep;
+        _notifications = notifications;
     }
     
     public async Task<List<LerCandidatoProcessoDTO>> Listar()
@@ -111,6 +115,9 @@ public class CandidatoProcessoSeletivoService
 
         await _rep.AdicionarCandidatoProcesso(novaRelacao);
 
+        try { await _notifications.StatusAtualizado(dto.CandidatoId, dto.ProcessoSeletivoId, dto.StatusRelacao); }
+        catch (Exception) { }
+
         // Atribui as navegações já carregadas para retornar nomeCandidato e nomeProcesso preenchidos
         novaRelacao.Candidato = usuario;
         novaRelacao.ProcessoSeletivo = processo;
@@ -169,6 +176,13 @@ public class CandidatoProcessoSeletivoService
         }).ToList();
 
         await _rep.AdicionarCandidatosNoProcesso(novasRelacoes);
+
+        foreach (CandidatoProcessoSeletivo relacao in novasRelacoes)
+        {
+            try { await _notifications.StatusAtualizado(relacao.CandidatoId, relacao.ProcessoSeletivoId, relacao.StatusRelacao); }
+            catch (Exception) { }
+        }
+
         return novasRelacoes.Select(CandidatoProcessoSeletivoToDTO.LerDTO).ToList();
     }
 
@@ -201,6 +215,9 @@ public class CandidatoProcessoSeletivoService
 
         // Recarrega via BuscarPorId (que possui .Include) para garantir nomeProcesso e nomeCandidato no DTO
         CandidatoProcessoSeletivo completo = await _rep.BuscarPorId(candidatoId, processoSeletivoId) ?? atualizado;
+
+        try { await _notifications.StatusAtualizado(candidatoId, processoSeletivoId, dto.statusRelacao); }
+        catch (Exception) { }
 
         return CandidatoProcessoSeletivoToDTO.LerDTO(completo);
     }

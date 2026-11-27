@@ -1,0 +1,8 @@
+Redefinição de senha
+
+Recebemos um pedido para redefinir sua senha.
+Seu código é: {{codigo}}
+
+Se não foi você, ignore este e-mail.
+
+NextHire

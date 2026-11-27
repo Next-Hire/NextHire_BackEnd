@@ -1,0 +1,7 @@
+Marco de {{total}} candidaturas
+
+Olá, {{nome}}!
+A vaga {{vaga}} ({{empresa}}) alcançou {{total}} candidaturas.
+Esse é um bom momento para revisar os perfis e avançar com a triagem.
+
+NextHire

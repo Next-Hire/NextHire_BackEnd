@@ -1,0 +1,9 @@
+Nova candidatura
+
+Olá, {{nome}}!
+{{candidato}} se candidatou à vaga {{vaga}} ({{empresa}}).
+Data: {{data}}
+
+Acesse o painel da NextHire para revisar o perfil.
+
+NextHire

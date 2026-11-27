@@ -6,6 +6,7 @@ using NextHire_API.DTOs.VagaDTO;
 using NextHire_API.Exceptions;
 using NextHire_API.Interfaces;
 using NextHireAPI.Domains;
+using NextHire_API.Applications.Email;
 using System.Runtime.CompilerServices;
 
 namespace NextHire_API.Applications.Services
@@ -13,8 +14,13 @@ namespace NextHire_API.Applications.Services
     public class CurriculoVagaService
     {
         private readonly ICurriculoVagaRepository _repository;
+        private readonly NotificationService _notifications;
 
-        public CurriculoVagaService(ICurriculoVagaRepository repository) => _repository = repository;
+        public CurriculoVagaService(ICurriculoVagaRepository repository, NotificationService notifications)
+        {
+            _repository = repository;
+            _notifications = notifications;
+        }
 
         public async Task<List<ListarCurriculoVagaDto>> ListarTodasAsCandidaturasPorEmpresaId(int empresaId)
         {
@@ -53,6 +59,9 @@ namespace NextHire_API.Applications.Services
 
             //TODO Validar possiveis nulos para a query
             await _repository.CadastrarCurriculoVaga(curriculoId, vagaId);
+
+            try { await _notifications.CandidaturaRecebida(curriculoId, vagaId); }
+            catch (Exception) { }
         }
 
         public async Task CancelarCandidatura(int curriculoId, int vagaId)
@@ -62,6 +71,9 @@ namespace NextHire_API.Applications.Services
 
             if (vagaId <= 0)
                 throw new DomainException("Vaga não encontrada");
+
+            try { await _notifications.CandidaturaCancelada(curriculoId, vagaId); }
+            catch (Exception) { }
 
             await _repository.Remover(curriculoId, vagaId);
         }

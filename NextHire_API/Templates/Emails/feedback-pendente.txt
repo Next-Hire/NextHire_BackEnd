@@ -1,0 +1,9 @@
+Feedback pendente
+
+Olá, {{nome}}!
+Há uma entrevista agendada para {{dataHora}} na vaga {{vaga}}.
+Candidato(s): {{candidato}}
+
+Após a conversa, registre seu feedback no painel.
+
+NextHire

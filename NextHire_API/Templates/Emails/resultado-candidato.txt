@@ -1,0 +1,8 @@
+Olá, {{nome}}
+
+Sobre sua participação na vaga {{vaga}} ({{empresa}}):
+{{descricao}}
+
+Obrigado por dedicar seu tempo ao processo.
+
+NextHire

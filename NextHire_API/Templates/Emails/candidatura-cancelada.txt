@@ -1,0 +1,6 @@
+Olá, {{nome}}
+
+Sua candidatura para a vaga {{vaga}} na empresa {{empresa}} foi cancelada.
+Se isso não foi feito por você, entre em contato com o suporte.
+
+NextHire

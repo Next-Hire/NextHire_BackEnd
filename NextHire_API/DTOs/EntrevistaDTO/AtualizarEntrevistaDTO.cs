@@ -12,6 +12,8 @@ namespace NextHire_API.DTOs.EntrevistaDTO
         public DateTime? dataEncerra { get; set; }
 
         public bool? statusEntrevista { get; set; }
+
+        public string? link { get; set; }
     }
     
     public class AtualizarDataEntrevistaDTO
@@ -21,5 +23,7 @@ namespace NextHire_API.DTOs.EntrevistaDTO
 
         [Required(ErrorMessage = "A data/hora de encerramento é obrigatória.")]
         public DateTime dataEncerra { get; set; }
+
+        public string? link { get; set; }
     }
 }

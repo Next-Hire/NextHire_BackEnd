@@ -20,6 +20,9 @@ namespace NextHire_API.DTOs.EntrevistaDTO
         [Required(ErrorMessage = "O processo seletivo é obrigatório.")]
         public int ProcessoSeletivoId { get; set; }
 
+        /// <summary>Link da videochamada. Se vazio, usa INTERVIEW_LINK do .env.</summary>
+        public string? link { get; set; }
+
         // Opcional: caso queira passar os IDs dos candidatos já na criação
         public List<int> CandidatosIds { get; set; } = new List<int>();
     }

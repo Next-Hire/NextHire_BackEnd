@@ -15,7 +15,7 @@ public class EntrevistaService
     private readonly IUsuarioRepository _usuarioRep;
     private readonly NotificationService _notifications;
 
-    public EntrevistaService(IEntrevistaRepository rep,  IUsuarioRepository usuarioRep, NotificationService notifications)
+    public EntrevistaService(IEntrevistaRepository rep, IUsuarioRepository usuarioRep, NotificationService notifications)
     {
         _rep = rep;
         // _ProcessoRep = ProcessoRep;
@@ -29,7 +29,7 @@ public class EntrevistaService
         List<Entrevista> e = await _rep.Listar();
         if (e == null)
             throw new DomainException("Nenhuma entrevista encontrada");
-        
+
         return e.Select(varAux => EntrevistaToDTO.LerDTO(varAux)).ToList();
 
     }
@@ -37,138 +37,140 @@ public class EntrevistaService
     public async Task<List<LerEntrevistaDTO>> EntrevistasHoje()
     {
         DateTime hoje = DateTime.Today;
-        
+
 
         List<Entrevista> e = await _rep.EntrevistasHoje(hoje);
-        
+
         return e.Select(varAux => EntrevistaToDTO.LerDTO(varAux)).ToList();
     }
-    
-    
+
+
     public async Task<List<LerEntrevistaDTO>> BuscarPorCandidato(int candidatoId)
-{
-    if (candidatoId <= 0)
-        throw new DomainException("ID do candidato inválido.");
-
-    List<Entrevista> entrevistas = await _rep.BuscarPorCandidato(candidatoId);
-
-    return entrevistas.Select(e => EntrevistaToDTO.LerDTO(e)).ToList();
-}
-
-public async Task<LerEntrevistaDTO> BuscarPorId(int id)
-{
-    if (id <= 0)
-        throw new DomainException("ID da entrevista inválido.");
-
-    Entrevista? entrevista = await _rep.BuscarPorId(id);
-    if (entrevista == null)
-        throw new DomainException("Entrevista não encontrada.");
-
-    return EntrevistaToDTO.LerDTO(entrevista);
-}
-
-public async Task<LerEntrevistaDTO> AdicionarEntrevista(CriarEntrevistaDTO dto)
-{
-    if (string.IsNullOrWhiteSpace(dto.tituloEntrevista))
-        throw new DomainException("O título da entrevista é obrigatório.");
-
-    if (dto.dataEncerra <= dto.dataInicio)
-        throw new DomainException("A data/hora de encerramento deve ser posterior à data/hora de início.");
-
-    if (dto.ProcessoSeletivoId <= 0)
-        throw new DomainException("Processo seletivo inválido.");
-
-    DateTime inicio = DateTime.SpecifyKind(dto.dataInicio, DateTimeKind.Unspecified);
-    DateTime fim = DateTime.SpecifyKind(dto.dataEncerra, DateTimeKind.Unspecified);
-
-    Entrevista novaEntrevista = new Entrevista
     {
-        NomeEntrevista = dto.tituloEntrevista,
-        HorarioInicio = inicio,
-        HorarioFim = fim,
-        ProcessoSeletivoId = dto.ProcessoSeletivoId,
-        StatusEntrevista = true
-    };
-    List<Usuario> candidatosQuery = await _usuarioRep.ListarCandidatos();
-    List<int> candidatosQueryIds = candidatosQuery.Select(c => c.UsuarioId).ToList();
+        if (candidatoId <= 0)
+            throw new DomainException("ID do candidato inválido.");
 
-    List<int> idsUnicos = dto.CandidatosIds?.Distinct().ToList() ?? new List<int>();
+        List<Entrevista> entrevistas = await _rep.BuscarPorCandidato(candidatoId);
 
-// Verifica se algum ID enviado no DTO não existe na lista de candidatos válidos
-    bool existemIdsInvalidos = idsUnicos.Except(candidatosQueryIds).Any();
-    if (existemIdsInvalidos)
-        throw new DomainException("Um ou mais candidatos informados não foram encontrados.");
+        return entrevistas.Select(e => EntrevistaToDTO.LerDTO(e)).ToList();
+    }
 
-    Entrevista entrevistaSalva = await _rep.AdicionarEntrevista(novaEntrevista, idsUnicos);
+    public async Task<LerEntrevistaDTO> BuscarPorId(int id)
+    {
+        if (id <= 0)
+            throw new DomainException("ID da entrevista inválido.");
 
-    try { await _notifications.EntrevistaConfirmada(entrevistaSalva.EntrevistaId); }
-    catch (Exception) { }
+        Entrevista? entrevista = await _rep.BuscarPorId(id);
+        if (entrevista == null)
+            throw new DomainException("Entrevista não encontrada.");
 
-    return EntrevistaToDTO.LerDTO(entrevistaSalva);
-}
+        return EntrevistaToDTO.LerDTO(entrevista);
+    }
 
-public async Task<LerEntrevistaDTO> AtualizarCandidatoNaEntrevista(int entrevistaId, int candidatoId)
-{
-    if (entrevistaId <= 0 || candidatoId <= 0)
-        throw new DomainException("IDs de entrevista e candidato devem ser válidos.");
-    
-    Entrevista? entrevistaAtualizada = await _rep.AtualizarCandidatoNaEntrevista(entrevistaId, candidatoId);
-    if (entrevistaAtualizada == null)
-        throw new DomainException("Entrevista ou candidato não encontrado.");
+    public async Task<LerEntrevistaDTO> AdicionarEntrevista(CriarEntrevistaDTO dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.tituloEntrevista))
+            throw new DomainException("O título da entrevista é obrigatório.");
 
-    return EntrevistaToDTO.LerDTO(entrevistaAtualizada);
-}
+        if (dto.dataEncerra <= dto.dataInicio)
+            throw new DomainException("A data/hora de encerramento deve ser posterior à data/hora de início.");
 
-public async Task<LerEntrevistaDTO> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal)
-{
-    if (entrevistaId <= 0)
-        throw new DomainException("ID da entrevista inválido.");
+        if (dto.ProcessoSeletivoId <= 0)
+            throw new DomainException("Processo seletivo inválido.");
 
-    if (!dataInicio.HasValue && !dataFinal.HasValue)
-        throw new DomainException("Informe ao menos a data de início ou a data final.");
- 
-    Entrevista entrevistaExistente = await _rep.BuscarPorId(entrevistaId)
-                                     ?? throw new DomainException("Entrevista não encontrada.");
+        DateTime inicio = DateTime.SpecifyKind(dto.dataInicio, DateTimeKind.Unspecified);
+        DateTime fim = DateTime.SpecifyKind(dto.dataEncerra, DateTimeKind.Unspecified);
 
-    // normalizacao de Datas
-    DateTime? inicio = dataInicio.HasValue
-        ? DateTime.SpecifyKind(dataInicio.Value, DateTimeKind.Unspecified)
-        : null;
+        Entrevista novaEntrevista = new Entrevista
+        {
+            NomeEntrevista = dto.tituloEntrevista,
+            HorarioInicio = inicio,
+            HorarioFim = fim,
+            ProcessoSeletivoId = dto.ProcessoSeletivoId,
+            StatusEntrevista = true,
+            Link = ResolverLink(dto.link)
+        };
 
-    DateTime? fim = dataFinal.HasValue
-        ? DateTime.SpecifyKind(dataFinal.Value, DateTimeKind.Unspecified)
-        : null;
+        List<Usuario> candidatosQuery = await _usuarioRep.ListarCandidatos();
+        List<int> candidatosQueryIds = candidatosQuery.Select(c => c.UsuarioId).ToList();
+
+        List<int> idsUnicos = dto.CandidatosIds?.Distinct().ToList() ?? new List<int>();
+
+        // Verifica se algum ID enviado no DTO não existe na lista de candidatos válidos
+        bool existemIdsInvalidos = idsUnicos.Except(candidatosQueryIds).Any();
+        if (existemIdsInvalidos)
+            throw new DomainException("Um ou mais candidatos informados não foram encontrados.");
+
+        Entrevista entrevistaSalva = await _rep.AdicionarEntrevista(novaEntrevista, idsUnicos);
+
+        try { await _notifications.EntrevistaConfirmada(entrevistaSalva.EntrevistaId); }
+        catch (Exception) { }
+
+        return EntrevistaToDTO.LerDTO(entrevistaSalva);
+    }
+
+    public async Task<LerEntrevistaDTO> AtualizarCandidatoNaEntrevista(int entrevistaId, int candidatoId)
+    {
+        if (entrevistaId <= 0 || candidatoId <= 0)
+            throw new DomainException("IDs de entrevista e candidato devem ser válidos.");
+
+        Entrevista? entrevistaAtualizada = await _rep.AtualizarCandidatoNaEntrevista(entrevistaId, candidatoId);
+        if (entrevistaAtualizada == null)
+            throw new DomainException("Entrevista ou candidato não encontrado.");
+
+        return EntrevistaToDTO.LerDTO(entrevistaAtualizada);
+    }
+
+    public async Task<LerEntrevistaDTO> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal, string? link = null)
+    {
+        if (entrevistaId <= 0)
+            throw new DomainException("ID da entrevista inválido.");
+
+        if (!dataInicio.HasValue && !dataFinal.HasValue && string.IsNullOrWhiteSpace(link))
+            throw new DomainException("Informe ao menos a data de início, a data final ou o link.");
+
+        Entrevista entrevistaExistente = await _rep.BuscarPorId(entrevistaId)
+                                         ?? throw new DomainException("Entrevista não encontrada.");
+
+        // normalizacao de Datas
+        DateTime? inicio = dataInicio.HasValue
+            ? DateTime.SpecifyKind(dataInicio.Value, DateTimeKind.Unspecified)
+            : null;
+
+        DateTime? fim = dataFinal.HasValue
+            ? DateTime.SpecifyKind(dataFinal.Value, DateTimeKind.Unspecified)
+            : null;
 
 
-    // validacao dos horarios
-    DateTime inicioEfetivo = inicio ?? entrevistaExistente.HorarioInicio;
-    DateTime fimEfetivo = fim ?? entrevistaExistente.HorarioFim;
+        // validacao dos horarios
+        DateTime inicioEfetivo = inicio ?? entrevistaExistente.HorarioInicio;
+        DateTime fimEfetivo = fim ?? entrevistaExistente.HorarioFim;
 
-    if (fimEfetivo <= inicioEfetivo)
-        throw new DomainException("A data/hora final deve ser maior que a data/hora inicial.");
+        if (fimEfetivo <= inicioEfetivo)
+            throw new DomainException("A data/hora final deve ser maior que a data/hora inicial.");
 
-    
-    Entrevista? entrevistaAtualizada = await _rep.AtualizarDataDaEntrevista(entrevistaId, inicio, fim);
-    if (entrevistaAtualizada == null)
-        throw new DomainException("Não foi possível atualizar as datas da entrevista.");
 
-    try { await _notifications.EntrevistaConfirmada(entrevistaId); }
-    catch (Exception) { }
+        Entrevista? entrevistaAtualizada = await _rep.AtualizarDataDaEntrevista(entrevistaId, inicio, fim, link);
+        if (entrevistaAtualizada == null)
+            throw new DomainException("Não foi possível atualizar as datas da entrevista.");
 
-    return EntrevistaToDTO.LerDTO(entrevistaAtualizada);
-}
+        try { await _notifications.EntrevistaConfirmada(entrevistaId); }
+        catch (Exception) { }
 
-public async Task<LerEntrevistaDTO> RemoverEntrevista(int id)
-{
-    if (id <= 0)
-        throw new DomainException("ID da entrevista inválido.");
+        return EntrevistaToDTO.LerDTO(entrevistaAtualizada);
+    }
 
-    Entrevista? entrevistaRemovida = await _rep.RemoverEntrevista(id);
-    if (entrevistaRemovida == null)
-        throw new DomainException("Entrevista não encontrada.");
+    public async Task<LerEntrevistaDTO> RemoverEntrevista(int id)
+    {
+        if (id <= 0)
+            throw new DomainException("ID da entrevista inválido.");
 
-    return EntrevistaToDTO.LerDTO(entrevistaRemovida);
-}
+        Entrevista? entrevistaRemovida = await _rep.RemoverEntrevista(id);
+        if (entrevistaRemovida == null)
+            throw new DomainException("Entrevista não encontrada.");
+
+        return EntrevistaToDTO.LerDTO(entrevistaRemovida);
+    }
 
     public async Task<List<LerEntrevistaDTO>> ListarPorStatus(bool status)
     {
@@ -177,6 +179,18 @@ public async Task<LerEntrevistaDTO> RemoverEntrevista(int id)
         return entrevistas
             .Select(e => EntrevistaToDTO.LerDTO(e))
             .ToList();
+    }
+
+    /// <summary>
+    /// Usa o link enviado no DTO; se vazio, cai para INTERVIEW_LINK do .env.
+    /// </summary>
+    private static string? ResolverLink(string? link)
+    {
+        if (!string.IsNullOrWhiteSpace(link))
+            return link.Trim();
+
+        string? padrao = Environment.GetEnvironmentVariable("INTERVIEW_LINK");
+        return string.IsNullOrWhiteSpace(padrao) ? null : padrao.Trim();
     }
 
 }

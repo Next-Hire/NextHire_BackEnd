@@ -11,7 +11,7 @@ namespace NextHire_API.Interfaces
         public Task<Entrevista?> BuscarPorId(int id);
 
         public Task<Entrevista> AtualizarCandidatoNaEntrevista(int entrevistaId, int candidatoId);
-        public Task<Entrevista> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal);
+        public Task<Entrevista> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal, string? link = null);
         public Task<Entrevista> AdicionarEntrevista(Entrevista entr, List<int> candidatosIds);
         public Task<Entrevista> RemoverEntrevista(int id);
     }

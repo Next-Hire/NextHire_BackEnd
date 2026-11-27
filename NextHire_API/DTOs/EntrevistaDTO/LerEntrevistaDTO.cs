@@ -13,6 +13,8 @@
 
         public bool? statusEntrevista { get; set; }
 
+        public string? link { get; set; }
+
         public int ProcessoSeletivoId { get; set; }
 
         public List<CandidatoDTO> ListaCandidatos { get; set; } = new List<CandidatoDTO>();

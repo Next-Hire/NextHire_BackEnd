@@ -49,6 +49,7 @@ namespace NextHire_API.Repository
             var vagas = await _context.Vaga
                 .Include(v => v.AnalistaRhNavigation)
                 .Include(v => v.Empresa)
+                .Include(v => v.Setor)
                 .Where(v => v.CurriculoVaga.Any(c => c.Curriculo.CandidatoId == candidatoId))
                 .ToListAsync();
 

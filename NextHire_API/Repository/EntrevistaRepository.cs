@@ -96,7 +96,7 @@ namespace NextHire_API.Interfaces
             
         }
    
-        public async Task<Entrevista?> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal)
+        public async Task<Entrevista?> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal, string? link = null)
         {
             Entrevista? entrQuery = await _ctx.Entrevista
                 .Include(e => e.Candidato)
@@ -111,6 +111,9 @@ namespace NextHire_API.Interfaces
 
             if (dataFinal.HasValue)
                 entrQuery.HorarioFim = dataFinal.Value;
+
+            if (link != null)
+                entrQuery.Link = string.IsNullOrWhiteSpace(link) ? null : link.Trim();
 
             // Se HorarioInicio for DateTime? (nullable), use .GetValueOrDefault() ou .Value:
             DateTime inicioEfetivo = entrQuery.HorarioInicio;
@@ -127,6 +130,17 @@ namespace NextHire_API.Interfaces
             Entrevista? entrQuery = await _ctx.Entrevista.FindAsync(id);
             if (entrQuery == null)
                 return null;
+
+            //? As FKs para entrevista no schema sao NO ACTION (sem CASCADE).
+            //? Remove primeiro os dependentes para evitar violacao de FK (23503).
+            await _ctx.Database.ExecuteSqlRawAsync(
+                "DELETE FROM candidato_entrevista WHERE entrevista_id = {0}", id);
+            await _ctx.Database.ExecuteSqlRawAsync(
+                "DELETE FROM entrevistador_entrevista WHERE entrevista_id = {0}", id);
+            await _ctx.Database.ExecuteSqlRawAsync(
+                "DELETE FROM avaliacao_habilidade WHERE entrevista_id = {0}", id);
+            await _ctx.Database.ExecuteSqlRawAsync(
+                "DELETE FROM comentario WHERE entrevista_id = {0}", id);
 
             _ctx.Entrevista.Remove(entrQuery);
             await _ctx.SaveChangesAsync();

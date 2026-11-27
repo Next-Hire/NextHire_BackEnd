@@ -15,7 +15,9 @@ namespace NextHireAPI.Domains
         public bool? PrimeiroAcesso { get; set; }
 
         public bool? StatusUsuario { get; set; }
+        public bool? isOAuth { get; set; }
 
         public TipoUsuarioEnum TipoUsuario { get; set; }
+
     }
 }

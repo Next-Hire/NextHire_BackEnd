@@ -29,6 +29,7 @@ public partial class Vaga
     public decimal? TempoExperienciaDesejado { get; set; }
 
     public string Titulo { get; set; } = null!;
+    public string? Cargo { get; set; }
 
     public EscalaTrabalhoEnum EscalaVaga { get; set; }
 

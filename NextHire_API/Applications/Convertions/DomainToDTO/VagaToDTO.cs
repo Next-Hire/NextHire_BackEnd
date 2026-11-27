@@ -27,7 +27,8 @@ namespace NextHire_API.Applications.Convertions
                 Remuneracao = vaga.Remuneracao,
                 TipoVaga = vaga.TipoVaga.ToString(),
                 TempoExperienciaDesejado = vaga.TempoExperienciaDesejado,
-                Titulo = vaga.Titulo
+                Titulo = vaga.Titulo,
+                Cargo = vaga.Cargo
             };
         }
 
@@ -45,7 +46,8 @@ namespace NextHire_API.Applications.Convertions
                 NivelPrioridadeVaga = ConverterNivelPrioridade(vaga.NivelPrioridade),
                 TipoVaga = ConverterTipoVaga(vaga.TipoVaga ?? string.Empty),
                 TempoExperienciaDesejado = vaga.TempoExperienciaDesejado,
-                Titulo = vaga.Titulo
+                Titulo = vaga.Titulo,
+                Cargo = vaga.Cargo
             };
         }
 
@@ -64,7 +66,8 @@ namespace NextHire_API.Applications.Convertions
                 TempoExperienciaDesejado = vaga.TempoExperienciaDesejado,
                 StatusVaga = true,
                 Titulo = vaga.Titulo,
-                SetorId = vaga.SetorOcupacaoId
+                SetorId = vaga.SetorOcupacaoId,
+                Cargo = vaga.Cargo
             };
         }
 

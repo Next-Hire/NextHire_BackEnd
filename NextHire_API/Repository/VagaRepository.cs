@@ -36,6 +36,7 @@ namespace NextHire_API.Repository
             => await OrdemImportancia(_context.Vaga
                 .Include(v => v.Empresa)
                 .Include(v => v.AnalistaRhNavigation)
+                .Include(v => v.Setor)
                 .Where(v => v.EmpresaId == empresaId))
                 .ToListAsync();
                 
@@ -51,6 +52,7 @@ namespace NextHire_API.Repository
             => await _context.Vaga
                 .Include(v => v.Empresa)
                 .Include(v => v.AnalistaRhNavigation)
+                .Include(v => v.Setor)
                 .FirstOrDefaultAsync(v => v.VagaId == vagaId)
                     ?? throw new DomainException("Vaga não encontrada.");
 
@@ -58,6 +60,7 @@ namespace NextHire_API.Repository
             => await OrdemImportancia(_context.Vaga
                 .Include(v => v.Empresa)
                 .Include(v => v.AnalistaRhNavigation)
+                .Include(v => v.Setor)
                 .Where(v => v.Titulo.Contains(titulo)))
                 .ToListAsync();
 
@@ -65,6 +68,7 @@ namespace NextHire_API.Repository
             => await OrdemImportancia(_context.Vaga
                 .Include(v => v.Empresa)
                 .Include(v => v.AnalistaRhNavigation)
+                .Include(v => v.Setor)
                 .Where(v => v.StatusVaga == status))
                 .ToListAsync();
 

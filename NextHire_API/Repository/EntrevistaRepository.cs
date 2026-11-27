@@ -13,11 +13,25 @@ namespace NextHire_API.Interfaces
             => await _ctx.Entrevista
                 .AsNoTracking()
                 .Include(varAux => varAux.Comentario)
+                .Include(varAux => varAux.TipoEntrevista)
             .Where(varAux => varAux.HorarioInicio >= DateTime.Now)
             .OrderBy(varAux => varAux.HorarioInicio)
             .ToListAsync();
 
-
+        public async Task<List<Entrevista>> ListarPorTipo(string tipoEntrevista)
+            => await _ctx.Entrevista
+                    .AsNoTracking()
+                    .Include(varAux => varAux.Candidato)
+                    .Include(varAux => varAux.TipoEntrevista)
+                    .Where(varAux => varAux.TipoEntrevista.Nome_Tipo == tipoEntrevista)
+                    .ToListAsync();
+        public async Task<Entrevista?> BuscarPorTipo(string tipoEntrevista)
+            => await _ctx.Entrevista
+                    .AsNoTracking()
+                    .Include(varAux => varAux.Candidato)
+                    .Include(varAux => varAux.TipoEntrevista)
+                    .FirstOrDefaultAsync(varAux => varAux.TipoEntrevista.Nome_Tipo == tipoEntrevista);
+                    
         public async Task<List<Entrevista>> EntrevistasHoje(DateTime data)
             {
             DateTime inicioDoDia = data.Date;
@@ -25,6 +39,7 @@ namespace NextHire_API.Interfaces
 
             List<Entrevista> entrevistasHoje = await _ctx.Entrevista
             .AsNoTracking()
+            .Include(varAux => varAux.TipoEntrevista)
             .Include(varAux => varAux.Comentario)
             .Where(varAux => varAux.HorarioInicio >= inicioDoDia && varAux.HorarioInicio < fimDoDia)
             .OrderBy(varAux => varAux.HorarioInicio)
@@ -40,6 +55,7 @@ namespace NextHire_API.Interfaces
             List<Entrevista> entrevistaQuery = await _ctx.Entrevista
              .AsNoTracking()
              .Include(varAux => varAux.Comentario)
+             .Include(varAux => varAux.TipoEntrevista)
              .Include(varAux => varAux.Candidato)
                  .ThenInclude(varAux => varAux.InformacaoCandidato)
              .Where(varAux => varAux.HorarioInicio >= DateTime.UtcNow && varAux.Candidato.Any(varAux => varAux.UsuarioId == candidatoId))
@@ -75,6 +91,8 @@ namespace NextHire_API.Interfaces
         }
 
 
+
+
         public async Task<Entrevista> AtualizarCandidatoNaEntrevista(int entrevistaId, int candidatoId)
         {
             Entrevista? entrQuery = await _ctx.Entrevista.FindAsync(entrevistaId);
@@ -99,6 +117,7 @@ namespace NextHire_API.Interfaces
         public async Task<Entrevista?> AtualizarDataDaEntrevista(int entrevistaId, DateTime? dataInicio, DateTime? dataFinal)
         {
             Entrevista? entrQuery = await _ctx.Entrevista
+                .Include(varAux => varAux.TipoEntrevista)
                 .Include(e => e.Candidato)
                 .ThenInclude(c => c.InformacaoCandidato)
                 .FirstOrDefaultAsync(e => e.EntrevistaId == entrevistaId);
@@ -140,6 +159,7 @@ namespace NextHire_API.Interfaces
             List<Entrevista> entrevistasAtivas = await _ctx.Entrevista
                 .AsNoTracking()
                 .Include(varAux => varAux.Comentario)
+                .Include(varAux => varAux.TipoEntrevista)
             .Where(varAux => varAux.StatusEntrevista == status)
             .OrderBy(varAux => varAux.HorarioInicio)
             .ToListAsync();

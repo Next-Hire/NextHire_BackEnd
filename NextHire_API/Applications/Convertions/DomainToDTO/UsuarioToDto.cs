@@ -23,7 +23,8 @@ namespace NextHireAPI.Convertions.DomainToDTO
                 Email = usuario.Email,
                 PrimeiroAcesso = usuario.PrimeiroAcesso,
                 StatusUsuario = usuario.StatusUsuario,
-                TipoUsuario = usuario.TipoUsuario
+                TipoUsuario = usuario.TipoUsuario,
+                isOAuth = usuario.is_OAuth ?? false
             };
         }
 
@@ -36,8 +37,8 @@ namespace NextHireAPI.Convertions.DomainToDTO
                 FuncionarioId = usuario.UsuarioId,
                 Nome = usuario.Nome,
                 Email = usuario.Email,
-                EmpresaId = empresa?.EmpresaId ?? throw new DomainException("Funcionario não locallizado!"),
-                NomeEmpresa = empresa?.Nome ?? throw new DomainException("Funcionario não locallizado!"),
+                EmpresaId = empresa?.EmpresaId ?? throw new DomainException("Funcionario não localizado!"),
+                NomeEmpresa = empresa?.Nome ?? throw new DomainException("Funcionario não localizado!"),
                 PrimeiroAcesso = usuario.PrimeiroAcesso,
                 StatusUsuario = usuario.StatusUsuario,
                 TipoUsuario = usuario.TipoUsuario
@@ -80,6 +81,7 @@ namespace NextHireAPI.Convertions.DomainToDTO
                 CandidatoId = usuario.UsuarioId,
                 Nome = usuario.Nome,
                 Email = usuario.Email,
+                isOAuth = usuario.is_OAuth ?? false,
                 PrimeiroAcesso = usuario.PrimeiroAcesso,
                 StatusUsuario = usuario.StatusUsuario,
                 TipoUsuario = usuario.TipoUsuario,
@@ -90,6 +92,7 @@ namespace NextHireAPI.Convertions.DomainToDTO
                 .OrderByDescending(hc => hc.Nivel)
                 .ToList(),
                 InformacaoCandidato = usuario.InformacaoCandidato
+               
             };
         }
 
@@ -128,7 +131,8 @@ namespace NextHireAPI.Convertions.DomainToDTO
                 Email = candidato.Email,
                 Senha = novaSenha,
                 TipoUsuario = TipoUsuarioEnum.Candidato,
-                StatusUsuario = true
+                StatusUsuario = true,
+                is_OAuth = candidato.isOAuth ?? false
             };
         }
 

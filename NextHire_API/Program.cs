@@ -185,6 +185,7 @@ builder.Services.AddSingleton<Microsoft.AspNetCore.Authorization.IAuthorizationH
 builder.Services.AddScoped<RedisService>();
 
 // Auth
+//builder.Services.AddHttpClient<>
 builder.Services.AddHttpClient<AutenticacaoService>();
 builder.Services.AddScoped<AutenticacaoService>();
 builder.Services.AddScoped<TokenJWT>();

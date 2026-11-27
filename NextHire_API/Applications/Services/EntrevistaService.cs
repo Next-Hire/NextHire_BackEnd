@@ -2,6 +2,7 @@ using NextHire_API.Applications.Convertions.DomainToDto;
 using NextHire_API.Applications.S3;
 using NextHire_API.Domains;
 using NextHire_API.DTOs.EntrevistaDTO;
+using NextHire_API.DTOs.TipoEntrevistaDTO;
 using NextHire_API.Exceptions;
 using NextHire_API.Interfaces;
 using NextHireAPI.Interfaces;
@@ -13,14 +14,15 @@ public class EntrevistaService
     private readonly IEntrevistaRepository _rep;
     // private readonly IProcessoSeletivoRepository _ProcessoRep;
     private readonly IUsuarioRepository _usuarioRep;
-    private readonly IGoogleCalendarRepository _googleRep;
-
-    public EntrevistaService(IEntrevistaRepository rep,  IUsuarioRepository usuarioRep, IGoogleCalendarRepository googleRep)
+    //private readonly IGoogleCalendarRepository _googleRep;
+    private readonly ITipoEntrevistaRepository _tipoRep;
+    public EntrevistaService(IEntrevistaRepository rep,  IUsuarioRepository usuarioRep, ITipoEntrevistaRepository tipoRep)//, IGoogleCalendarRepository googleRep)
     {
         _rep = rep;
         // _ProcessoRep = ProcessoRep;
         _usuarioRep = usuarioRep;
-        _googleRep = googleRep;
+        //_googleRep = googleRep;
+        _tipoRep = tipoRep;
     }
 
 
@@ -34,14 +36,52 @@ public class EntrevistaService
 
     }
 
-    public async Task<string> GerarLink(string titulo, DateTime inicio, DateTime fim)
-    {
-        if (fim <= inicio)
-            throw new DomainException("A data/hora de encerramento deve ser posterior à de início.");
+    //public async Task<string> GerarLink(string titulo, DateTime inicio, DateTime fim)
+    //{
+    //    if (fim <= inicio)
+    //        throw new DomainException("A data/hora de encerramento deve ser posterior à de início.");
 
-        return await _googleRep.gerarURL(titulo, inicio, fim);
+    //    return await _googleRep.gerarURL(titulo, inicio, fim);
+
+    //}
+
+    public async Task<List<LerEntrevistaDTO>> BuscarPorTipoEntrevista(string nome)
+    {
+        TipoEntrevista entrQuery = await _tipoRep.BuscarPorTipo(nome);
+        if (entrQuery == null)
+            throw new DomainException("Tipo entrevista não encontrado");
+
+        List<Entrevista> lerEntrQuery = await _rep.ListarPorTipo(nome);
+
+        return lerEntrQuery.Select(varAux => EntrevistaToDTO.LerDTO(varAux));
+    }
+
+    public async Task<List<LerEntrevistaDTO>> ListarPorTipoEntrevista(string nome)
+    {
 
     }
+
+    /*
+     $ adicionar em dto vaga => cargo
+bash: adicionar: command not found
+
+54930515831@D08S30-1362969 MINGW64 ~/Desktop/teste/NextHire_BackEnd/NextHire_API (fix/develop/context)
+$ adicionar em dto tipo entrevista id em entrevista
+bash: adicionar: command not found
+
+54930515831@D08S30-1362969 MINGW64 ~/Desktop/teste/NextHire_BackEnd/NextHire_API (fix/develop/context)
+$ adicionar em dto is_oauth em usuario dto
+bash: adicionar: command not found
+
+54930515831@D08S30-1362969 MINGW64 ~/Desktop/teste/NextHire_BackEnd/NextHire_API (fix/develop/context)
+$ wqwq\d
+
+
+
+
+
+
+     */
 
     public async Task<List<LerEntrevistaDTO>> EntrevistasHoje()
     {

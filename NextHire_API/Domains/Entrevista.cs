@@ -21,6 +21,8 @@ public partial class Entrevista
     public bool? StatusEntrevista { get; set; }
     public string? link_entrevista { get; set; }
 
+    public bool? is_Once { get; set; } // true = um unico candidato por entrevista, false = mais de um candidato por entrevista
+
     public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();
 
     public virtual ICollection<Comentario> Comentario { get; set; } = new List<Comentario>();

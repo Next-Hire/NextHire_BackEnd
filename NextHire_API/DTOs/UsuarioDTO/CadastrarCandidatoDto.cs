@@ -9,5 +9,6 @@ namespace NextHireAPI.DTOs.UsuarioDto
         public string Email { get; set; } = null!;
 
         public string senha { get; set;}
+        public bool? isOAuth { get; set; }
     }
 }

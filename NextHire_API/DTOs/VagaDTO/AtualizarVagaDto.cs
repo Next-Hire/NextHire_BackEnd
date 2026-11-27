@@ -30,5 +30,7 @@ namespace NextHire_API.DTOs.VagaDTO
         public decimal? TempoExperienciaDesejado { get; set; }
 
         public string Titulo { get; set; } = null!;
+
+        public string Cargo { get; set; }
     }
 }

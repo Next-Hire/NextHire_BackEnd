@@ -31,6 +31,12 @@ public class EntrevistaService
 
     }
 
+    public async Task<string> GerarLink()
+    {
+
+        return string;
+    }
+
     public async Task<List<LerEntrevistaDTO>> EntrevistasHoje()
     {
         DateTime hoje = DateTime.Today;

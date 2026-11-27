@@ -16,6 +16,8 @@ public partial class Entrevista
 
     public int ProcessoSeletivoId { get; set; }
 
+    public int TipoEntrevistaId { get; set; }
+
     public bool? StatusEntrevista { get; set; }
     public string? link_entrevista { get; set; }
 
@@ -24,6 +26,8 @@ public partial class Entrevista
     public virtual ICollection<Comentario> Comentario { get; set; } = new List<Comentario>();
 
     public virtual ProcessoSeletivo ProcessoSeletivo { get; set; } = null!;
+
+    public virtual TipoEntrevista TipoEntrevista { get; set; } = null!;
 
     public virtual ICollection<Usuario> Candidato { get; set; } = new List<Usuario>();
 

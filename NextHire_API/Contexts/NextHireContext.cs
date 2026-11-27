@@ -369,6 +369,8 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.NomeEntrevista)
                 .IsRequired()
                 .HasColumnName("nome_entrevista");
+            entity.Property(e => e.TipoEntrevistaId)
+            .HasColumnName("tipo_entrevista_id");
             entity.Property(e => e.ProcessoSeletivoId).HasColumnName("processo_seletivo_id");
             entity.Property(e => e.link_entrevista)
             .HasColumnType("character varying")
@@ -376,6 +378,9 @@ public partial class NextHireContext : DbContext
             entity.Property(e => e.StatusEntrevista)
                 .HasDefaultValue(true)
                 .HasColumnName("status_entrevista");
+            entity.HasOne(d => d.TipoEntrevista).WithMany(tipo => tipo.Entrevista)
+                .HasForeignKey(tipo => tipo.TipoEntrevistaId)
+                .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("entrevista_tipo_id_fkey");
             entity.HasOne(d => d.ProcessoSeletivo).WithMany(p => p.Entrevista)
                 .HasForeignKey(d => d.ProcessoSeletivoId)
                 .OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("entrevista_processo_seletivo_id_fkey");

@@ -64,9 +64,10 @@ namespace NextHire.Controllers
         }
 
         [HttpGet("google")]
+        [AllowAnonymous]
         public ActionResult GoogleInAuth()
         {
-            var clientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            var clientId = Environment.GetEnvironmentVariable("GOOGLE_URL_ID_CLIENT");
             var redirectUri = Uri.EscapeDataString(Environment.GetEnvironmentVariable("GOOGLE_URL_BACK")!);
             var state = Guid.NewGuid().ToString("N");
             var scope = Uri.EscapeDataString("openid profile email");
@@ -80,11 +81,11 @@ namespace NextHire.Controllers
         // 2. Recebe o retorno do LinkedIn, valida/cria o usuário e gera o SEU TokenJWT
         [HttpGet("linkedin/callback")]
         [AllowAnonymous]
-        public async Task<IActionResult> LinkedInCallback([FromQuery] string code, [FromQuery] string? error)
+        public async Task<IActionResult> LinkedInCallback([FromQuery] string? code, [FromQuery] string? error)
         {
             try
             {
-                var e = await _service.LinkedInLogin(code, error);
+                var e = await _service.LinkedInLogin(code ?? "", error ?? "");
                 return Redirect(e);
             }
 
@@ -97,11 +98,11 @@ namespace NextHire.Controllers
 
         [HttpGet("google/callback")]
         [AllowAnonymous]
-        public async Task<ActionResult> GoogleInCallback([FromQuery] string code, [FromQuery] string? error)
+        public async Task<ActionResult> GoogleInCallback([FromQuery] string? code, [FromQuery] string? error)
         {
             try
             {
-                string urlGoogle = await _service.GoogleLinkLogin(code, error);
+                string urlGoogle = await _service.GoogleLinkLogin(code ?? "", error ?? "");
                 return Redirect(urlGoogle);
             }
 

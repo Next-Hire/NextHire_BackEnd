@@ -32,7 +32,7 @@ namespace NextHireAPI.Applications.Services
         public async Task<TokenResponseDto> Login(string email, string senha)
         {
             Usuario usuario = await _repository.BuscarUsuarioPorEmail(email);
-            if (usuario == null)
+            if (usuario == null || usuario.is_OAuth == true || string.IsNullOrEmpty(usuario.Senha))
                 throw new DomainException("Erro! email ou senha inválidos!");
 
             if (!PassToArgon2.VerifyPassword(senha, usuario.Senha))
@@ -52,8 +52,8 @@ namespace NextHireAPI.Applications.Services
 
         private async Task<string> salvarUsuarioOAuth(string email, string nome)
         {
-            Usuario? usuarioExiste = await _repository.BuscarUsuarioPorEmail(email);
-            if (usuarioExiste == null)
+            bool usuarioExiste = await _repository.EmailExiste(email);
+            if (!usuarioExiste)
             {
                 Usuario usuarioQuery = new Usuario()
                 {
@@ -64,14 +64,14 @@ namespace NextHireAPI.Applications.Services
                 };
 
                 await _repository.CadastrarCandidato(usuarioQuery);
-                usuarioExiste = await _repository.BuscarUsuarioPorEmail(email);
             }
+                Usuario? usuarioExistente = await _repository.BuscarUsuarioPorEmail(email);
 
 
-            var tokenJWT = _jwt.GerarToken(usuarioExiste);
-            var frontEndURL = Environment.GetEnvironmentVariable("LINKEDIN_URL_FRONT");
+            var tokenJWT = _jwt.GerarToken(usuarioExistente);
+            var frontEndURL = Environment.GetEnvironmentVariable("OAUTH_URL_FRONT");
 
-            return $"{frontEndURL}?=token{tokenJWT}";
+            return $"{frontEndURL}?token={tokenJWT}";
 
 
 
@@ -135,8 +135,8 @@ namespace NextHireAPI.Applications.Services
             {
                 ["grant_type"] = "authorization_code",
                 ["code"] = code,
-                ["client_id"] = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")!,
-                ["client_secret"] = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET")!,
+                ["client_id"] = Environment.GetEnvironmentVariable("GOOGLE_URL_ID_CLIENT")!,
+                ["client_secret"] = Environment.GetEnvironmentVariable("GOOGLE_URL_CLIENT_SECRET")!,
                 ["redirect_uri"] = Environment.GetEnvironmentVariable("GOOGLE_URL_BACK")!
             });
 

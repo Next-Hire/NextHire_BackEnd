@@ -95,7 +95,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da avaliação criada, com a chave composta no header Location.</returns>
         [HttpPost]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Registra uma nova avaliação de habilidade", Description = "Cria uma avaliação de habilidade vinculada a um candidato, uma entrevista e uma habilidade, registrando o nível avaliado. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Registra uma nova avaliação de habilidade", Description = "Cria uma avaliação de habilidade vinculada a um candidato, uma entrevista e uma habilidade, registrando o nível avaliado. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(201, "Avaliação registrada com sucesso.", typeof(ListarAvaliacaoHabilidadeDto))]
         [SwaggerResponse(400, "Dados inválidos: candidato, entrevista, habilidade ou nível fora dos valores aceitos.")]
         public async Task<IActionResult> Adicionar([FromBody] AdicionarAvaliacaoHabilidadeDto dto)
@@ -127,7 +127,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da avaliação atualizada.</returns>
         [HttpPut("{candidatoId:int}/{entrevistaId:int}/{habilidadeId:int}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Atualiza uma avaliação de habilidade", Description = "Atualiza a avaliação identificada pela chave composta candidato + entrevista + habilidade, normalmente alterando o nível (nota) avaliado. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza uma avaliação de habilidade", Description = "Atualiza a avaliação identificada pela chave composta candidato + entrevista + habilidade, normalmente alterando o nível (nota) avaliado. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Avaliação atualizada com sucesso.", typeof(ListarAvaliacaoHabilidadeDto))]
         [SwaggerResponse(404, "Avaliação não encontrada para a chave composta informada.")]
         [SwaggerResponse(400, "Dados inválidos na atualização da avaliação.")]
@@ -158,7 +158,7 @@ namespace NextHire_API.Controllers
         /// <returns>Resposta vazia com status 204.</returns>
         [HttpDelete("{candidatoId:int}/{entrevistaId:int}/{habilidadeId:int}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Remove uma avaliação de habilidade", Description = "Exclui definitivamente a avaliação identificada pela chave composta candidato + entrevista + habilidade. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove uma avaliação de habilidade", Description = "Exclui definitivamente a avaliação identificada pela chave composta candidato + entrevista + habilidade. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(204, "Avaliação removida com sucesso.")]
         [SwaggerResponse(404, "Avaliação não encontrada para a chave composta informada.")]
         [SwaggerResponse(400, "Erro ao remover a avaliação.")]

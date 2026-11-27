@@ -70,7 +70,7 @@ namespace NextHire_API.Controllers
         /// <returns>Resumo da importação, incluindo códigos não encontrados.</returns>
         [HttpPost("rbosf/importar")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Importa habilidades do RBOSF", Description = "Busca cada código no RBOSF e faz upsert no catálogo local pelo código. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Importa habilidades do RBOSF", Description = "Busca cada código no RBOSF e faz upsert no catálogo local pelo código. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Importação concluída.", typeof(ResultadoImportacaoRbosfDto))]
         [SwaggerResponse(400, "Dados inválidos ou erro ao consultar o RBOSF.")]
         public async Task<ActionResult<ResultadoImportacaoRbosfDto>> ImportarDoRbosf(
@@ -133,7 +133,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da habilidade criada.</returns>
         [HttpPost]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Cadastra uma nova habilidade", Description = "Cria uma habilidade no catálogo e retorna os dados da habilidade criada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Cadastra uma nova habilidade", Description = "Cria uma habilidade no catálogo e retorna os dados da habilidade criada. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(201, "Habilidade cadastrada com sucesso.", typeof(ListarHabilidadeDto))]
         [SwaggerResponse(400, "Dados inválidos ou erro ao cadastrar a habilidade.")]
         public ActionResult Adicionar(AdicionarHabilidadeDto habilidade)
@@ -155,7 +155,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da habilidade atualizada.</returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Atualiza uma habilidade", Description = "Substitui os dados da habilidade informada e retorna os dados atualizados. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza uma habilidade", Description = "Substitui os dados da habilidade informada e retorna os dados atualizados. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(204, "Habilidade atualizada com sucesso.", typeof(ListarHabilidadeDto))]
         [SwaggerResponse(400, "Dados inválidos, habilidade inexistente ou erro ao atualizar.")]
         public ActionResult Atualizar(int id, AdicionarHabilidadeDto habilidade)
@@ -163,7 +163,7 @@ namespace NextHire_API.Controllers
             try
             {
                ListarHabilidadeDto habilidadedto = _service.Atualizar(id, habilidade);
-                return StatusCode(204, habilidadedto);
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -176,7 +176,7 @@ namespace NextHire_API.Controllers
         /// <returns>Resposta vazia com status 204.</returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Remove uma habilidade", Description = "Exclui definitivamente a habilidade informada do catálogo. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove uma habilidade", Description = "Exclui definitivamente a habilidade informada do catálogo. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(204, "Habilidade removida com sucesso.")]
         [SwaggerResponse(400, "Habilidade não encontrada ou erro ao remover.")]
         public ActionResult Deletar(int id)

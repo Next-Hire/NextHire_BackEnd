@@ -26,7 +26,7 @@ namespace NextHire_API.Applications.Services
         {
             IEnumerable<SetorOcupacao?> setores = await _repSetorOcupacao.ListagemTotal();
             if (setores == null || !setores.Any())
-                throw new DomainException("Nenhum setor de ocupação encontrado");
+                return Enumerable.Empty<LerSetor_OcupacaoDTO2>();
 
             return setores.Select(varAux => Setor_OcupacaoConvertion.lerSetoresOcupacoes(varAux)).ToList();
         }

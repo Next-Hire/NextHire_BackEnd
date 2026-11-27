@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NextHire_API.Applications.Services;
 using NextHire_API.DTOs.ProcessoSeletivoDTO;
 using NextHire_API.Exceptions;
+using NextHire_API.Applications.Pagination;
 using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Runtime.InteropServices;
@@ -23,11 +24,12 @@ namespace NextHire_API.Controllers
         [SwaggerOperation(Summary = "Listar todos os processos seletivos", Description = "Retorna todos os processos seletivos cadastradas no sistema. Requer perfil de Gestor/AnalistaRH.")]
         [SwaggerResponse(200, "Processos seletivos listados com sucesso.", typeof(List<ListarProcessoSeletivoDto>))]
         [SwaggerResponse(400, "Erro ao listar os processos seletivos.")]
-        public async Task<ActionResult<ListarProcessoSeletivoDto>> ListarProcessosSeletivos()
+        public async Task<ActionResult<ListarProcessoSeletivoDto>> ListarProcessosSeletivos([FromQuery] int? pagina, [FromQuery] int? tamanhoPagina)
         {
             try
             {
-                return Ok(await _service.ListarProcessosSeletivos());
+                List<ListarProcessoSeletivoDto> processos = await _service.ListarProcessosSeletivos();
+                return Ok(processos.Paginar(pagina, tamanhoPagina));
             }
             catch (DomainException ex)
             {
@@ -132,7 +134,7 @@ namespace NextHire_API.Controllers
             try
             {
                 await _service.AtualizarProcessoSeletivo(processoId, processoDto.TituloProcesso, processoDto.DataFechamento);
-                return StatusCode(204, "Processo Atualizado com sucesso");
+                return NoContent();
             }
             catch (DomainException ex)
             {
@@ -150,7 +152,7 @@ namespace NextHire_API.Controllers
             try
             {
                 await _service.RemoverProcessoSeletivo(processoId);
-                return StatusCode(204, "Processo removido com sucesso");
+                return NoContent();
             }
             catch (DomainException ex)
             {

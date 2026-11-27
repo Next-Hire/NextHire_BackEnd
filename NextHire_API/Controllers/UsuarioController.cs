@@ -1,6 +1,7 @@
 
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using NextHireAPI.Applications.Services;
@@ -27,8 +28,8 @@ namespace NextHireAPI.Controllers
         /// <summary>Lista todos os usuários cadastrados (candidatos e funcionários).</summary>
         /// <returns>Lista completa de usuários cadastrados.</returns>
         [HttpGet("usuarios")]
-        //[Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista todos os usuários", Description = "Retorna todos os usuários cadastrados no sistema, tanto candidatos quanto funcionários. Requer perfil de Analista de RH ou Administrador.")]
+        [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Lista todos os usuários", Description = "Retorna todos os usuários cadastrados no sistema, tanto candidatos quanto funcionários. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Usuários listados com sucesso.", typeof(List<ListarUsuariosDto>))]
         [SwaggerResponse(404, "Nenhum usuário cadastrado.")]
         public async Task<IActionResult> ListarUsuarios()
@@ -47,8 +48,8 @@ namespace NextHireAPI.Controllers
         /// <param name="empresaId">ID da empresa cujos funcionários serão listados.</param>
         /// <returns>Lista de funcionários da empresa informada.</returns>
         [HttpGet("funcionarios")]
-        //[Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista os funcionários de uma empresa", Description = "Retorna os funcionários vinculados ao ID da empresa informado. Requer perfil de Analista de RH ou Administrador.")]
+        [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Lista os funcionários de uma empresa", Description = "Retorna os funcionários vinculados ao ID da empresa informado. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Funcionários listados com sucesso.", typeof(List<ListarFuncionarioDto>))]
         [SwaggerResponse(404, "Nenhum funcionário encontrado para a empresa informada.")]
         public async Task<IActionResult> ListarFuncionariosPorEmpresa(int empresaId)
@@ -67,7 +68,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Lista completa de candidatos.</returns>
         [HttpGet("candidatos")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista todos os candidatos", Description = "Retorna todos os candidatos cadastrados no sistema. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista todos os candidatos", Description = "Retorna todos os candidatos cadastrados no sistema. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Candidatos listados com sucesso.", typeof(List<ListarCandidatoDto>))]
         [SwaggerResponse(404, "Nenhum candidato cadastrado.")]
         public async Task<IActionResult> ListarCandidatos()
@@ -87,7 +88,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Dados do funcionário.</returns>
         [HttpGet("funcionario/{funcionarioId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Busca um funcionário pelo ID", Description = "Retorna os dados de um funcionário específico. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Busca um funcionário pelo ID", Description = "Retorna os dados de um funcionário específico. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Funcionário encontrado.", typeof(ListarFuncionarioDto))]
         [SwaggerResponse(404, "Funcionário não encontrado.")]
         public async Task<IActionResult> BuscarFuncionarioPorId(int funcionarioId)
@@ -107,7 +108,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Dados completos do perfil do candidato.</returns>
         [HttpGet("candidato/{candidatoId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Busca o perfil completo de um candidato pelo ID", Description = "Retorna o perfil completo de um candidato específico. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Busca o perfil completo de um candidato pelo ID", Description = "Retorna o perfil completo de um candidato específico. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Candidato encontrado.", typeof(ListarCandidatoDto))]
         [SwaggerResponse(404, "Candidato não encontrado.")]
         public async Task<IActionResult> BuscarCandidatoPorId(int candidatoId)
@@ -127,8 +128,8 @@ namespace NextHireAPI.Controllers
         /// <param name="funcionarios">Lista de dados dos funcionários a serem cadastrados.</param>
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost("funcionarios/{empresaId}")]
-        //[Authorize(Roles = "adm")]
-        [SwaggerOperation(Summary = "Cadastra funcionários de uma empresa", Description = "Cria um lote de funcionários vinculados ao ID da empresa informado. Requer perfil de Analista de RH ou Administrador.")]
+        [Authorize(Roles = "Adm")]
+        [SwaggerOperation(Summary = "Cadastra funcionários de uma empresa", Description = "Cria um lote de funcionários vinculados ao ID da empresa informado. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Funcionários cadastrados com sucesso.")]
         [SwaggerResponse(400, "Dados inválidos ou empresa inexistente.")]
         public async Task<IActionResult> AdicionarFuncionarios(int empresaId, [FromBody] List<AdicionarFuncionarioDto> funcionarios)
@@ -198,6 +199,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Mensagem de confirmação do envio.</returns>
         [HttpPost("enviar-codigo")]
         [AllowAnonymous]
+        [EnableRateLimiting("envio-codigo")]
         [SwaggerOperation(Summary = "Envia código de recuperação de senha", Description = "Envia um código de verificação para o e-mail informado, utilizado na recuperação de senha. Endpoint público, não exige autenticação.")]
         [SwaggerResponse(200, "Código de verificação enviado para o e-mail.")]
         [SwaggerResponse(400, "Formato de e-mail inválido.")]
@@ -235,12 +237,12 @@ namespace NextHireAPI.Controllers
             }
         }
 
-        /// <summary>Desativa um usuário do sistema (soft delete). Somente o próprio usuário (via token) ou um Administrador.</summary>
+        /// <summary>Desativa um usuário do sistema (soft delete). Somente o próprio usuário (via token) ou um Adm.</summary>
         /// <param name="usuarioId">ID do usuário a ser desativado.</param>
         /// <returns>Mensagem de confirmação da desativação.</returns>
         [HttpDelete("{usuarioId}")]
         [Authorize(Policy = "MesmoUsuarioOuAdm")]
-        [SwaggerOperation(Summary = "Desativa um usuário (soft delete)", Description = "Desativa o usuário informado (status_usuario = false), sem excluir o registro do banco. Somente o próprio usuário autenticado (ID do token igual ao da rota) ou um Administrador pode desativar.")]
+        [SwaggerOperation(Summary = "Desativa um usuário (soft delete)", Description = "Desativa o usuário informado (status_usuario = false), sem excluir o registro do banco. Somente o próprio usuário autenticado (ID do token igual ao da rota) ou um Adm pode desativar.")]
         [SwaggerResponse(204, "Usuário removido com sucesso.")]
         [SwaggerResponse(400, "Usuário não encontrado ou erro ao remover.")]
         public async Task<IActionResult> RemoverUsuario(int usuarioId)
@@ -249,7 +251,7 @@ namespace NextHireAPI.Controllers
             {
                 await _service.RemoverUsuario(usuarioId);
 
-                return StatusCode(204, "Usuário removido com sucesso.");
+                return NoContent();
             }
             catch (DomainException ex)
             {

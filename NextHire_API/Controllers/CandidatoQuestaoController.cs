@@ -212,7 +212,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Status 201 indicando que a resposta foi registrada.</returns>
         [HttpPost]
         [Authorize(Roles = "Candidato,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Salva a resposta de um candidato a uma questão", Description = "Registra a resposta do candidato à questão informada. Aceita resposta simples (verdadeiro/falso ou texto) ou lista de alternativas para múltipla escolha. Requer perfil de Candidato, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Salva a resposta de um candidato a uma questão", Description = "Registra a resposta do candidato à questão informada. Aceita resposta simples (verdadeiro/falso ou texto) ou lista de alternativas para múltipla escolha. Requer perfil de Candidato, Analista de RH ou Adm.")]
         [SwaggerResponse(201, "Resposta registrada com sucesso.")]
         [SwaggerResponse(400, "Dados inválidos: questão, candidato ou payload da resposta incorretos.")]
         public async Task<ActionResult<LerCandidatoQuestaoDTO>> Adicionar([FromBody] CriarCandidatoQuestaoDTO dto)
@@ -237,7 +237,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Dados da resposta removida.</returns>
         [HttpDelete("candidato/{candidatoId}/questao/{questaoId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Remove a resposta de um candidato a uma questão", Description = "Exclui a resposta do candidato informado à questão informada e retorna os dados da resposta removida. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove a resposta de um candidato a uma questão", Description = "Exclui a resposta do candidato informado à questão informada e retorna os dados da resposta removida. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Resposta removida com sucesso.", typeof(LerCandidatoQuestaoDTO))]
         [SwaggerResponse(404, "Resposta não encontrada para o candidato e questão informados.")]
         public async Task<ActionResult<LerCandidatoQuestaoDTO>> Excluir(int candidatoId, int questaoId)

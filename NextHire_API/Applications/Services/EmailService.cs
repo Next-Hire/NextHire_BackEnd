@@ -8,7 +8,6 @@ namespace NextHireAPI.Applications.Services
 {
     public class EmailService()
     {
-        private static string CodigoGerado { get; set; }
         private static MailAddress emailEmp = ConverteParaMailAdress(Environment.GetEnvironmentVariable("MAIL_TO_SMTP"));
         private static string senhaAplicativo = Environment.GetEnvironmentVariable("MAIL_CODE_PASS").ToString();
 
@@ -17,11 +16,9 @@ namespace NextHireAPI.Applications.Services
             const string letras = "ABCDEFGHIJKLMNOPQRSTUV";
             var random = new Random();
 
-            CodigoGerado = new string(Enumerable.Repeat(letras, tamanho)
+            return new string(Enumerable.Repeat(letras, tamanho)
                 .Select(s => s[random.Next(s.Length)])
                 .ToArray());
-
-            return CodigoGerado;
         }
 
         public static bool ValidarNome(string nome)

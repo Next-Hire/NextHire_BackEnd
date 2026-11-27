@@ -4,10 +4,11 @@ using NextHire_API.Applications.Services;
 using NextHire_API.DTOs.EntrevistaDTO;
 using NextHire_API.DTOs.Setor_OcupacaoDTOs; 
 using NextHire_API.Exceptions;
+using NextHire_API.Applications.Pagination;
 
 namespace NextHire_API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class EntrevistaController : ControllerBase
     {
@@ -20,12 +21,12 @@ namespace NextHire_API.Controllers
 
         // GET: api/Entrevista
         [HttpGet]
-        public async Task<ActionResult<List<LerEntrevistaDTO>>> Listar()
+        public async Task<ActionResult<List<LerEntrevistaDTO>>> Listar([FromQuery] int? pagina, [FromQuery] int? tamanhoPagina)
         {
             try
             {
                 List<LerEntrevistaDTO> entrevistas = await _service.Listar();
-                return Ok(entrevistas);
+                return Ok(entrevistas.Paginar(pagina, tamanhoPagina));
             }
             catch (DomainException ex)
             {

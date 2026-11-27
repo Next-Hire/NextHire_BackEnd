@@ -160,7 +160,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados do setor de ocupação criado.</returns>
         [HttpPost]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Cadastra um novo setor de ocupação", Description = "Cria um setor de ocupação e retorna os dados do setor criado. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Cadastra um novo setor de ocupação", Description = "Cria um setor de ocupação e retorna os dados do setor criado. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Setor de ocupação cadastrado com sucesso.", typeof(CriarSetor_OcupacaoDTO))]
         [SwaggerResponse(400, "Dados inválidos ou erro ao cadastrar o setor de ocupação.")]
         public async Task<ActionResult<CriarSetor_OcupacaoDTO>> Adicionar([FromBody] CriarSetor_OcupacaoDTO criarDTO)
@@ -182,7 +182,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados do setor de ocupação atualizado.</returns>
         [HttpPut("Atualizar/{setorId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Atualiza um setor de ocupação", Description = "Substitui os dados do setor de ocupação informado e retorna o setor atualizado. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza um setor de ocupação", Description = "Substitui os dados do setor de ocupação informado e retorna o setor atualizado. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Setor de ocupação atualizado com sucesso.", typeof(AtualizarSetor_OcupacaoDTO))]
         [SwaggerResponse(400, "Dados inválidos, setor inexistente ou erro ao atualizar.")]
         public async Task<ActionResult<AtualizarSetor_OcupacaoDTO>> Atualizar(int setorId, [FromBody] AtualizarSetor_OcupacaoDTO atualizarDTO)
@@ -207,7 +207,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados do setor de ocupação removido.</returns>
         [HttpDelete]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Remove um setor de ocupação", Description = "Exclui o setor de ocupação informado, identificado pelos dados de setor, área e empresa recebidos por query, e retorna o setor removido. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove um setor de ocupação", Description = "Exclui o setor de ocupação informado, identificado pelos dados de setor, área e empresa recebidos por query, e retorna o setor removido. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Setor de ocupação removido com sucesso.", typeof(LerSetor_OcupacaoDTO2))]
         [SwaggerResponse(400, "Setor de ocupação não encontrado ou erro ao remover.")]
         public async Task<ActionResult<LerSetor_OcupacaoDTO2>> RemoverSetor(

@@ -24,7 +24,7 @@ namespace NextHire_API.Controllers
         /// <returns>Lista completa de anotações.</returns>
         [HttpGet]
         [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Lista todas as anotações", Description = "Retorna todas as anotações cadastradas no sistema. Requer perfil de Administrador.")]
+        [SwaggerOperation(Summary = "Lista todas as anotações", Description = "Retorna todas as anotações cadastradas no sistema. Requer perfil de Adm.")]
         [SwaggerResponse(200, "Anotações listadas com sucesso.", typeof(List<ListarAnotacaoDto>))]
         [SwaggerResponse(400, "Erro ao listar as anotações.")]
         public ActionResult Listar()
@@ -45,7 +45,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da anotação encontrada.</returns>
         [HttpGet("{id}")]
         [Authorize(Roles = "Candidato,Adm")]
-        [SwaggerOperation(Summary = "Busca uma anotação pelo ID", Description = "Retorna os dados da anotação correspondente ao ID informado. Requer perfil de Candidato ou Administrador.")]
+        [SwaggerOperation(Summary = "Busca uma anotação pelo ID", Description = "Retorna os dados da anotação correspondente ao ID informado. Requer perfil de Candidato ou Adm.")]
         [SwaggerResponse(200, "Anotação encontrada.", typeof(ListarAnotacaoDto))]
         [SwaggerResponse(400, "Anotação não encontrada ou erro na busca.")]
         public ActionResult BuscarPorId(int id)
@@ -66,7 +66,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da anotação criada.</returns>
         [HttpPost]
         [Authorize(Roles = "Candidato,Adm")]
-        [SwaggerOperation(Summary = "Cadastra uma nova anotação", Description = "Cria uma anotação privada do candidato e retorna os dados da anotação criada. Requer perfil de Candidato ou Administrador.")]
+        [SwaggerOperation(Summary = "Cadastra uma nova anotação", Description = "Cria uma anotação privada do candidato e retorna os dados da anotação criada. Requer perfil de Candidato ou Adm.")]
         [SwaggerResponse(200, "Anotação cadastrada com sucesso.", typeof(ListarAnotacaoDto))]
         [SwaggerResponse(400, "Dados inválidos ou erro ao cadastrar a anotação.")]
         public ActionResult Adicionar(AdicionarAnotacaoDto anotacaoDto)
@@ -88,7 +88,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da anotação atualizada.</returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Candidato,Adm")]
-        [SwaggerOperation(Summary = "Atualiza uma anotação", Description = "Substitui os dados da anotação informada e retorna os dados atualizados. Requer perfil de Candidato ou Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza uma anotação", Description = "Substitui os dados da anotação informada e retorna os dados atualizados. Requer perfil de Candidato ou Adm.")]
         [SwaggerResponse(200, "Anotação atualizada com sucesso.", typeof(ListarAnotacaoDto))]
         [SwaggerResponse(400, "Dados inválidos, anotação inexistente ou erro ao atualizar.")]
         public ActionResult Atualizar(AdicionarAnotacaoDto anotacaoDto, int id)
@@ -109,7 +109,7 @@ namespace NextHire_API.Controllers
         /// <returns>Resposta vazia com status 200.</returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Candidato,Adm")]
-        [SwaggerOperation(Summary = "Remove uma anotação", Description = "Exclui definitivamente a anotação informada. Requer perfil de Candidato ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove uma anotação", Description = "Exclui definitivamente a anotação informada. Requer perfil de Candidato ou Adm.")]
         [SwaggerResponse(200, "Anotação removida com sucesso.")]
         [SwaggerResponse(400, "Anotação não encontrada ou erro ao remover.")]
         public ActionResult Deletar(int id)

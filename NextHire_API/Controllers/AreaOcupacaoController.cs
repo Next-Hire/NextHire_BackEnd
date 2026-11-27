@@ -96,7 +96,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da área de ocupação cadastrada.</returns>
         [HttpPost]
         [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Cadastra uma nova área de ocupação", Description = "Cria uma nova área de ocupação no catálogo e retorna os dados dela. Requer perfil de Administrador.")]
+        [SwaggerOperation(Summary = "Cadastra uma nova área de ocupação", Description = "Cria uma nova área de ocupação no catálogo e retorna os dados dela. Requer perfil de Adm.")]
         [SwaggerResponse(201, "Área de ocupação cadastrada com sucesso.", typeof(ListarAreaOcupacaoDto))]
         [SwaggerResponse(400, "Dados inválidos ou área já cadastrada.")]
         public ActionResult Adicionar(AdicionarAreaOcupacao areaOcupacao)
@@ -118,7 +118,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da área de ocupação atualizada.</returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Atualiza uma área de ocupação", Description = "Substitui os dados da área de ocupação informada. Requer perfil de Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza uma área de ocupação", Description = "Substitui os dados da área de ocupação informada. Requer perfil de Adm.")]
         [SwaggerResponse(204, "Área de ocupação atualizada com sucesso.")]
         [SwaggerResponse(400, "Área de ocupação não encontrada ou dados inválidos.")]
         public ActionResult Atualizar(int id, AdicionarAreaOcupacao areaOcupacao)
@@ -126,7 +126,7 @@ namespace NextHire_API.Controllers
             try
             {
                 var area = _service.Atualizar(id, areaOcupacao);
-                return StatusCode(204, area);
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -139,7 +139,7 @@ namespace NextHire_API.Controllers
         /// <returns>Resposta vazia com status 204.</returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Remove uma área de ocupação", Description = "Exclui definitivamente a área de ocupação informada do catálogo. Requer perfil de Administrador.")]
+        [SwaggerOperation(Summary = "Remove uma área de ocupação", Description = "Exclui definitivamente a área de ocupação informada do catálogo. Requer perfil de Adm.")]
         [SwaggerResponse(204, "Área de ocupação removida com sucesso.")]
         [SwaggerResponse(400, "Área de ocupação não encontrada ou erro ao remover.")]
         public ActionResult Excluir(int id)

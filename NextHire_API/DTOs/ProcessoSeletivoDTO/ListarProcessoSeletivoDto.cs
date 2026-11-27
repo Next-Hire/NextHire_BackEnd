@@ -10,8 +10,12 @@ public partial class ListarProcessoSeletivoDto
 
     public string TituloProcesso { get; set; } = null!;
 
+    /// <summary>Data de abertura.</summary>
+    /// <example>2026-10-01</example>
     public DateOnly? DataAbertura { get; set; }
 
+    /// <summary>Data de fechamento.</summary>
+    /// <example>2026-12-31</example>
     public DateOnly DataFechamento { get; set; }
 
     public string StatusProcessoSeletivo { get; set; } = null!;

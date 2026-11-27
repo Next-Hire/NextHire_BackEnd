@@ -105,7 +105,7 @@ namespace NextHire_API.Controllers
             try
             {
                 await _service.Atualizar(questaoId, questao);
-                return StatusCode(204, "Questão atualizada com sucesso.");
+                return NoContent();
             }
             catch (DomainException ex)
             {

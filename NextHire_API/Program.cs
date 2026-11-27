@@ -22,6 +22,14 @@ using NextHire_API.Applications.S3;
 using NextHire_API.Applications.Integrations;
 using NextHire_API.Exceptions;
 using NextHire_API.Applications.Email;
+using NextHire_API.Middleware;
+using NextHire_API.Health;
+using NextHire_API.Infrastructure.Json;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NextHire_API.Applications.Auth;
 using Microsoft.EntityFrameworkCore.Diagnostics; // adicione no topo do Program.cs, se necessário
 
@@ -70,7 +78,29 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
     ConnectionMultiplexer.Connect(redisConnection)
 );
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower));
+        options.JsonSerializerOptions.Converters.Add(new UtcDateTimeJsonConverter());
+    });
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("envio-codigo", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "anonimo",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0
+            }));
+});
+
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database");
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -163,6 +193,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+
     //? Política: somente o próprio usuário (via token) ou um Administrador pode executar a ação
     options.AddPolicy("MesmoUsuarioOuAdm", policy =>
         policy.Requirements.Add(new NextHireAPI.Applications.Validations.SameUserRequirement()));
@@ -287,13 +321,19 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        string[] origens = (Environment.GetEnvironmentVariable("CORS_ORIGINS")
+                ?? "http://localhost:3000,http://localhost:5173,http://localhost:4200")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        policy.WithOrigins(origens)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
  
@@ -333,7 +373,13 @@ app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
+app.MapHealthChecks("/health").AllowAnonymous();
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = _ => false
+}).AllowAnonymous();
 app.MapControllers();
 
 app.Run();

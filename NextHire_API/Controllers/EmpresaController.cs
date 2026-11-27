@@ -87,7 +87,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da empresa cadastrada.</returns>
         [HttpPost]
         [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Cadastra uma nova empresa", Description = "Cria o cadastro de uma empresa no sistema e retorna os dados dela. Requer perfil de Administrador.")]
+        [SwaggerOperation(Summary = "Cadastra uma nova empresa", Description = "Cria o cadastro de uma empresa no sistema e retorna os dados dela. Requer perfil de Adm.")]
         [SwaggerResponse(200, "Empresa cadastrada com sucesso.", typeof(CriarEmpresaDTO))]
         [SwaggerResponse(400, "Dados inválidos ou empresa já cadastrada.")]
         public async Task<ActionResult<CriarEmpresaDTO>> Adicionar([FromBody] CriarEmpresaDTO EmpresaCons)
@@ -110,7 +110,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da empresa atualizada.</returns>
         [HttpPut("Atualizar/{id}")]
         [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Atualiza uma empresa existente", Description = "Atualiza o nome e/ou o status da empresa informada (parâmetros opcionais via query). Requer perfil de Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza uma empresa existente", Description = "Atualiza o nome e/ou o status da empresa informada (parâmetros opcionais via query). Requer perfil de Adm.")]
         [SwaggerResponse(200, "Empresa atualizada com sucesso.", typeof(LerEmpresaDTO))]
         [SwaggerResponse(400, "Empresa não encontrada ou dados inválidos.")]
         public async Task<ActionResult<LerEmpresaDTO>> Atualizar(int id, string? nome, bool? status)
@@ -131,7 +131,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados da empresa removida.</returns>
         [HttpDelete]
         [Authorize(Roles = "Adm")]
-        [SwaggerOperation(Summary = "Remove uma empresa", Description = "Exclui definitivamente a empresa informada do sistema. Requer perfil de Administrador.")]
+        [SwaggerOperation(Summary = "Remove uma empresa", Description = "Exclui definitivamente a empresa informada do sistema. Requer perfil de Adm.")]
         [SwaggerResponse(200, "Empresa removida com sucesso.", typeof(LerEmpresaDTO))]
         [SwaggerResponse(400, "Empresa não encontrada ou erro ao remover.")]
         public async Task<ActionResult<LerEmpresaDTO>> Remover(int id)

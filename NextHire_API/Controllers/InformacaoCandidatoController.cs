@@ -23,7 +23,7 @@ namespace NextHire_API.Controllers
         /// <returns>Lista completa das informações de candidatos.</returns>
         [HttpGet]
         [Authorize(Roles = "Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista as informações de todos os candidatos", Description = "Retorna as informações pessoais de todos os candidatos cadastrados. Requer perfil de Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista as informações de todos os candidatos", Description = "Retorna as informações pessoais de todos os candidatos cadastrados. Requer perfil de Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Informações listadas com sucesso.", typeof(List<ListarInformacaoCandidatoDto>))]
         [SwaggerResponse(500, "Erro interno ao listar as informações.")]
         public IActionResult Listar()
@@ -43,7 +43,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados das informações pessoais do registro informado.</returns>
         [HttpGet("{id:int}")]
         [Authorize(Roles = "Candidato,Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Busca informações do candidato por ID", Description = "Retorna as informações pessoais vinculadas ao ID do registro informado. Requer perfil de Candidato, Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Busca informações do candidato por ID", Description = "Retorna as informações pessoais vinculadas ao ID do registro informado. Requer perfil de Candidato, Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Informações encontradas.", typeof(ListarInformacaoCandidatoDto))]
         [SwaggerResponse(404, "Registro de informações não encontrado.")]
         [SwaggerResponse(400, "ID ou dados do registro inválidos.")]
@@ -68,7 +68,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados das informações pessoais do candidato informado.</returns>
         [HttpGet("candidato/{candidatoId:int}")]
         [Authorize(Roles = "Candidato,Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Busca informações pelo ID do candidato", Description = "Retorna as informações pessoais vinculadas ao ID do usuário candidato informado. Requer perfil de Candidato, Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Busca informações pelo ID do candidato", Description = "Retorna as informações pessoais vinculadas ao ID do usuário candidato informado. Requer perfil de Candidato, Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Informações encontradas.", typeof(ListarInformacaoCandidatoDto))]
         [SwaggerResponse(404, "Nenhuma informação encontrada para o candidato informado.")]
         [SwaggerResponse(400, "ID do candidato inválido.")]
@@ -93,7 +93,7 @@ namespace NextHire_API.Controllers
         /// <returns>Informações cadastradas, com a URL de consulta do registro criado.</returns>
         [HttpPost]
         [Authorize(Roles = "Candidato,Adm")]
-        [SwaggerOperation(Summary = "Adiciona informações do candidato", Description = "Cria um novo registro de informações pessoais para o candidato informado. Requer perfil de Candidato ou Administrador.")]
+        [SwaggerOperation(Summary = "Adiciona informações do candidato", Description = "Cria um novo registro de informações pessoais para o candidato informado. Requer perfil de Candidato ou Adm.")]
         [SwaggerResponse(201, "Informações cadastradas com sucesso.", typeof(ListarInformacaoCandidatoDto))]
         [SwaggerResponse(400, "Dados inválidos para o cadastro das informações.")]
         public IActionResult Adicionar([FromBody] AdicionarInformacaoCandidatoDto dto)
@@ -118,7 +118,7 @@ namespace NextHire_API.Controllers
         /// <returns>Informações atualizadas do registro.</returns>
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Candidato,Adm")]
-        [SwaggerOperation(Summary = "Atualiza informações do candidato", Description = "Substitui os dados do registro de informações informado. Requer perfil de Candidato ou Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza informações do candidato", Description = "Substitui os dados do registro de informações informado. Requer perfil de Candidato ou Adm.")]
         [SwaggerResponse(200, "Informações atualizadas com sucesso.", typeof(ListarInformacaoCandidatoDto))]
         [SwaggerResponse(404, "Registro de informações não encontrado.")]
         [SwaggerResponse(400, "Dados inválidos para a atualização.")]
@@ -143,7 +143,7 @@ namespace NextHire_API.Controllers
         /// <returns>Resposta vazia com status 204.</returns>
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Candidato,Adm")]
-        [SwaggerOperation(Summary = "Remove informações do candidato", Description = "Exclui definitivamente o registro de informações informado. Requer perfil de Candidato ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove informações do candidato", Description = "Exclui definitivamente o registro de informações informado. Requer perfil de Candidato ou Adm.")]
         [SwaggerResponse(204, "Informações removidas com sucesso.")]
         [SwaggerResponse(404, "Registro de informações não encontrado.")]
         [SwaggerResponse(400, "ID inválido ou erro ao remover.")]

@@ -28,10 +28,7 @@ namespace NextHire_API.Controllers
             try
             {
                 List<LerCandidatoProcessoDTO> lista = await _service.Listar();
-                if (lista == null || lista.Count == 0)
-                    return NotFound(lista);
-                
-                return Ok(lista);
+                return Ok(lista ?? new List<LerCandidatoProcessoDTO>());
             }
             catch (DomainException ex)
             {
@@ -149,8 +146,8 @@ namespace NextHire_API.Controllers
         /// <param name="dto">Dados do vínculo entre candidato e processo seletivo a ser criado.</param>
         /// <returns>Dados do vínculo criado.</returns>
         [HttpPost]
-        [Authorize(Roles = "Administrador,AnalistaRh,Gestor")]
-        [SwaggerOperation(Summary = "Vincula um candidato a um processo seletivo", Description = "Cria a relação entre candidato e processo seletivo com o status inicial informado e retorna os dados criados. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [Authorize(Roles = "Adm,AnalistaRh,Gestor")]
+        [SwaggerOperation(Summary = "Vincula um candidato a um processo seletivo", Description = "Cria a relação entre candidato e processo seletivo com o status inicial informado e retorna os dados criados. Requer perfil de Adm, Analista de RH ou Gestor.")]
         [SwaggerResponse(201, "Candidato vinculado ao processo seletivo com sucesso.", typeof(LerCandidatoProcessoDTO))]
         [SwaggerResponse(400, "Dados inválidos, processo encerrado, vínculo duplicado ou erro ao cadastrar.")]
         public async Task<ActionResult<LerCandidatoProcessoDTO>> AdicionarCandidatoProcesso(
@@ -175,7 +172,7 @@ namespace NextHire_API.Controllers
         /// <returns>Lista dos vínculos criados.</returns>
         [HttpPost("candidatos")]
         [Authorize(Roles = "Adm,AnalistaRh,Gestor")]
-        [SwaggerOperation(Summary = "Vincula vários candidatos a um processo seletivo", Description = "Cria em lote a relação entre múltiplos candidatos e um processo seletivo com o status inicial informado. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [SwaggerOperation(Summary = "Vincula vários candidatos a um processo seletivo", Description = "Cria em lote a relação entre múltiplos candidatos e um processo seletivo com o status inicial informado. Requer perfil de Adm, Analista de RH ou Gestor.")]
         [SwaggerResponse(200, "Candidatos vinculados ao processo seletivo com sucesso.", typeof(List<LerCandidatoProcessoDTO>))]
         [SwaggerResponse(400, "Dados inválidos, candidatos já vinculados ou erro ao cadastrar.")]
         public async Task<ActionResult<List<LerCandidatoProcessoDTO>>> AdicionarCandidatosProcessoEmLote(
@@ -198,8 +195,8 @@ namespace NextHire_API.Controllers
         /// <param name="dto">Novo status da relação do candidato no processo seletivo.</param>
         /// <returns>Dados do vínculo atualizado.</returns>
         [HttpPut("candidato/{candidatoId}/processo/{processoSeletivoId}")]
-        [Authorize(Roles = "Administrador,AnalistaRh,Gestor")]
-        [SwaggerOperation(Summary = "Atualiza o status de um candidato no processo seletivo", Description = "Altera o status da relação (Considera, Avança ou Não Avança) entre o candidato e o processo seletivo informados. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [Authorize(Roles = "Adm,AnalistaRh,Gestor")]
+        [SwaggerOperation(Summary = "Atualiza o status de um candidato no processo seletivo", Description = "Altera o status da relação (Considera, Avança ou Não Avança) entre o candidato e o processo seletivo informados. Requer perfil de Adm, Analista de RH ou Gestor.")]
         [SwaggerResponse(200, "Status atualizado com sucesso.", typeof(LerCandidatoProcessoDTO))]
         [SwaggerResponse(400, "Dados inválidos, vínculo inexistente ou erro ao atualizar.")]
         public async Task<ActionResult<LerCandidatoProcessoDTO>> AtualizarCandidatoProcesso(
@@ -226,8 +223,8 @@ namespace NextHire_API.Controllers
         /// <param name="processoSeletivoId">ID do processo seletivo.</param>
         /// <returns>Dados do vínculo removido.</returns>
         [HttpDelete("candidato/{candidatoId:int}/processo/{processoSeletivoId:int}")]
-        // [Authorize(Roles = "Administrador,AnalistaRh,Gestor")]
-        [SwaggerOperation(Summary = "Remove um candidato de um processo seletivo", Description = "Exclui a relação entre o candidato e o processo seletivo informados e retorna os dados do vínculo removido. Requer perfil de Administrador, Analista de RH ou Gestor.")]
+        [Authorize(Roles = "Adm,AnalistaRh,Gestor")]
+        [SwaggerOperation(Summary = "Remove um candidato de um processo seletivo", Description = "Exclui a relação entre o candidato e o processo seletivo informados e retorna os dados do vínculo removido. Requer perfil de Adm, Analista de RH ou Gestor.")]
         [SwaggerResponse(200, "Vínculo removido com sucesso.", typeof(LerCandidatoProcessoDTO))]
         [SwaggerResponse(400, "Vínculo não encontrado ou erro ao remover.")]
         public async Task<ActionResult<LerCandidatoProcessoDTO>> RemoverCandidatoProcesso(

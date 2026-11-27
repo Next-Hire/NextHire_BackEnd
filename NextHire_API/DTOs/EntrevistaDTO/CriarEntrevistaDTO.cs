@@ -8,9 +8,13 @@ namespace NextHire_API.DTOs.EntrevistaDTO
         public string tituloEntrevista { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "A data/hora de início é obrigatória.")]
+        /// <summary>Início da entrevista (ISO 8601).</summary>
+        /// <example>2026-12-02T14:00:00Z</example>
         public DateTime dataInicio { get; set; }
 
         [Required(ErrorMessage = "A data/hora de encerramento é obrigatória.")]
+        /// <summary>Fim da entrevista (ISO 8601).</summary>
+        /// <example>2026-12-02T15:00:00Z</example>
         public DateTime dataEncerra { get; set; }
 
         [Required(ErrorMessage = "O processo seletivo é obrigatório.")]

@@ -32,8 +32,8 @@ namespace NextHire_API.Controllers
         /// <param name="vagaId">ID da vaga cujos candidatos serão listados.</param>
         /// <returns>Lista de currículos (candidaturas) vinculados à vaga informada.</returns>
         [HttpGet("Candidaturas/empresa/{empresaId}")]
-        //[Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista os candidaturas em vagas de uma empresa", Description = "Retorna os currículos inscritos nas vagas da empresa informada. Requer perfil de Analista de RH ou Administrador.")]
+        [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Lista os candidaturas em vagas de uma empresa", Description = "Retorna os currículos inscritos nas vagas da empresa informada. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Candidatos listados com sucesso.", typeof(List<ListarCurriculoVagaDto>))]
         [SwaggerResponse(404, "Vaga não encontrada ou nenhuma candidatura registrada.")]
         public async Task<ActionResult<List<ListarCurriculoVagaDto>>> ListarTodasAsCandidaturasPorEmpresaId(int empresaId)
@@ -53,7 +53,7 @@ namespace NextHire_API.Controllers
         /// <returns>Lista de currículos (candidaturas) vinculados à vaga informada.</returns>
         [HttpGet("CandidatosPorVagaId/{vagaId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista os candidatos de uma vaga", Description = "Retorna os currículos inscritos na vaga informada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista os candidatos de uma vaga", Description = "Retorna os currículos inscritos na vaga informada. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Candidatos listados com sucesso.", typeof(List<ListarCurriculoVagaDto>))]
         [SwaggerResponse(404, "Vaga não encontrada ou nenhuma candidatura registrada.")]
         public async Task<ActionResult<List<ListarCurriculoVagaDto>>> ListarCurriculosPorVagaId(int vagaId)
@@ -73,7 +73,7 @@ namespace NextHire_API.Controllers
         /// <returns>Lista de vagas em que o candidato informado se inscreveu.</returns>
         [HttpGet("VagasPorCandidatoId/{candidatoId}")]
         [Authorize(Roles = "Candidato,Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista as vagas de um candidato", Description = "Retorna as vagas em que o candidato informado se candidatou. Requer perfil de Candidato, Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista as vagas de um candidato", Description = "Retorna as vagas em que o candidato informado se candidatou. Requer perfil de Candidato, Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Vagas listadas com sucesso.", typeof(List<ListarVagaDto>))]
         [SwaggerResponse(404, "Candidato não encontrado ou nenhuma candidatura registrada.")]
         public async Task<ActionResult<List<ListarVagaDto>>> ListarVagasPorCandidatoId(int candidatoId)
@@ -154,7 +154,7 @@ namespace NextHire_API.Controllers
         /// <returns>Nota geral e comentários do agente sobre as respostas e o currículo.</returns>
         [HttpPost("AvaliarCandidatura/vaga/{vagaId}/candidato/{candidatoId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Avalia uma candidatura com o Next Agent", Description = "Envia a vaga, as respostas do candidato e o currículo ao agente (LM Studio), valida a resposta e persiste nota geral + comentários. Se já existir avaliação para o par candidato/vaga, ela é atualizada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Avalia uma candidatura com o Next Agent", Description = "Envia a vaga, as respostas do candidato e o currículo ao agente (LM Studio), valida a resposta e persiste nota geral + comentários. Se já existir avaliação para o par candidato/vaga, ela é atualizada. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Avaliação gerada e persistida.", typeof(ListarAvaliacaoAgenteDto))]
         [SwaggerResponse(400, "Dados inválidos, candidatura/respostas inexistentes ou resposta inválida do agente.")]
         public async Task<ActionResult<ListarAvaliacaoAgenteDto>> AvaliarCandidatura(int vagaId, int candidatoId)
@@ -175,7 +175,7 @@ namespace NextHire_API.Controllers
         /// <returns>Avaliação persistida (nota geral e comentários).</returns>
         [HttpGet("Avaliacao/vaga/{vagaId}/candidato/{candidatoId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Busca a avaliação de uma candidatura", Description = "Retorna a avaliação do agente já persistida para a candidatura informada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Busca a avaliação de uma candidatura", Description = "Retorna a avaliação do agente já persistida para a candidatura informada. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Avaliação encontrada.", typeof(ListarAvaliacaoAgenteDto))]
         [SwaggerResponse(404, "Nenhuma avaliação encontrada para o candidato e vaga informados.")]
         public async Task<ActionResult<ListarAvaliacaoAgenteDto>> BuscarAvaliacao(int vagaId, int candidatoId)
@@ -195,7 +195,7 @@ namespace NextHire_API.Controllers
         /// <returns>Avaliações persistidas para a vaga, da maior para a menor nota.</returns>
         [HttpGet("AvaliacoesPorVagaId/{vagaId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista as avaliações de uma vaga", Description = "Retorna as avaliações do agente já persistidas para a vaga informada, ordenadas por nota. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista as avaliações de uma vaga", Description = "Retorna as avaliações do agente já persistidas para a vaga informada, ordenadas por nota. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Avaliações listadas com sucesso.", typeof(List<ListarAvaliacaoAgenteDto>))]
         [SwaggerResponse(404, "Nenhuma avaliação encontrada para a vaga informada.")]
         public async Task<ActionResult<List<ListarAvaliacaoAgenteDto>>> ListarAvaliacoesPorVagaId(int vagaId)

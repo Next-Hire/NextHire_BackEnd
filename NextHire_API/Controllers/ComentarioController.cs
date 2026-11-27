@@ -20,7 +20,7 @@ namespace NextHire_API.Controllers
         /// <returns>Lista completa de comentários.</returns>
         [HttpGet("comentarios")]
         [Authorize(Roles = "Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista todos os comentários", Description = "Retorna todos os comentários cadastrados no sistema. Requer perfil de Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista todos os comentários", Description = "Retorna todos os comentários cadastrados no sistema. Requer perfil de Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Comentários listados com sucesso.", typeof(List<ListarComentarioDto>))]
         [SwaggerResponse(404, "Nenhum comentário cadastrado.")]
         public async Task<IActionResult> ListarComentarios()
@@ -40,7 +40,7 @@ namespace NextHire_API.Controllers
         /// <returns>Comentários da entrevista informada.</returns>
         [HttpGet("entrevista/{entrevistaId}")]
         [Authorize(Roles = "Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista os comentários de uma entrevista", Description = "Retorna os comentários vinculados à entrevista informada. Requer perfil de Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista os comentários de uma entrevista", Description = "Retorna os comentários vinculados à entrevista informada. Requer perfil de Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Comentários listados com sucesso.", typeof(List<ListarComentarioDto>))]
         [SwaggerResponse(404, "Nenhum comentário encontrado para a entrevista informada.")]
         public async Task<IActionResult> ListarPorEntrevistaId(int entrevistaId)
@@ -60,7 +60,7 @@ namespace NextHire_API.Controllers
         /// <returns>Comentários feitos pelo gestor informado.</returns>
         [HttpGet("gestor/{gestorId}")]
         [Authorize(Roles = "Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Lista os comentários de um gestor", Description = "Retorna os comentários feitos pelo gestor informado. Requer perfil de Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Lista os comentários de um gestor", Description = "Retorna os comentários feitos pelo gestor informado. Requer perfil de Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Comentários listados com sucesso.", typeof(List<ListarComentarioDto>))]
         [SwaggerResponse(404, "Nenhum comentário encontrado para o gestor informado.")]
         public async Task<IActionResult> ListarPorGestorId(int gestorId)
@@ -80,7 +80,7 @@ namespace NextHire_API.Controllers
         /// <returns>Dados do comentário encontrado.</returns>
         [HttpGet("{comentarioId}")]
         [Authorize(Roles = "Gestor,AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Busca um comentário pelo ID", Description = "Retorna os dados do comentário correspondente ao ID informado. Requer perfil de Gestor, Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Busca um comentário pelo ID", Description = "Retorna os dados do comentário correspondente ao ID informado. Requer perfil de Gestor, Analista de RH ou Adm.")]
         [SwaggerResponse(200, "Comentário encontrado.", typeof(ListarComentarioDto))]
         [SwaggerResponse(404, "Comentário não encontrado.")]
         public async Task<IActionResult> BuscarPorId(int comentarioId)
@@ -124,7 +124,7 @@ namespace NextHire_API.Controllers
         /// <returns>Mensagem de confirmação da atualização.</returns>
         [HttpPatch("{comentarioId}")]
         [Authorize(Roles = "Gestor,Adm")]
-        [SwaggerOperation(Summary = "Atualiza um comentário", Description = "Substitui o conteúdo do comentário informado. Requer perfil de Gestor ou Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza um comentário", Description = "Substitui o conteúdo do comentário informado. Requer perfil de Gestor ou Adm.")]
         [SwaggerResponse(204, "Comentário atualizado com sucesso.")]
         [SwaggerResponse(400, "Dados inválidos, comentário inexistente ou erro ao atualizar.")]
         public async Task<IActionResult> AtualizarComentario(
@@ -135,7 +135,7 @@ namespace NextHire_API.Controllers
             {
                 await _service.Atualizar(comentarioAtualizado, comentarioId);
 
-                return StatusCode(204, "Comentário atualizado com sucesso.");
+                return NoContent();
             }
             catch (DomainException ex)
             {
@@ -148,7 +148,7 @@ namespace NextHire_API.Controllers
         /// <returns>Mensagem de confirmação da remoção.</returns>
         [HttpDelete("{comentarioId}")]
         [Authorize(Roles = "Gestor,Adm")]
-        [SwaggerOperation(Summary = "Remove um comentário", Description = "Exclui definitivamente o comentário informado. Requer perfil de Gestor ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove um comentário", Description = "Exclui definitivamente o comentário informado. Requer perfil de Gestor ou Adm.")]
         [SwaggerResponse(204, "Comentário removido com sucesso.")]
         [SwaggerResponse(400, "Comentário não encontrado ou erro ao remover.")]
         public async Task<IActionResult> RemoverComentario(int comentarioId)
@@ -157,7 +157,7 @@ namespace NextHire_API.Controllers
             {
                 await _service.Remover(comentarioId);
 
-                return StatusCode(204, "Comentário removido com sucesso.");
+                return NoContent();
             }
             catch (DomainException ex)
             {

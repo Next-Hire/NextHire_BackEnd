@@ -134,7 +134,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Cadastra uma nova vaga", Description = "Cria uma vaga vinculada a uma empresa e setor, com remuneração, tipo (nova_funcao, substituicao, expansao_equipe), prioridade (alta, media, baixa) e data de fechamento. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Cadastra uma nova vaga", Description = "Cria uma vaga vinculada a uma empresa e setor, com remuneração, tipo (nova_funcao, substituicao, expansao_equipe), prioridade (alta, media, baixa) e data de fechamento. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(201, "Vaga cadastrada com sucesso.")]
         [SwaggerResponse(400, "Dados inválidos: remuneração, tipo ou prioridade fora dos valores aceitos.")]
         public async Task<IActionResult> Adicionar([FromBody] AdicionarVagaDto vaga)
@@ -157,7 +157,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Mensagem de confirmação da atualização.</returns>
         [HttpPatch("{vagaId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Atualiza uma vaga existente", Description = "Substitui os dados da vaga informada. Exige remuneração e tipo válidos. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Atualiza uma vaga existente", Description = "Substitui os dados da vaga informada. Exige remuneração e tipo válidos. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(204, "Vaga atualizada com sucesso.")]
         [SwaggerResponse(400, "Dados inválidos, vaga inexistente ou nenhuma alteração detectada.")]
         public async Task<IActionResult> Atualizar(int vagaId, [FromBody] AtualizarVagaDto vaga)
@@ -166,7 +166,7 @@ namespace NextHireAPI.Controllers
             {
                 await _service.Atualizar(vagaId, vaga);
 
-                return StatusCode(204, "Vaga atualizada com sucesso.");
+                return NoContent();
             }
             catch (DomainException ex)
             {
@@ -179,7 +179,7 @@ namespace NextHireAPI.Controllers
         /// <returns>Resposta vazia com status 204.</returns>
         [HttpDelete("{vagaId}")]
         [Authorize(Roles = "AnalistaRh,Adm")]
-        [SwaggerOperation(Summary = "Remove uma vaga", Description = "Exclui definitivamente a vaga informada. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerOperation(Summary = "Remove uma vaga", Description = "Exclui definitivamente a vaga informada. Requer perfil de Analista de RH ou Adm.")]
         [SwaggerResponse(204, "Vaga removida com sucesso.")]
         [SwaggerResponse(400, "Vaga não encontrada ou erro ao remover.")]
         public async Task<IActionResult> Remover(int vagaId)

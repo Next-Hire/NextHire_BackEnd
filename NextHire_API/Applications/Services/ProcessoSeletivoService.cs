@@ -20,8 +20,8 @@ namespace NextHire_API.Applications.Services
         public async Task<List<ListarProcessoSeletivoDto>> ListarProcessosSeletivos()
         {
             List<ProcessoSeletivo> processos = await _repository.ListarProcessosSeletivos();
-            if (processos.Count <= 0 || processos == null)
-                throw new DomainException("Nenhum processo seletivo encontrado.");
+            if (processos == null || processos.Count == 0)
+                return new List<ListarProcessoSeletivoDto>();
 
             return processos.Select(p => ProcessoSeletivoToDto.ConvertProcessoSeletivoToDto(p)).ToList();
         }
@@ -29,8 +29,8 @@ namespace NextHire_API.Applications.Services
         public async Task<List<ListarProcessoSeletivoDto>> ListarProcessosSeletivosPorEmpresaId(int empresaId)
         {
             List<ProcessoSeletivo> processos = await _repository.ListarProcessosSeletivosPorEmpresaId(empresaId);
-            if (processos.Count <= 0 || processos == null)
-                throw new DomainException("Nenhum processo seletivo encontrado.");
+            if (processos == null || processos.Count == 0)
+                return new List<ListarProcessoSeletivoDto>();
 
             return processos.Select(p => ProcessoSeletivoToDto.ConvertProcessoSeletivoToDto(p)).ToList();
         }
@@ -38,8 +38,8 @@ namespace NextHire_API.Applications.Services
         public async Task<List<ListarProcessoSeletivoDto>> ListarProcessosSeletivosPorSetorId(int setorId)
         {
             List<ProcessoSeletivo> processos = await _repository.ListarProcessosSeletivosPorSetorId(setorId);
-            if (processos.Count <= 0 || processos == null)
-                throw new DomainException("Nenhum processo seletivo encontrado.");
+            if (processos == null || processos.Count == 0)
+                return new List<ListarProcessoSeletivoDto>();
 
             return processos.Select(p => ProcessoSeletivoToDto.ConvertProcessoSeletivoToDto(p)).ToList();
         }
@@ -47,8 +47,8 @@ namespace NextHire_API.Applications.Services
         public async Task<List<ListarProcessoSeletivoDto>> ListarProcessosSeletivosPorAreaId(int areaId)
         {
             List<ProcessoSeletivo> processos = await _repository.ListarProcessosSeletivosPorAreaId(areaId);
-            if (processos.Count <= 0 || processos == null)
-                throw new DomainException("Nenhum processo seletivo encontrado.");
+            if (processos == null || processos.Count == 0)
+                return new List<ListarProcessoSeletivoDto>();
 
             return processos.Select(p => ProcessoSeletivoToDto.ConvertProcessoSeletivoToDto(p)).ToList();
         }

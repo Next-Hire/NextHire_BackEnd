@@ -25,8 +25,8 @@ namespace NextHire_API.Applications.Services
         public async Task<List<ListarCurriculoVagaDto>> ListarTodasAsCandidaturasPorEmpresaId(int empresaId)
         {
             List<CurriculoVaga> candidaturas = await _repository.ListarTodasAsCandidaturasPorEmpresaId(empresaId);
-            if(candidaturas == null || candidaturas.Count == 0)
-                throw new DomainException("Nenhum candidato encontrado para a vaga informada.");
+            if (candidaturas == null || candidaturas.Count == 0)
+                return new List<ListarCurriculoVagaDto>();
 
             return candidaturas.Select(c => CurriculoVagaToDTO.CurriculoVagaToDto(c)).ToList();
         }
@@ -34,8 +34,8 @@ namespace NextHire_API.Applications.Services
         public async Task<List<ListarCurriculoVagaDto>> ListarCandidatosPorVagaId(int vagaId)
         {
             List<CurriculoVaga> candidaturas = await _repository.ListarCandidatosPorVagaId(vagaId);
-            if(candidaturas == null || candidaturas.Count == 0)
-                throw new DomainException("Nenhum candidato encontrado para a vaga informada.");
+            if (candidaturas == null || candidaturas.Count == 0)
+                return new List<ListarCurriculoVagaDto>();
 
             return candidaturas.Select(c => CurriculoVagaToDTO.CurriculoVagaToDto(c)).ToList();
         }
@@ -43,8 +43,8 @@ namespace NextHire_API.Applications.Services
         public async Task<List<ListarVagaDto>> ListarVagaPorCandidatoId(int candidatoId)
         {
             List<Vaga> vagas = await _repository.ListarVagasPorCandidatoId(candidatoId);
-            if (vagas == null || vagas.Count <= 0)
-                throw new DomainException("Nenhuma vaga encontrada.");
+            if (vagas == null || vagas.Count == 0)
+                return new List<ListarVagaDto>();
 
             return vagas.Select(v => VagaToDTO.VagaToDto(v)).ToList();
         }

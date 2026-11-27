@@ -566,7 +566,9 @@ CREATE TABLE public.informacao_candidato (
     candidato_id integer NOT NULL,
     situacao_profissional public.situacao_profissional_enum NOT NULL,
     formacao_academica jsonb NOT NULL,
-    idioma jsonb NOT NULL
+    idioma jsonb NOT NULL,
+    contato jsonb,
+    endereco text
 );
 
 
@@ -597,8 +599,8 @@ ALTER SEQUENCE public.informacao_candidato_info_candidato_id_seq OWNED BY public
 CREATE TABLE public.processo_seletivo (
     processo_seletivo_id integer NOT NULL,
     titulo_processo text NOT NULL,
-    data_abertura timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    data_fechamento timestamp without time zone NOT NULL,
+    data_abertura date DEFAULT CURRENT_DATE,
+    data_fechamento date NOT NULL,
     status_processo_seletivo boolean DEFAULT true,
     vaga_id integer NOT NULL
 );
@@ -1442,6 +1444,147 @@ ALTER TABLE ONLY public.vaga
 
 ALTER TABLE ONLY public.vaga
     ADD CONSTRAINT vaga_setor_id_fkey FOREIGN KEY (setor_id) REFERENCES public.setor_ocupacao(setor_ocupacao_id);
+
+
+--
+-- Name: avaliacao_agente; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.avaliacao_agente (
+    avaliacao_id integer NOT NULL,
+    nota_geral integer NOT NULL,
+    comentario_respostas text NOT NULL,
+    comentario_curriculo text NOT NULL,
+    data_avaliacao timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    vaga_id integer NOT NULL,
+    candidato_id integer NOT NULL,
+    CONSTRAINT avaliacao_agente_nota_geral_check CHECK (((nota_geral >= 0) AND (nota_geral <= 100)))
+);
+
+
+--
+-- Name: avaliacao_agente_avaliacao_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.avaliacao_agente_avaliacao_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: avaliacao_agente_avaliacao_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.avaliacao_agente_avaliacao_id_seq OWNED BY public.avaliacao_agente.avaliacao_id;
+
+
+--
+-- Name: avaliacao_agente avaliacao_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.avaliacao_agente ALTER COLUMN avaliacao_id SET DEFAULT nextval('public.avaliacao_agente_avaliacao_id_seq'::regclass);
+
+
+--
+-- Name: avaliacao_agente avaliacao_agente_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.avaliacao_agente
+    ADD CONSTRAINT avaliacao_agente_pkey PRIMARY KEY (avaliacao_id);
+
+
+--
+-- Name: avaliacao_agente uq_avaliacao_agente_vaga_candidato; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.avaliacao_agente
+    ADD CONSTRAINT uq_avaliacao_agente_vaga_candidato UNIQUE (vaga_id, candidato_id);
+
+
+--
+-- Name: avaliacao_agente avaliacao_agente_candidato_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.avaliacao_agente
+    ADD CONSTRAINT avaliacao_agente_candidato_id_fkey FOREIGN KEY (candidato_id) REFERENCES public.usuario(usuario_id);
+
+
+--
+-- Name: avaliacao_agente avaliacao_agente_vaga_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.avaliacao_agente
+    ADD CONSTRAINT avaliacao_agente_vaga_id_fkey FOREIGN KEY (vaga_id) REFERENCES public.vaga(vaga_id);
+
+
+--
+-- Name: email_outbox; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_outbox (
+    email_outbox_id serial NOT NULL,
+    destinatario text NOT NULL,
+    nome_destinatario text,
+    assunto text NOT NULL,
+    template text NOT NULL,
+    dados_json jsonb DEFAULT '{}'::jsonb NOT NULL,
+    dedupe_key text NOT NULL,
+    status text DEFAULT 'pendente'::text NOT NULL,
+    tentativas integer DEFAULT 0 NOT NULL,
+    erro text,
+    criado_em timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    enviado_em timestamp without time zone,
+    proxima_tentativa_em timestamp without time zone,
+    CONSTRAINT uq_email_outbox_dedupe UNIQUE (dedupe_key)
+);
+
+
+--
+-- Name: email_outbox email_outbox_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_outbox
+    ADD CONSTRAINT email_outbox_pkey PRIMARY KEY (email_outbox_id);
+
+
+--
+-- Name: ix_email_outbox_pendentes; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ix_email_outbox_pendentes ON public.email_outbox USING btree (status, proxima_tentativa_em);
+
+
+--
+-- Name: preferencia_notificacao; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.preferencia_notificacao (
+    preferencia_notificacao_id serial NOT NULL,
+    usuario_id integer NOT NULL,
+    tipo text NOT NULL,
+    habilitado boolean DEFAULT true NOT NULL,
+    CONSTRAINT uq_preferencia_notificacao UNIQUE (usuario_id, tipo)
+);
+
+
+--
+-- Name: preferencia_notificacao preferencia_notificacao_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.preferencia_notificacao
+    ADD CONSTRAINT preferencia_notificacao_pkey PRIMARY KEY (preferencia_notificacao_id);
+
+
+--
+-- Name: preferencia_notificacao preferencia_notificacao_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.preferencia_notificacao
+    ADD CONSTRAINT preferencia_notificacao_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuario(usuario_id);
 
 
 --

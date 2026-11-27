@@ -101,6 +101,26 @@ namespace NextHireAPI.Controllers
                 return NotFound(ex.Message);
             }
         }
+        
+        /// <summary>Busca um funcionário específico pelo ID.</summary>
+        /// <param name="funcionarioId">ID do funcionário desejado.</param>
+        /// <returns>Dados do funcionário.</returns>
+        [HttpGet("email/{email}")]
+        // [Authorize(Roles = "AnalistaRh,Adm")]
+        [SwaggerOperation(Summary = "Busca um funcionário pelo ID", Description = "Retorna os dados de um funcionário específico. Requer perfil de Analista de RH ou Administrador.")]
+        [SwaggerResponse(200, "Funcionário encontrado.", typeof(ListarFuncionarioDto))]
+        [SwaggerResponse(404, "Funcionário não encontrado.")]
+        public async Task<IActionResult> BuscarUsuarioPorEmail(string email)
+        {
+            try
+            {
+                return Ok(await _service.BuscarUsuarioPorEmail(email));
+            }
+            catch (DomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
 
         /// <summary>Busca o perfil completo de um candidato específico pelo ID.</summary>
         /// <param name="candidatoId">ID do candidato desejado.</param>

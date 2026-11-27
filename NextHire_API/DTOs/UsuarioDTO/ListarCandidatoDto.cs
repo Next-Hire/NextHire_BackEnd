@@ -15,6 +15,8 @@ namespace NextHireAPI.Domains
         public bool? StatusUsuario { get; set; }
 
         public TipoUsuarioEnum TipoUsuario { get; set; }
+        
+        
 
         public virtual ICollection<CurriculoCandidato> CurriculoCandidato { get; set; } = new List<CurriculoCandidato>();
 

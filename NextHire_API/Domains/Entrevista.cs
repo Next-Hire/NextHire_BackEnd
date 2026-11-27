@@ -17,6 +17,7 @@ public partial class Entrevista
     public int ProcessoSeletivoId { get; set; }
 
     public bool? StatusEntrevista { get; set; }
+    public string? link_entrevista { get; set; }
 
     public virtual ICollection<AvaliacaoHabilidade> AvaliacaoHabilidade { get; set; } = new List<AvaliacaoHabilidade>();
 
